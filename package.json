@@ -58,8 +58,12 @@
     "dist:all": "npm run dist:mac && npm run dist:win"
   },
   "devDependencies": {
+    "@electron/fuses": "^2.1.3",
     "electron": "42.6.1",
     "electron-builder": "26.15.3"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   },
   "allowScripts": {
     "electron@42.6.1": true,

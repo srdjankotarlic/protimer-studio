@@ -88,7 +88,7 @@ The app serves output, remote, backstage and Signal Light pages on the productio
 
 ## Build from source
 
-Requires Node.js 22 or later.
+Requires Node.js 22.12 or later.
 
 ```bash
 git clone https://github.com/srdjankotarlic/protimer-studio.git
