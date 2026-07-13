@@ -1,0 +1,89 @@
+const { validateShowDocument } = require('./repository.js');
+
+function row(id, status, detail = '') {
+  return { id, status, detail: String(detail || '') };
+}
+
+function uniqueIds(items) {
+  const ids = new Set();
+  for (const item of items || []) {
+    const id = String(item && item.id || '');
+    if (!id || ids.has(id)) return false;
+    ids.add(id);
+  }
+  return true;
+}
+
+function evaluatePreflight(input, facts = {}) {
+  const validated = validateShowDocument(input);
+  const document = validated.value || { show: {} };
+  const show = document.show || {};
+  const cues = Array.isArray(show.rundown) ? show.rundown : [];
+  const checks = [];
+
+  checks.push(row('showSaved', facts.lastSaveOk ? 'ok' : 'block', facts.lastSaveOk ? 'saved' : 'save-required'));
+  checks.push(row('autosaveWritable', facts.autosaveWritable ? 'ok' : 'block', facts.autosaveWritable ? 'writable' : 'not-writable'));
+
+  const rundownValid = validated.ok && cues.length > 0 && cues.length <= 5000 && uniqueIds(cues)
+    && cues.every(cue => String(cue && cue.name || '').trim() && Number(cue && cue.durationMs) >= 1000);
+  checks.push(row('rundownValid', rundownValid ? 'ok' : 'block', rundownValid ? cues.length + '-cues' : 'invalid-or-empty'));
+
+  const missingAssets = Array.isArray(facts.missingAssets) ? facts.missingAssets.filter(Boolean) : [];
+  checks.push(row('missingAssets', missingAssets.length ? 'block' : 'ok', missingAssets.length ? missingAssets.join(', ') : 'all-found'));
+
+  checks.push(row('speakerScreen', facts.speakerScreenReady ? 'ok' : 'warn', facts.speakerScreenReady ? 'open' : 'not-open'));
+  const browserStatus = facts.programBrowserReady ? 'ok' : (facts.speakerScreenReady ? 'warn' : 'block');
+  checks.push(row('programBrowser', browserStatus, facts.programBrowserReady ? 'reachable' : 'not-reachable'));
+  checks.push(row('backstage', facts.backstageReady ? 'ok' : 'warn', facts.backstageReady ? 'reachable' : 'not-reachable'));
+  checks.push(row('phoneRemote', facts.remoteReady ? 'ok' : 'warn', facts.remoteReady ? 'reachable' : 'not-reachable'));
+  checks.push(row('apiCompanion', facts.apiReady ? 'ok' : 'warn', facts.apiReady ? 'ready' : 'not-ready'));
+
+  const preferences = show.preferences || {};
+  checks.push(row('soundChime', preferences.soundZero || preferences.chimes ? 'ok' : 'warn', preferences.soundZero || preferences.chimes ? 'enabled' : 'disabled'));
+
+  const lower = show.lowerThird || {};
+  const library = lower.library || {};
+  const templates = Array.isArray(library.templates) ? library.templates : [];
+  const activeId = String(lower.activeTemplateId || library.activeTemplateId || '');
+  const templateIds = new Set(templates.map(template => String(template && template.id || '')).filter(Boolean));
+  const autoCues = cues.filter(cue => cue && cue.lowerThirdAuto);
+  const missingAutoTemplate = autoCues.some(cue => {
+    const requested = String(cue.lowerThirdTemplateId || activeId || '');
+    return !requested || !templateIds.has(requested);
+  });
+  const templateReady = !!activeId && templateIds.has(activeId);
+  checks.push(row('lowerThirdTemplate', missingAutoTemplate ? 'block' : (templateReady ? 'ok' : 'warn'),
+    missingAutoTemplate ? 'auto-cue-template-missing' : (templateReady ? activeId : 'none-selected')));
+
+  const displays = Array.isArray(facts.displays) ? facts.displays : [];
+  const selectedDisplayId = Number(facts.selectedDisplayId);
+  const selectedDisplay = displays.find(display => Number(display.id) === selectedDisplayId);
+  checks.push(row('displayAssignment', selectedDisplay ? 'ok' : 'block', selectedDisplay ? String(selectedDisplay.label || selectedDisplay.id) : 'not-assigned'));
+
+  const configs = show.outputs && Array.isArray(show.outputs.configs) ? show.outputs.configs.filter(config => config && config.enabled !== false) : [];
+  const configResolutionsValid = configs.every(config => {
+    const mode = String(config.mode || 'fullscreen');
+    if (mode !== 'custom' && mode !== 'window') return true;
+    return Number(config.width) >= 160 && Number(config.width) <= 8192 && Number(config.height) >= 120 && Number(config.height) <= 8192;
+  });
+  const displayResolutionValid = !!selectedDisplay && Number(selectedDisplay.width) >= 320 && Number(selectedDisplay.height) >= 180;
+  checks.push(row('outputResolution', displayResolutionValid && configResolutionsValid ? 'ok' : 'block',
+    displayResolutionValid && configResolutionsValid ? selectedDisplay.width + 'x' + selectedDisplay.height : 'invalid'));
+
+  checks.push(row('recoveryStatus', facts.recoveryAvailable ? 'block' : 'ok', facts.recoveryAvailable ? 'recovery-pending' : 'clear'));
+
+  const overall = checks.some(check => check.status === 'block') ? 'blocking'
+    : checks.some(check => check.status === 'warn') ? 'warning' : 'ready';
+  return {
+    ok: overall !== 'blocking',
+    overall,
+    checks,
+    counts: {
+      ok: checks.filter(check => check.status === 'ok').length,
+      warning: checks.filter(check => check.status === 'warn').length,
+      blocking: checks.filter(check => check.status === 'block').length
+    }
+  };
+}
+
+module.exports = { evaluatePreflight };

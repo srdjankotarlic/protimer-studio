@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ProTimer Studio — Free Stage Timer and Live Event Control</title>
+  <meta name="description" content="Free open-source stage timer, rundown, lower-third studio and multi-display control for live events. Download for Apple Silicon Mac and Windows x64.">
+  <meta name="keywords" content="stage timer, speaker timer, event rundown software, live production timer, lower thirds, AV production, conference timer, OBS browser source, show control">
+  <meta name="author" content="Srdjan Kotarlic">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="theme-color" content="#101419">
+  <link rel="canonical" href="https://srdjankotarlic.github.io/protimer-studio/">
+  <link rel="alternate" hreflang="en" href="https://srdjankotarlic.github.io/protimer-studio/">
+  <link rel="alternate" hreflang="sr" href="https://srdjankotarlic.github.io/protimer-studio/#srpski">
+  <link rel="icon" type="image/png" href="assets/icon.png">
+  <link rel="apple-touch-icon" href="assets/icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ProTimer Studio">
+  <meta property="og:title" content="ProTimer Studio — Free Live Event Control">
+  <meta property="og:description" content="Rundown, speaker timer, lower thirds, screen content and multiple outputs in one free local app.">
+  <meta property="og:url" content="https://srdjankotarlic.github.io/protimer-studio/">
+  <meta property="og:image" content="https://srdjankotarlic.github.io/protimer-studio/assets/social-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="ProTimer Studio operator workspace">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ProTimer Studio — Free Live Event Control">
+  <meta name="twitter:description" content="A free stage timer, rundown, lower-third and multi-display app for live production.">
+  <meta name="twitter:image" content="https://srdjankotarlic.github.io/protimer-studio/assets/social-preview.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ProTimer Studio",
+    "applicationCategory": "MultimediaApplication",
+    "applicationSubCategory": "Live event production software",
+    "operatingSystem": "macOS, Windows 10, Windows 11",
+    "softwareVersion": "0.9.0-beta.1",
+    "description": "Free open-source event rundown, stage timer, lower-third studio and multi-display control.",
+    "url": "https://srdjankotarlic.github.io/protimer-studio/",
+    "downloadUrl": "https://github.com/srdjankotarlic/protimer-studio/releases/latest",
+    "license": "https://opensource.org/license/mit",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Srdjan Kotarlic",
+      "url": "https://github.com/srdjankotarlic"
+    },
+    "screenshot": [
+      "https://srdjankotarlic.github.io/protimer-studio/assets/operator-workspace.png",
+      "https://srdjankotarlic.github.io/protimer-studio/assets/lower-third-studio.png",
+      "https://srdjankotarlic.github.io/protimer-studio/assets/output-routing.png"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is ProTimer Studio free?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Yes. ProTimer Studio is free and open source under the MIT License. There is no account, subscription, trial limit or output watermark."}
+      },
+      {
+        "@type": "Question",
+        "name": "Does ProTimer Studio work without internet?",
+        "acceptedAnswer": {"@type": "Answer", "text": "The core app works locally and offline. Phone, backstage and browser views use the local production network. Optional public sharing requires internet access."}
+      },
+      {
+        "@type": "Question",
+        "name": "Which computers are supported?",
+        "acceptedAnswer": {"@type": "Answer", "text": "The public beta provides an Apple Silicon Mac DMG and Windows 10/11 x64 installer and portable app. Intel Mac is not currently published."}
+      },
+      {
+        "@type": "Question",
+        "name": "Can I use ProTimer Studio with OBS or vMix?",
+        "acceptedAnswer": {"@type": "Answer", "text": "ProTimer Studio provides a local browser output suitable for production testing. External OBS and vMix alpha workflows are not yet certified, so verify the exact path before a live event."}
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="ProTimer Studio home">
+      <img src="assets/icon.png" width="34" height="34" alt="">
+      <span>ProTimer Studio</span>
+      <span class="beta">Beta</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="#features">Features</a>
+      <a href="#screens">Screens</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a class="nav-download" href="https://github.com/srdjankotarlic/protimer-studio/releases/latest">Download</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="eyebrow">Free and open source</p>
+        <h1 id="hero-title">ProTimer Studio</h1>
+        <p class="hero-lead">Run the rundown, speaker timer, lower thirds and every event screen from one local app.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="https://github.com/srdjankotarlic/protimer-studio/releases/latest">Download public beta</a>
+          <a class="button secondary" href="https://github.com/srdjankotarlic/protimer-studio">View on GitHub</a>
+        </div>
+        <div class="hero-facts" aria-label="Product facts">
+          <span>macOS Apple Silicon</span>
+          <span>Windows x64 beta</span>
+          <span>No account</span>
+          <span>MIT License</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="problem-band" aria-labelledby="problem-title">
+      <div class="section-inner problem-layout">
+        <div>
+          <p class="eyebrow">Built for the show site</p>
+          <h2 id="problem-title">One operator view. One source of truth.</h2>
+        </div>
+        <p>Prepare NEXT without changing LIVE, keep Program visible, route it to several destinations and give speakers, crew and stream operators the views they need. The core workflow stays on your computer and production LAN.</p>
+      </div>
+    </section>
+
+    <section class="features" id="features" aria-labelledby="features-title">
+      <div class="section-inner">
+        <p class="eyebrow">Core workflows</p>
+        <h2 id="features-title">More than a countdown clock</h2>
+        <div class="feature-grid">
+          <article>
+            <span class="feature-number">01</span>
+            <h3>Rundown and GO</h3>
+            <p>Clear selected, NEXT and LIVE states with planned duration, notes, actual timing and safe GO progression.</p>
+          </article>
+          <article>
+            <span class="feature-number">02</span>
+            <h3>Speaker timing</h3>
+            <p>Countdown, stopwatch and clock modes with warning colors, overtime, messages, chimes and Signal Light.</p>
+          </article>
+          <article>
+            <span class="feature-number">03</span>
+            <h3>Lower thirds</h3>
+            <p>Build reusable 16:9 templates from cue fields, text, shapes, logos, images and muted video.</p>
+          </article>
+          <article>
+            <span class="feature-number">04</span>
+            <h3>Screen content</h3>
+            <p>Take images, video, PDF pages, text, logos, timers or a blank state to Program.</p>
+          </article>
+          <article>
+            <span class="feature-number">05</span>
+            <h3>Multiple outputs</h3>
+            <p>Send Program to fullscreen displays, normal windows, exact pixel regions or grid cells at the same time.</p>
+          </article>
+          <article>
+            <span class="feature-number">06</span>
+            <h3>Local integration</h3>
+            <p>Phone remote, backstage, browser output, HTTP, OSC, autosave, portable show files and post-show reports.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="screens" id="screens" aria-labelledby="screens-title">
+      <div class="section-inner">
+        <p class="eyebrow">Real product screens</p>
+        <h2 id="screens-title">Inspect the workflow before you install</h2>
+        <figure class="screen-feature">
+          <img src="assets/lower-third-studio.png" width="1440" height="900" loading="lazy" alt="Lower Third Studio with templates, layers, preview canvas and inspector">
+          <figcaption><strong>Lower Third Studio</strong><span>Preview locally, then TAKE with data from the LIVE cue.</span></figcaption>
+        </figure>
+        <figure class="screen-feature">
+          <img src="assets/output-routing.png" width="1280" height="768" loading="lazy" alt="Output Routing with two independently configured destinations">
+          <figcaption><strong>Output Routing</strong><span>Keep destinations explicit and fail safely when a display disappears.</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="install" id="install" aria-labelledby="install-title">
+      <div class="section-inner">
+        <p class="eyebrow">Public beta downloads</p>
+        <h2 id="install-title">Choose your computer</h2>
+        <div class="install-grid">
+          <article>
+            <div class="platform-head"><h3>macOS</h3><span>Apple Silicon</span></div>
+            <p>DMG for M-series Macs. The beta is ad-hoc signed but not Apple notarized, so first launch requires macOS Privacy &amp; Security approval.</p>
+            <a class="button primary" href="https://github.com/srdjankotarlic/protimer-studio/releases/latest">Get Mac beta</a>
+          </article>
+          <article>
+            <div class="platform-head"><h3>Windows</h3><span>x64 beta</span></div>
+            <p>Installer and portable versions for Windows 10/11 x64. SmartScreen may warn because Authenticode signing is not yet available.</p>
+            <a class="button primary" href="https://github.com/srdjankotarlic/protimer-studio/releases/latest">Get Windows beta</a>
+          </article>
+        </div>
+        <div class="integrity-note">
+          <strong>Verify your download.</strong>
+          <span>Every release includes <code>SHA256SUMS.txt</code>. Download only from the official GitHub repository.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="beta-band" aria-labelledby="beta-title">
+      <div class="section-inner beta-layout">
+        <div>
+          <p class="eyebrow">Why public beta</p>
+          <h2 id="beta-title">Real operators make the product better.</h2>
+          <p>Try it off-air, then tell us what was unclear, what failed and what would save time on a real show. Display setup and reproducible steps matter more than a generic “doesn't work”.</p>
+        </div>
+        <a class="button secondary" href="https://github.com/srdjankotarlic/protimer-studio/issues/new?template=bug_report.yml">Report a bug</a>
+      </div>
+    </section>
+
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <div class="section-inner faq-layout">
+        <div>
+          <p class="eyebrow">Before you download</p>
+          <h2 id="faq-title">Questions</h2>
+        </div>
+        <div class="faq-list">
+          <details open>
+            <summary>Is it really free?</summary>
+            <p>Yes. The MIT License permits use, modification and redistribution. There is no account, subscription, trial limit or output watermark.</p>
+          </details>
+          <details>
+            <summary>Does it need internet?</summary>
+            <p>No for the core app. Phone, backstage, Signal Light and browser views use your local production network. Optional public sharing needs internet.</p>
+          </details>
+          <details>
+            <summary>Why does the operating system warn me?</summary>
+            <p>The public beta is not yet Developer ID notarized or Windows Authenticode signed. Confirm the GitHub source and SHA-256 before overriding a warning.</p>
+          </details>
+          <details>
+            <summary>Can it replace every dedicated timer or media server?</summary>
+            <p>No. It is a software-first option for event teams. Dedicated hardware still wins where physical redundancy is essential, and ProTimer Studio is not a video switcher or full media server.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="serbian" id="srpski" lang="sr" aria-labelledby="serbian-title">
+      <div class="section-inner problem-layout">
+        <div>
+          <p class="eyebrow">Srpski interfejs</p>
+          <h2 id="serbian-title">Besplatan alat za live produkciju</h2>
+        </div>
+        <p>ProTimer Studio spaja rundown, stage timer, poruke govorniku, potpise i više izlaza. Program je besplatan, bez naloga i bez trial watermarka. U aplikaciji izaberite Serbian FULL, a za prvi show pratite <a href="https://github.com/srdjankotarlic/protimer-studio/blob/main/docs/USER-GUIDE.md#brzi-početak-na-srpskom">kratko uputstvo</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="section-inner footer-layout">
+      <div><strong>ProTimer Studio</strong><span>Free live event control under the MIT License.</span></div>
+      <nav aria-label="Footer navigation">
+        <a href="https://github.com/srdjankotarlic/protimer-studio">GitHub</a>
+        <a href="https://github.com/srdjankotarlic/protimer-studio/releases">Releases</a>
+        <a href="https://github.com/srdjankotarlic/protimer-studio/discussions">Discussions</a>
+        <a href="https://github.com/srdjankotarlic/protimer-studio/blob/main/docs/PRIVACY.md">Privacy</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

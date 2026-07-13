@@ -1,0 +1,70 @@
+# Repository map
+
+Current public repository map. Line counts are approximate and should be checked with `wc -l` before line-sensitive work.
+
+## Runtime entry points
+
+| Path | Approx. lines | Risk | Responsibility |
+|---|---:|---|---|
+| `main.js` | 5,360 | High | Electron main process, HTTP/SSE, OSC, IPC, media storage, output windows and full smoke harness. |
+| `controller.html` | 8,530 | High | Operator HTML/CSS/JS, Preview/Program state, rundown, scenes, Lower Third Studio and production workflows. |
+| `output.html` | 940 | High | Canonical Program renderer for Electron and browser/OBS output. |
+| `preload.js` | 44 | Medium | Context-isolated renderer bridge. Keep the browser fallback in sync. |
+| `remote.html` | - | Medium | Phone/tablet remote over HTTP/SSE. |
+| `backstage.html` | - | Medium | Schedule and crew view. |
+| `signal.html` | - | Medium | Podium signal-light view. |
+| `i18n.js` | 390 | Medium | 37 language packs, coverage metadata and remote/backstage/output dictionaries. |
+
+## Product modules
+
+| Directory | Responsibility |
+|---|---|
+| `src/lower-third/` | Versioned template model, validation, migration, runtime resolution, fixture probe and package import/export. |
+| `src/show-storage/` | Atomic show repository, recovery, portable show packages and preflight. |
+| `src/screen-content/` | Standard screen-content model and validation. |
+| `src/control-api/` | Canonical HTTP/OSC command and status normalization. |
+| `src/report/` | Canonical post-show report and safe CSV generation. |
+| `src/output-routing/` | Pure output config, display resolution and geometry rules. |
+
+## Styling and assets
+
+- `styles/operator-shell.css`: responsive shell and mode layout.
+- `styles/pro-ui.css`: shared professional visual system and component styling.
+- `build/icon.svg`: source application icon.
+- `build/icon.png`, `build/icon.icns`, `build/icon.iconset/`: generated packaging assets.
+- `build/banner.html`: repository/social banner source.
+
+## Tests
+
+- `tools/run-test-suite.js`: cross-platform aggregate module/renderer runner.
+- `npm test`: 59 headless checks across eight scripts.
+- `test/*-renderer.test.js`: five real Electron workflow suites pinned to PHL 243V7.
+- `test/beta-usability-matrix.test.js`: 53 responsive checks at four viewport sizes.
+- `main.js --smoke`: source/packaged integration and visual assertions.
+- `tools/run-lt-soak.js`: targeted condition-driven soak.
+- `test/fixtures/lower-third/`: deterministic image/video/codec fixtures included in packaged smoke.
+
+Generated evidence lives under `artifacts/generated/` and is not release code. `dist-installers/` is ignored build output and must be cleaned before a release build.
+
+## Tooling
+
+| Path | Responsibility |
+|---|---|
+| `tools/smoke-display.js` | Strict PHL 243V7 test-display resolver; absence or ambiguity aborts. |
+| `tools/run-smoke-on-display.js` | Source/packaged smoke launcher and focused routing mode. |
+| `tools/list-displays.js` | Physical display inventory. |
+| `tools/write-build-info.js` | Build commit/timestamp metadata. |
+
+## Release and product documents
+
+- `README.md`: development and release entry point.
+- `ARCHITECTURE.md`: current system boundaries and invariants.
+- `docs/TESTING.md`: test layers and commands.
+- `docs/LOCALIZATION.md`: exact language coverage.
+- `docs/PUBLIC-BETA-VERIFICATION.md`: verified release evidence and explicit gaps.
+- `docs/KNOWN-LIMITATIONS.md`: claims that must remain qualified.
+- `docs/COMPANION.md`: control integration.
+- `SECURITY.md`: network and local-control security model.
+- `CONTRIBUTING.md`, `SUPPORT.md`: public contribution and support paths.
+
+`dist-installers/`, `node_modules/`, local smoke config and generated artifacts are not source-of-truth product code.

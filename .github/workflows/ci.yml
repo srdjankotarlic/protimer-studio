@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Syntax checks
+        run: node --check main.js && node --check preload.js && node --check i18n.js && node --check tools/check-free-build.js && node --check tools/check-public-site.js && node --check tools/run-test-suite.js
+      - name: Free-build contract
+        run: npm run check:free
+      - name: Public site contract
+        run: npm run check:site
+      - name: Dependency audit
+        run: npm audit
+      - name: Module tests
+        run: npm test

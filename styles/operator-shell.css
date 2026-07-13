@@ -1,0 +1,134 @@
+/* =============================================================================
+   ProTimer Studio — operator-shell.css
+   SINGLE SOURCE OF TRUTH for app layout (design tokens + shell + mode + breakpoints).
+
+   FAZA 1B: this file is loaded and owns the app-shell glue + tokens. The per-zone
+   grid CONTRACTS below are written now but are intentionally SHADOWED by the legacy
+   inline `.main` rules in controller.html (which use !important). They become the
+   active layout only in FAZA 1D, when the conflicting legacy blocks are retired
+   zone-by-zone. This link is placed BEFORE the inline <style> so, during 1B, any
+   equal-specificity legacy rule wins — the file is provably inert for layout except
+   for net-new selectors (#app-shell, #overlay-root, :root tokens).
+   ============================================================================= */
+
+:root{
+  /* sentinel — smoke asserts this file is loaded AND packaged (getPropertyValue) */
+  --operator-shell-loaded: 1;
+
+  /* z-index scale (replaces scattered magic numbers; no rogue 9999) */
+  --z-shell: 1;
+  --z-header: 20;
+  --z-popover-backdrop: 90;
+  --z-popover: 100;
+  --z-drawer: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+  /* legacy aliases kept while older inline rules are retired zone-by-zone */
+  --z-base: var(--z-shell);
+  --z-scrim: var(--z-popover-backdrop);
+  --z-overlay: var(--z-modal);
+
+  /* 8px spacing system */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
+  --radius: 12px;
+
+  /* shell sizes */
+  --header-h: 56px;
+  --footer-h: 30px;
+  --sidebar-w: 320px;
+  --sidebar-w-standard: 288px;
+  --sidebar-w-narrow: 258px;
+  --drawer-w: 380px;
+
+  /* surfaces / text / accents (mirror existing palette; used going forward) */
+  --shell-bg: #0b0b0d;
+  --shell-panel: #15161a;
+  --shell-border: rgba(255,255,255,.10);
+  --shell-text: #f2f2f5;
+  --shell-muted: #9b9fa9;
+  --shell-accent: #30d158;
+  --shell-warning: #ffc23a;
+  --shell-danger: #ff453a;
+  --shell-focus: 0 0 0 3px rgba(10,132,255,.28);
+}
+
+/* ---- APP SHELL (owns body's flex column; previously 1A inline glue) ---- */
+#app-shell{
+  flex:1 1 auto;
+  min-height:0;
+  min-width:0;
+  height:100vh;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  width:100%;
+  overflow:hidden;
+}
+
+/* ---- OVERLAY ROOT (body-level; no transformed ancestor; holds future drawers) ---- */
+#overlay-root{ position:fixed; inset:0; pointer-events:none; z-index:var(--z-overlay); }
+#overlay-root > *{ pointer-events:auto; }
+
+/* ---- ZONE BASELINES (safe, additive; legacy component styles still apply in 1B) ---- */
+.app-header{ min-width:0; }
+.operator-workspace{ min-width:0; min-height:0; }
+.primary-sidebar{ min-width:0; }
+.operator-main{ min-width:0; }
+.status-bar{ min-width:0; }
+/* Temporary Faza-1 compatibility layout: `.right` keeps its content and becomes the third
+   wide column. In the later Utility Drawer phase, this column will become the Message /
+   Outputs / Lower Third drawer. No final Message/Outputs UX decision is made in Faza 1. */
+.utility-column{ min-width:0; }
+/* Wide Standard: utility-column scrolls on its own (net-new selector, gated to the
+   shell-active standard mode → cannot affect narrow drawer or compact behaviour). */
+.shell-layout.mode-standard .utility-column{ overflow-y:auto; min-height:0; }
+
+/* =============================================================================
+   LAYOUT CONTRACTS — target grids per mode & breakpoint.
+   GATED behind `.shell-layout`, a class added to #app-shell ONLY in FAZA 1D (when the
+   conflicting legacy `.main` rules are retired). In 1B/1C `#app-shell` has `.mode-standard`
+   but NOT `.shell-layout`, so every rule below matches nothing and is provably inert —
+   1B/1C cannot shift the current layout. Flip `.shell-layout` on in 1D to activate.
+   Breakpoints: WIDE >=1280 · STANDARD 1024-1279 · NARROW 900-1023.
+   ============================================================================= */
+
+/* OPTION A (approved): Standard WIDE keeps `.right` as a real third column
+   (primary-sidebar | operator-main | utility-column). No fixed px sums that would
+   re-impose a large implicit window minimum — clamp + minmax(0,1fr) only.
+   Temporary Faza-1 compatibility layout; in the later Utility Drawer phase the
+   utility-column becomes the Message / Outputs / Lower Third drawer.
+   NOTE: still SHADOWED by the inline FAZA-2 `.main` !important rule, which already
+   renders this exact 3-col layout — this contract documents the target for the swap. */
+.shell-layout.mode-standard .operator-workspace{
+  display: grid;
+  grid-template-columns: clamp(280px,22vw,340px) minmax(0,1fr) clamp(280px,23vw,360px);
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  overflow: hidden;
+}
+.shell-layout.mode-compact .operator-workspace{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);      /* compact = single operator column, drawers overlay */
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  overflow: hidden;
+}
+/* 1024–1279: utility-column collapses to the existing narrow drawer behaviour (2-col). */
+@media (max-width: 1279px){
+  .shell-layout.mode-standard .operator-workspace{ grid-template-columns: var(--sidebar-w-standard) minmax(0,1fr); }
+}
+/* 900–1023: single Program + sidebar; utility uses existing narrow/compact opening. */
+@media (max-width: 1023px){
+  .shell-layout.mode-standard .operator-workspace{ grid-template-columns: var(--sidebar-w-narrow) minmax(0,1fr); }
+}
+
+/* Advanced: sidebar | operator-main | advanced-workspace (three columns, wide only). */
+.shell-layout.mode-advanced .operator-workspace{
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  overflow: hidden;
+}
+@media (max-width: 1279px){
+  .shell-layout.mode-advanced .operator-workspace{ grid-template-columns: var(--sidebar-w-standard) minmax(0,1fr); }
+}

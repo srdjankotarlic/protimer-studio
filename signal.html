@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>ProTimer Studio — Signal</title>
+<style>
+  /* Signal Light — zamena za hardverski Limitimer: tablet na govornici.
+     Cela pozadina = faza (zeleno/žuto/crveno) da „preseče" scensko svetlo. */
+  *{box-sizing:border-box; -webkit-user-select:none; user-select:none;}
+  html,body{height:100%;}
+  body{margin:0; overflow:hidden; background:#0a0a0d; color:#fff;
+    font:600 16px/1.3 -apple-system,"SF Pro Text",system-ui,sans-serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transition:background .35s;}
+  body.g{background:#0d8a3c;} body.y{background:#c99a06;} body.r{background:#c81e14;}
+  body.neg{animation:blink 1s steps(2,start) infinite;}
+  @keyframes blink{50%{background:#7a0d07;}}
+  body.bk{background:#000 !important; animation:none;}
+  body.bk #name,body.bk #time,body.bk #msg{visibility:hidden;}
+  #name{font-size:clamp(18px,4.5vw,44px); font-weight:700; letter-spacing:.5px; opacity:.92;
+    padding:0 24px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
+  #time{font-family:"SF Mono",ui-monospace,Menlo,monospace; font-weight:700; line-height:.95;
+    font-variant-numeric:tabular-nums; font-size:clamp(80px,26vw,42vh); text-shadow:0 2px 24px rgba(0,0,0,.25);}
+  #msg{font-size:clamp(16px,3.5vw,34px); font-weight:700; padding:0 24px; text-align:center;
+    min-height:1.4em; opacity:.95; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
+  #msg.flash{animation:mblink .8s steps(2,start) infinite;}
+  @keyframes mblink{50%{opacity:.15;}}
+</style>
+</head>
+<body>
+  <div id="name"></div>
+  <div id="time">--:--</div>
+  <div id="msg"></div>
+<script src="i18n.js?v=20260703-i18n2"></script>
+<script>
+const $ = id => document.getElementById(id);
+const langUtil = window.PT_I18N_UTIL || { normalizeLang:c=>c||'en', langMeta:c=>({}) };
+let S = null;
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmt(sec,neg){ const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),x=sec%60;
+  return (neg?'−':'')+(h>0?`${h}:${pad(m)}:${pad(x)}`:`${m}:${pad(x)}`); }
+
+function render(){
+  if(!S) return;
+  const now=Date.now();
+  const lang = langUtil.normalizeLang(S.lang || 'en');
+  const meta = langUtil.langMeta(lang);
+  document.documentElement.lang = lang;
+  document.documentElement.dir = meta.dir || 'ltr';
+  const b=document.body;
+  b.classList.toggle('bk', !!S.blackout);
+
+  // ime govornika = tekuća cue tačka
+  const cue = (S.currentCue>=0 && S.cues && S.cues[S.currentCue]) ? S.cues[S.currentCue] : null;
+  $('name').textContent = cue ? cue.name : '';
+
+  const m=$('msg');
+  if(S.message && S.message.text){ m.textContent=S.message.text; m.className=S.message.flash?'flash':''; }
+  else { m.textContent=''; m.className=''; }
+
+  let text='--:--', phase='g', neg=false;
+  if(S.mode==='clock'){ const d=new Date(); let h=d.getHours(),suf=''; if(S.clock12){ suf=h>=12?' PM':' AM'; h=h%12||12; } text=`${S.clock12?h:pad(h)}:${pad(d.getMinutes())}:${pad(d.getSeconds())}${suf}`; }
+  else if(S.mode==='countup'){ const el=S.running?(S.elapsedMs||0)+(now-(S.startAt||now)):(S.elapsedMs||0); text=fmt(Math.floor(el/1000),false); }
+  else {
+    let rem=S.running?(S.endAt||0)-now:(S.remMs||0);
+    if(!S.overtime && rem<0) rem=0;
+    text=rem>=0?fmt(Math.ceil(rem/1000),false):fmt(Math.floor(-rem/1000),true);
+    if(rem<0){ phase='r'; neg=true; }
+    else if(rem<=(S.redSec||60)*1000) phase='r';
+    else if(rem<=(S.yellowSec||120)*1000) phase='y';
+  }
+  b.classList.toggle('g',phase==='g'); b.classList.toggle('y',phase==='y'); b.classList.toggle('r',phase==='r');
+  b.classList.toggle('neg',neg && !S.blackout);
+  $('time').textContent=text;
+}
+
+const connect=()=>{ const es=new EventSource('/events');
+  es.onmessage=e=>{ try{ S=JSON.parse(e.data); }catch(_){}} ;
+  es.onerror=()=>{ es.close(); setTimeout(connect,1000); }; };
+connect();
+setInterval(render, 200);
+// budan ekran na tabletu (ako browser podržava)
+if(navigator.wakeLock){ const wl=()=>navigator.wakeLock.request('screen').catch(()=>{});
+  wl(); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) wl(); }); }
+</script>
+</body>
+</html>

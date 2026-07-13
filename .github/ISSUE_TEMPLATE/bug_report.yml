@@ -1,0 +1,65 @@
+name: Bug report
+description: Report a reproducible problem in ProTimer Studio
+title: "[Bug]: "
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for testing the beta. Remove client data, IP addresses and control tokens before posting.
+  - type: input
+    id: version
+    attributes:
+      label: Version and build commit
+      placeholder: "0.9.0-beta.1 / abc1234"
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - macOS Apple Silicon
+        - Windows 11 x64
+        - Windows 10 x64
+        - Source build
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: displays
+    attributes:
+      label: Display setup
+      placeholder: "Laptop display + 1920x1080 projector over HDMI"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open... 2. Select... 3. Observe..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or logs
+      description: Drag files here after removing private show information.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety check
+      options:
+        - label: I tested this off-air and removed confidential information.
+          required: true

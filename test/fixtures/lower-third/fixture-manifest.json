@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "note": "Sintetički, originalno generisani test asseti (tools/generate-lower-third-fixtures.sh). Pattern 320x180: x<107 NEPROZIRNO lime, 107-213 poluprovidno (a~128), x>213 potpuno transparentno; beli pokretni kvadrat u alpha-vp8/vp9.",
+  "samplePoints": { "opaque": {"x":30,"y":90,"expectedAlpha":255}, "semi": {"x":160,"y":90,"expectedAlpha":128,"tolerance":40}, "transparent": {"x":290,"y":90,"expectedAlpha":0} },
+  "fixtures": [
+    { "filename":"alpha-static.png",  "purpose":"static alpha image", "codec":"png",  "width":320,"height":180,"durationSec":null,"alpha":true },
+    { "filename":"alpha-static.svg",  "purpose":"static alpha vector","codec":"svg",  "width":320,"height":180,"durationSec":null,"alpha":true },
+    { "filename":"alpha-static.webp", "purpose":"static alpha webp",  "codec":"webp", "width":320,"height":180,"durationSec":null,"alpha":true, "present":false, "reason":"libwebp encoder nedostupan u lokalnom ffmpeg 8.1.2 buildu — generisati u sledećoj fazi drugim alatom" },
+    { "filename":"opaque-static.jpg", "purpose":"opaque image",       "codec":"jpeg", "width":320,"height":180,"durationSec":null,"alpha":false },
+    { "filename":"opaque-h264.mp4",   "purpose":"opaque video",       "codec":"h264", "width":320,"height":180,"durationSec":1.0,"alpha":false },
+    { "filename":"alpha-vp8.webm",    "purpose":"alpha video vp8",    "codec":"vp8",  "width":320,"height":180,"durationSec":1.2,"alpha":true },
+    { "filename":"alpha-vp9.webm",    "purpose":"alpha video vp9",    "codec":"vp9",  "width":320,"height":180,"durationSec":1.2,"alpha":true },
+    { "filename":"intro-alpha.webm",  "purpose":"intro phase clip",   "codec":"vp9",  "width":320,"height":180,"durationSec":1.0,"alpha":true },
+    { "filename":"hold-loop-alpha.webm","purpose":"loop hold clip",   "codec":"vp9",  "width":320,"height":180,"durationSec":1.0,"alpha":true, "loopTest":true },
+    { "filename":"outro-alpha.webm",  "purpose":"outro phase clip",   "codec":"vp9",  "width":320,"height":180,"durationSec":1.0,"alpha":true },
+    { "filename":"corrupt-video.webm","purpose":"decode error path",  "codec":"vp8-truncated","width":null,"height":null,"durationSec":null,"alpha":null, "expectError":true }
+  ]
+}

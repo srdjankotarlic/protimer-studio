@@ -1,0 +1,383 @@
+(function(){
+  const LANGUAGES = [
+    {code:'en', name:'English', native:'English', coverage:'full'},
+    {code:'es', name:'Spanish', native:'Español'},
+    {code:'zh', name:'Chinese', native:'中文'},
+    {code:'hi', name:'Hindi', native:'हिन्दी'},
+    {code:'ar', name:'Arabic', native:'العربية', dir:'rtl'},
+    {code:'pt', name:'Portuguese', native:'Português'},
+    {code:'bn', name:'Bengali', native:'বাংলা'},
+    {code:'ru', name:'Russian', native:'Русский'},
+    {code:'ja', name:'Japanese', native:'日本語'},
+    {code:'pa', name:'Punjabi', native:'ਪੰਜਾਬੀ'},
+    {code:'de', name:'German', native:'Deutsch'},
+    {code:'jv', name:'Javanese', native:'Basa Jawa'},
+    {code:'ko', name:'Korean', native:'한국어'},
+    {code:'fr', name:'French', native:'Français'},
+    {code:'tr', name:'Turkish', native:'Türkçe'},
+    {code:'vi', name:'Vietnamese', native:'Tiếng Việt'},
+    {code:'te', name:'Telugu', native:'తెలుగు'},
+    {code:'mr', name:'Marathi', native:'मराठी'},
+    {code:'ta', name:'Tamil', native:'தமிழ்'},
+    {code:'ur', name:'Urdu', native:'اردو', dir:'rtl'},
+    {code:'it', name:'Italian', native:'Italiano'},
+    {code:'fa', name:'Persian', native:'فارسی', dir:'rtl'},
+    {code:'gu', name:'Gujarati', native:'ગુજરાતી'},
+    {code:'pl', name:'Polish', native:'Polski'},
+    {code:'uk', name:'Ukrainian', native:'Українська'},
+    {code:'ml', name:'Malayalam', native:'മലയാളം'},
+    {code:'kn', name:'Kannada', native:'ಕನ್ನಡ'},
+    {code:'or', name:'Odia', native:'ଓଡ଼ିଆ'},
+    {code:'my', name:'Burmese', native:'မြန်မာ'},
+    {code:'th', name:'Thai', native:'ไทย'},
+    {code:'id', name:'Indonesian', native:'Bahasa Indonesia'},
+    {code:'nl', name:'Dutch', native:'Nederlands'},
+    {code:'ro', name:'Romanian', native:'Română'},
+    {code:'el', name:'Greek', native:'Ελληνικά'},
+    {code:'cs', name:'Czech', native:'Čeština'},
+    {code:'sv', name:'Swedish', native:'Svenska'},
+    {code:'sr', name:'Serbian', native:'Srpski', coverage:'full'}
+  ];
+
+  const en = {
+    languageTitle:'Interface language',
+    outLabel:'Output to', displayTitle:'Monitor for the output screen', sendScreen:'Send to screen',
+    fsTitle:'Fullscreen (F)', closeTitle:'Close output window', onTop:'On top',
+    mode:'Mode', modeCountdown:'Countdown', modeCountup:'Stopwatch', modeClock:'Clock',
+    set:'Set', endAt:'End at', startTarget:'Start', targetTitle:'Countdown to exact time',
+    durTitle:'10 = minutes · 10:00 = MM:SS · 1:00:00 = HH:MM:SS', quick:'Quick',
+    colors:'Colors', background:'Background', timeText:'Time/text', warnColors:'Warning colors',
+    tagY:'Y', tagR:'R', yellow:'Yellow', red:'Red', transparent:'Transparent background (OBS)',
+    grid:'Grid', gridOn:'Position on screen', gridHint:'click a cell →',
+    fitWindow:'Compact', fitTitle:'When not fullscreen, the window follows the timer size',
+    text:'Text', textPh:'On-screen text (e.g. BREAK, WELCOME)…', textOnly:'Text only', clear:'Clear',
+    thresholds:'Warnings', yellowAt:'Yellow at', redAt:'Red at', flashZero:'Flash at zero',
+    sound:'Sound', overtime:'Count past zero', progress:'Progress bar',
+    message:'Message', messagePh:'Message to speaker… (M to focus, Enter sends)', flash:'Flash', send:'Send',
+    cueList:'CUE LIST', cueEmpty:'No items. Add name + duration ↓', namePh:'Name',
+    autoNext:'Auto-advance to next', goNext:'GO NEXT &nbsp;(N)', noName:'(no name)',
+    rundown:'RUNDOWN', showStart:'Start', notePh:'Note (optional)…', nowNextOut:'NOW/NEXT on screen',
+    cueImport:'Import', cueExport:'CSV', cueImportTitle:'Import CSV / paste from Excel or Sheets (name, duration, note)', cueExportTitle:'Export rundown as CSV', cueImportNone:'No rows recognized. Format: name, duration (10:00), note',
+    backstageLabel:'Backstage (schedule / crew)', signalLabel:'Signal light (podium · PRO)', onTime:'ON TIME', late:'behind', early:'ahead',
+    apiLabel:'API (Stream Deck / Companion)', apiTitle:'GET command for a Companion "Generic HTTP" button. type: start · reset · go · blackout · adjust(&value=sec) · setDuration(&value=ms)',
+    nowLabel:'NOW', nextLabel:'NEXT', endLabel:'End', plannedLabel:'Planned', projectedLabel:'Projected',
+    netTitle:'NETWORK → OBS · PHONE', screenOBS:'Screen (OBS / monitor)', copy:'Copy',
+    remoteLabel:'Remote (phone / tablet)',
+    shareOnline:'Share online', publicLabel:'Public link (any network)',
+    connecting:'Connecting…', stopSharing:'Stop sharing', shareFail:'Failed, try again',
+    shareNote:'QR = scan with a phone (same Wi-Fi). “Share online” = a link that works from any network.',
+    netNote:'All devices must be on the <b>SAME Wi-Fi</b> network. OBS: <b>Browser Source</b> → Screen URL (enable “Transparent background” for overlay; NDI via DistroAV). Phone: open the Remote URL in a browser. OSC: UDP port <b>7879</b>, addresses <b>/protimer/start</b> · reset · go · blackout · adjust · setDuration.',
+    chimes:'Sound', chimesTitle:'Audible chime on screen: 1 tone yellow · 2 tones red · 3 tones zero (PRO)',
+    schedLabel:'Auto-start at', schedTitle:'Timer starts by itself at the set time (PRO)',
+    logoBtn:'Logo image', logoBig:'Image too large (max 8 MB).',
+    posTR:'Top right', posTL:'Top left', posTC:'Top center', posBL:'Bottom left', posBR:'Bottom right',
+    presets:'Quick', presetHint:'double-click = edit', presetEdit:'Preset text:',
+    fontTitle:'Timer digits font', fontMono:'Mono (classic)', fontGrotesk:'Modern', fontSerif:'Elegant', fontDisplay:'Bold',
+    h12:'12h (AM/PM)',
+    report:'Report', reportTitle:'Report: planned vs. actual per item (PRO)',
+    reportEmpty:'No data yet — the report fills up as you run the rundown.',
+    reportClear:'Report exported. Clear the log for the next event?',
+    start:'START', pause:'PAUSE', clockBtn:'CLOCK',
+    outLive:'SCREEN LIVE', outClosed:'SCREEN CLOSED', screenTag:'SCREEN', controlTag:'control',
+    netOff:'server not running', netStarting:'starting…', live:'live', deviceOne:'device', deviceMany:'devices', connected:'connected',
+    shortcuts:'<kbd>Space</kbd> start/pause · <kbd>R</kbd> reset · <kbd>N</kbd> next · <kbd>↑↓</kbd> ±1m · <kbd>←→</kbd> ±10s · <kbd>B</kbd> blackout · <kbd>F</kbd> fullscreen · <kbd>M</kbd> message · <kbd>C</kbd> clear message'
+  };
+
+  const sr = {
+    languageTitle:'Jezik interfejsa',
+    outLabel:'Izlaz na', displayTitle:'Monitor za izlazni ekran', sendScreen:'Pošalji na ekran',
+    fsTitle:'Pun ekran (F)', closeTitle:'Zatvori izlazni prozor', onTop:'Na vrhu',
+    mode:'Režim', modeCountdown:'Odbrojavanje', modeCountup:'Štoperica', modeClock:'Sat',
+    set:'Postavi', endAt:'Kraj u', startTarget:'Start', targetTitle:'Odbrojavanje do tačnog vremena',
+    durTitle:'10 = minuti · 10:00 = MM:SS · 1:00:00 = HH:MM:SS', quick:'Brzo',
+    colors:'Boje', background:'Pozadina', timeText:'Vreme/tekst', warnColors:'Boje upozorenja',
+    tagY:'Ž', tagR:'C', yellow:'Žuto', red:'Crveno', transparent:'Providna pozadina (OBS)',
+    grid:'Grid', gridOn:'Pozicija na ekranu', gridHint:'klikni kockicu →',
+    fitWindow:'Kompaktan', fitTitle:'Prozor (kad nije pun ekran) prati veličinu tajmera',
+    text:'Tekst', textPh:'Tekst na ekranu (npr. PAUZA, DOBRO DOŠLI)…', textOnly:'Samo tekst', clear:'Obriši',
+    thresholds:'Pragovi', yellowAt:'Žuto na', redAt:'Crveno na', flashZero:'Blic na nuli',
+    sound:'Zvuk', overtime:'Minus posle nule', progress:'Traka napretka',
+    message:'Poruka', messagePh:'Poruka govorniku… (M za fokus, Enter šalje)', flash:'Treperi', send:'Pošalji',
+    cueList:'CUE LISTA', cueEmpty:'Nema tačaka. Dodaj naziv + trajanje ↓', namePh:'Naziv',
+    autoNext:'Auto-prelaz na sledeći', goNext:'GO SLEDEĆI &nbsp;(N)', noName:'(bez naziva)',
+    rundown:'RUNDOWN', showStart:'Start', notePh:'Beleška (opciono)…', nowNextOut:'NOW/NEXT na ekranu',
+    cueImport:'Uvoz', cueExport:'CSV', cueImportTitle:'Uvezi CSV / nalepi iz Excel-a ili Sheets-a (naziv, trajanje, beleška)', cueExportTitle:'Izvezi rundown kao CSV', cueImportNone:'Nijedan red nije prepoznat. Format: naziv, trajanje (10:00), beleška',
+    backstageLabel:'Backstage (raspored / crew)', signalLabel:'Signal svetlo (govornica · PRO)', onTime:'NA VREME', late:'kasni', early:'ispred',
+    apiLabel:'API (Stream Deck / Companion)', apiTitle:'GET komanda za Companion „Generic HTTP“ dugme. type: start · reset · go · blackout · adjust(&value=sek) · setDuration(&value=ms)',
+    nowLabel:'SADA', nextLabel:'SLEDI', endLabel:'Kraj', plannedLabel:'Planirano', projectedLabel:'Procena',
+    netTitle:'MREŽA → OBS · TELEFON', screenOBS:'Ekran (OBS / monitor)', copy:'Kopiraj',
+    remoteLabel:'Daljinski (telefon / tablet)',
+    shareOnline:'Deli online', publicLabel:'Javni link (bilo koja mreža)',
+    connecting:'Povezivanje…', stopSharing:'Prekini deljenje', shareFail:'Nije uspelo, pokušaj opet',
+    shareNote:'QR = skeniraj telefonom (ista Wi-Fi). „Deli online" = link sa bilo koje mreže.',
+    netNote:'Svi uređaji moraju biti na <b>ISTOJ Wi-Fi</b> mreži. OBS: <b>Browser Source</b> → Ekran URL („Providna pozadina" za overlay; NDI preko DistroAV). Telefon: otvori Daljinski URL u pretraživaču. OSC: UDP port <b>7879</b>, adrese <b>/protimer/start</b> · reset · go · blackout · adjust · setDuration.',
+    chimes:'Zvuk', chimesTitle:'Zvučni signal na ekranu: 1 ton žuto · 2 tona crveno · 3 tona nula (PRO)',
+    schedLabel:'Auto-start u', schedTitle:'Tajmer sam krene u zadato vreme (PRO)',
+    logoBtn:'Logo slika', logoBig:'Slika je prevelika (max 8 MB).',
+    posTR:'Gore desno', posTL:'Gore levo', posTC:'Gore centar', posBL:'Dole levo', posBR:'Dole desno',
+    presets:'Brze', presetHint:'dupli klik = izmeni', presetEdit:'Tekst preseta:',
+    fontTitle:'Font cifara tajmera', fontMono:'Mono (klasik)', fontGrotesk:'Moderni', fontSerif:'Elegantni', fontDisplay:'Masivni',
+    h12:'12h (AM/PM)',
+    report:'Izveštaj', reportTitle:'Izveštaj: planirano vs. stvarno po tački (PRO)',
+    reportEmpty:'Još nema podataka — izveštaj se puni dok vodiš rundown.',
+    reportClear:'Izveštaj izvezen. Očistiti dnevnik za sledeći događaj?',
+    start:'START', pause:'PAUZA', clockBtn:'SAT',
+    outLive:'EKRAN ŽIV', outClosed:'EKRAN ZATVOREN', screenTag:'EKRAN', controlTag:'kontrola',
+    netOff:'server nije pokrenut', netStarting:'pokrećem…', live:'uživo', deviceOne:'uređaj', deviceMany:'uređaja', connected:'povezano',
+    shortcuts:'<kbd>Space</kbd> start/pauza · <kbd>R</kbd> reset · <kbd>N</kbd> sledeći · <kbd>↑↓</kbd> ±1m · <kbd>←→</kbd> ±10s · <kbd>B</kbd> blackout · <kbd>F</kbd> pun ekran · <kbd>M</kbd> poruka · <kbd>C</kbd> obriši poruku'
+  };
+
+  const core = {
+    es:{languageTitle:'Idioma de la interfaz',outLabel:'Salida a',sendScreen:'Enviar a pantalla',mode:'Modo',modeCountdown:'Cuenta atrás',modeCountup:'Cronómetro',modeClock:'Reloj',set:'Fijar',quick:'Rápido',colors:'Colores',background:'Fondo',timeText:'Tiempo/texto',yellow:'Amarillo',red:'Rojo',transparent:'Fondo transparente (OBS)',text:'Texto',textOnly:'Solo texto',clear:'Borrar',thresholds:'Avisos',sound:'Sonido',progress:'Barra de progreso',message:'Mensaje',flash:'Parpadear',send:'Enviar',namePh:'Nombre',autoNext:'Avanzar al siguiente',goNext:'GO ▶ SIGUIENTE &nbsp;(N)',rundown:'RUNDOWN',notePh:'Nota (opcional)…',cueImport:'⬆ Importar',cueExport:'⬇ CSV',copy:'Copiar',remoteLabel:'Remoto (teléfono / tablet)',shareOnline:'🌐 Compartir online',stopSharing:'✕ Dejar de compartir',start:'▶ START',pause:'⏸ PAUSA',outLive:'PANTALLA EN VIVO',outClosed:'PANTALLA CERRADA',live:'en vivo',connected:'conectado'},
+    zh:{languageTitle:'界面语言',outLabel:'输出到',sendScreen:'发送到屏幕',mode:'模式',modeCountdown:'倒计时',modeCountup:'秒表',modeClock:'时钟',set:'设置',quick:'快速',colors:'颜色',background:'背景',timeText:'时间/文字',yellow:'黄色',red:'红色',transparent:'透明背景 (OBS)',text:'文字',textOnly:'仅文字',clear:'清除',thresholds:'提醒',sound:'声音',progress:'进度条',message:'消息',flash:'闪烁',send:'发送',namePh:'名称',autoNext:'自动进入下一项',goNext:'GO ▶ 下一项 &nbsp;(N)',rundown:'流程表',notePh:'备注（可选）…',cueImport:'⬆ 导入',cueExport:'⬇ CSV',copy:'复制',remoteLabel:'遥控（手机/平板）',shareOnline:'🌐 在线分享',stopSharing:'✕ 停止分享',start:'▶ 开始',pause:'⏸ 暂停',outLive:'屏幕在线',outClosed:'屏幕已关闭',live:'在线',connected:'已连接'},
+    hi:{languageTitle:'इंटरफ़ेस भाषा',outLabel:'आउटपुट',sendScreen:'स्क्रीन पर भेजें',mode:'मोड',modeCountdown:'काउंटडाउन',modeCountup:'स्टॉपवॉच',modeClock:'घड़ी',set:'सेट',quick:'त्वरित',colors:'रंग',background:'पृष्ठभूमि',timeText:'समय/टेक्स्ट',yellow:'पीला',red:'लाल',transparent:'पारदर्शी पृष्ठभूमि (OBS)',text:'टेक्स्ट',textOnly:'केवल टेक्स्ट',clear:'साफ़',thresholds:'चेतावनी',sound:'ध्वनि',progress:'प्रगति बार',message:'संदेश',flash:'फ्लैश',send:'भेजें',namePh:'नाम',autoNext:'अगले पर स्वतः जाएँ',goNext:'GO ▶ अगला &nbsp;(N)',rundown:'रनडाउन',notePh:'नोट (वैकल्पिक)…',cueImport:'⬆ आयात',cueExport:'⬇ CSV',copy:'कॉपी',remoteLabel:'रिमोट (फ़ोन / टैबलेट)',shareOnline:'🌐 ऑनलाइन साझा करें',stopSharing:'✕ साझा करना रोकें',start:'▶ START',pause:'⏸ विराम',outLive:'स्क्रीन लाइव',outClosed:'स्क्रीन बंद',live:'लाइव',connected:'कनेक्टेड'},
+    ar:{languageTitle:'لغة الواجهة',outLabel:'الإخراج إلى',sendScreen:'إرسال إلى الشاشة',mode:'الوضع',modeCountdown:'عد تنازلي',modeCountup:'ساعة إيقاف',modeClock:'ساعة',set:'تعيين',quick:'سريع',colors:'ألوان',background:'الخلفية',timeText:'الوقت/النص',yellow:'أصفر',red:'أحمر',transparent:'خلفية شفافة (OBS)',text:'نص',textOnly:'نص فقط',clear:'مسح',thresholds:'تنبيهات',sound:'صوت',progress:'شريط التقدم',message:'رسالة',flash:'وميض',send:'إرسال',namePh:'الاسم',autoNext:'انتقال تلقائي للتالي',goNext:'GO ▶ التالي &nbsp;(N)',rundown:'جدول العرض',notePh:'ملاحظة (اختياري)…',cueImport:'⬆ استيراد',cueExport:'⬇ CSV',copy:'نسخ',remoteLabel:'تحكم عن بعد (هاتف / جهاز لوحي)',shareOnline:'🌐 مشاركة عبر الإنترنت',stopSharing:'✕ إيقاف المشاركة',start:'▶ بدء',pause:'⏸ إيقاف مؤقت',outLive:'الشاشة مباشرة',outClosed:'الشاشة مغلقة',live:'مباشر',connected:'متصل'},
+    pt:{languageTitle:'Idioma da interface',outLabel:'Saída para',sendScreen:'Enviar para tela',mode:'Modo',modeCountdown:'Contagem regressiva',modeCountup:'Cronômetro',modeClock:'Relógio',set:'Definir',quick:'Rápido',colors:'Cores',background:'Fundo',timeText:'Tempo/texto',yellow:'Amarelo',red:'Vermelho',transparent:'Fundo transparente (OBS)',text:'Texto',textOnly:'Só texto',clear:'Limpar',thresholds:'Alertas',sound:'Som',progress:'Barra de progresso',message:'Mensagem',flash:'Piscar',send:'Enviar',namePh:'Nome',autoNext:'Avançar automaticamente',goNext:'GO ▶ PRÓXIMO &nbsp;(N)',rundown:'RUNDOWN',notePh:'Nota (opcional)…',cueImport:'⬆ Importar',cueExport:'⬇ CSV',copy:'Copiar',remoteLabel:'Remoto (telefone / tablet)',shareOnline:'🌐 Compartilhar online',stopSharing:'✕ Parar compartilhamento',start:'▶ START',pause:'⏸ PAUSA',outLive:'TELA AO VIVO',outClosed:'TELA FECHADA',live:'ao vivo',connected:'conectado'},
+    bn:{languageTitle:'ইন্টারফেস ভাষা',outLabel:'আউটপুট',sendScreen:'স্ক্রিনে পাঠান',mode:'মোড',modeCountdown:'কাউন্টডাউন',modeCountup:'স্টপওয়াচ',modeClock:'ঘড়ি',set:'সেট',quick:'দ্রুত',colors:'রং',background:'পটভূমি',timeText:'সময়/টেক্সট',yellow:'হলুদ',red:'লাল',transparent:'স্বচ্ছ পটভূমি (OBS)',text:'টেক্সট',textOnly:'শুধু টেক্সট',clear:'মুছুন',thresholds:'সতর্কতা',sound:'শব্দ',progress:'প্রগ্রেস বার',message:'বার্তা',flash:'ফ্ল্যাশ',send:'পাঠান',namePh:'নাম',autoNext:'পরেরটিতে অটো',goNext:'GO ▶ পরবর্তী &nbsp;(N)',rundown:'রানডাউন',notePh:'নোট (ঐচ্ছিক)…',cueImport:'⬆ আমদানি',cueExport:'⬇ CSV',copy:'কপি',remoteLabel:'রিমোট (ফোন / ট্যাবলেট)',shareOnline:'🌐 অনলাইনে শেয়ার',stopSharing:'✕ শেয়ার বন্ধ',start:'▶ START',pause:'⏸ বিরতি',outLive:'স্ক্রিন লাইভ',outClosed:'স্ক্রিন বন্ধ',live:'লাইভ',connected:'সংযুক্ত'},
+    ru:{languageTitle:'Язык интерфейса',outLabel:'Вывод на',sendScreen:'Отправить на экран',mode:'Режим',modeCountdown:'Обратный отсчёт',modeCountup:'Секундомер',modeClock:'Часы',set:'Задать',quick:'Быстро',colors:'Цвета',background:'Фон',timeText:'Время/текст',yellow:'Жёлтый',red:'Красный',transparent:'Прозрачный фон (OBS)',text:'Текст',textOnly:'Только текст',clear:'Очистить',thresholds:'Предупреждения',sound:'Звук',progress:'Индикатор прогресса',message:'Сообщение',flash:'Мигать',send:'Отправить',namePh:'Название',autoNext:'Авто-переход дальше',goNext:'GO ▶ ДАЛЕЕ &nbsp;(N)',rundown:'ПЛАН',notePh:'Заметка (необязательно)…',cueImport:'⬆ Импорт',cueExport:'⬇ CSV',copy:'Копировать',remoteLabel:'Пульт (телефон / планшет)',shareOnline:'🌐 Поделиться онлайн',stopSharing:'✕ Остановить доступ',start:'▶ START',pause:'⏸ ПАУЗА',outLive:'ЭКРАН АКТИВЕН',outClosed:'ЭКРАН ЗАКРЫТ',live:'онлайн',connected:'подключено'},
+    ja:{languageTitle:'インターフェース言語',outLabel:'出力先',sendScreen:'画面へ送信',mode:'モード',modeCountdown:'カウントダウン',modeCountup:'ストップウォッチ',modeClock:'時計',set:'設定',quick:'クイック',colors:'色',background:'背景',timeText:'時間/テキスト',yellow:'黄',red:'赤',transparent:'透明背景 (OBS)',text:'テキスト',textOnly:'テキストのみ',clear:'クリア',thresholds:'警告',sound:'音',progress:'進行バー',message:'メッセージ',flash:'点滅',send:'送信',namePh:'名前',autoNext:'次へ自動進行',goNext:'GO ▶ 次へ &nbsp;(N)',rundown:'ランダウン',notePh:'メモ（任意）…',cueImport:'⬆ 読み込み',cueExport:'⬇ CSV',copy:'コピー',remoteLabel:'リモート（電話 / タブレット）',shareOnline:'🌐 オンライン共有',stopSharing:'✕ 共有停止',start:'▶ START',pause:'⏸ 一時停止',outLive:'画面ライブ',outClosed:'画面閉じる',live:'ライブ',connected:'接続済み'},
+    pa:{languageTitle:'ਇੰਟਰਫੇਸ ਭਾਸ਼ਾ',outLabel:'ਆਉਟਪੁੱਟ',sendScreen:'ਸਕ੍ਰੀਨ ਤੇ ਭੇਜੋ',mode:'ਮੋਡ',modeCountdown:'ਕਾਊਂਟਡਾਊਨ',modeCountup:'ਸਟਾਪਵਾਚ',modeClock:'ਘੜੀ',set:'ਸੈੱਟ',quick:'ਤੁਰੰਤ',colors:'ਰੰਗ',background:'ਬੈਕਗ੍ਰਾਊਂਡ',timeText:'ਸਮਾਂ/ਟੈਕਸਟ',yellow:'ਪੀਲਾ',red:'ਲਾਲ',transparent:'ਪਾਰਦਰਸ਼ੀ ਬੈਕਗ੍ਰਾਊਂਡ (OBS)',text:'ਟੈਕਸਟ',textOnly:'ਕੇਵਲ ਟੈਕਸਟ',clear:'ਸਾਫ਼',thresholds:'ਚੇਤਾਵਨੀ',sound:'ਆਵਾਜ਼',progress:'ਪ੍ਰਗਤੀ ਬਾਰ',message:'ਸੁਨੇਹਾ',flash:'ਫਲੈਸ਼',send:'ਭੇਜੋ',namePh:'ਨਾਮ',autoNext:'ਅਗਲੇ ਤੇ ਆਟੋ',goNext:'GO ▶ ਅਗਲਾ &nbsp;(N)',rundown:'ਰਨਡਾਊਨ',notePh:'ਨੋਟ (ਚੋਣਵਾਂ)…',cueImport:'⬆ ਇੰਪੋਰਟ',cueExport:'⬇ CSV',copy:'ਕਾਪੀ',remoteLabel:'ਰਿਮੋਟ (ਫ਼ੋਨ / ਟੈਬਲੇਟ)',shareOnline:'🌐 ਆਨਲਾਈਨ ਸਾਂਝਾ ਕਰੋ',stopSharing:'✕ ਸਾਂਝਾ ਰੋਕੋ',start:'▶ START',pause:'⏸ ਵਿਰਾਮ',outLive:'ਸਕ੍ਰੀਨ ਲਾਈਵ',outClosed:'ਸਕ੍ਰੀਨ ਬੰਦ',live:'ਲਾਈਵ',connected:'ਕਨੈਕਟਡ'},
+    de:{languageTitle:'Sprache der Oberfläche',outLabel:'Ausgabe auf',sendScreen:'Auf Bildschirm senden',mode:'Modus',modeCountdown:'Countdown',modeCountup:'Stoppuhr',modeClock:'Uhr',set:'Setzen',quick:'Schnell',colors:'Farben',background:'Hintergrund',timeText:'Zeit/Text',yellow:'Gelb',red:'Rot',transparent:'Transparenter Hintergrund (OBS)',text:'Text',textOnly:'Nur Text',clear:'Löschen',thresholds:'Warnungen',sound:'Ton',progress:'Fortschrittsbalken',message:'Nachricht',flash:'Blinken',send:'Senden',namePh:'Name',autoNext:'Automatisch weiter',goNext:'GO ▶ WEITER &nbsp;(N)',rundown:'ABLAUFPLAN',notePh:'Notiz (optional)…',cueImport:'⬆ Import',cueExport:'⬇ CSV',copy:'Kopieren',remoteLabel:'Fernbedienung (Telefon / Tablet)',shareOnline:'🌐 Online teilen',stopSharing:'✕ Teilen stoppen',start:'▶ START',pause:'⏸ PAUSE',outLive:'BILDSCHIRM LIVE',outClosed:'BILDSCHIRM ZU',live:'live',connected:'verbunden'},
+    jv:{languageTitle:'Basa antarmuka',outLabel:'Output menyang',sendScreen:'Kirim menyang layar',mode:'Mode',modeCountdown:'Countdown',modeCountup:'Stopwatch',modeClock:'Jam',set:'Setel',quick:'Cepet',colors:'Werna',background:'Latar',timeText:'Wektu/teks',yellow:'Kuning',red:'Abang',transparent:'Latar transparan (OBS)',text:'Teks',textOnly:'Mung teks',clear:'Busak',thresholds:'Pèngetan',sound:'Swara',progress:'Bar progres',message:'Pesen',flash:'Kedhip',send:'Kirim',namePh:'Jeneng',autoNext:'Otomatis sabanjure',goNext:'GO ▶ SABANJURE &nbsp;(N)',rundown:'RUNDOWN',notePh:'Cathetan (opsional)…',cueImport:'⬆ Impor',cueExport:'⬇ CSV',copy:'Salin',remoteLabel:'Remote (telpon / tablet)',shareOnline:'🌐 Nuduhake online',stopSharing:'✕ Mandheg nuduhake',start:'▶ START',pause:'⏸ PAUSE',outLive:'LAYAR LIVE',outClosed:'LAYAR DITUTUP',live:'live',connected:'nyambung'},
+    ko:{languageTitle:'인터페이스 언어',outLabel:'출력 대상',sendScreen:'화면으로 보내기',mode:'모드',modeCountdown:'카운트다운',modeCountup:'스톱워치',modeClock:'시계',set:'설정',quick:'빠른 설정',colors:'색상',background:'배경',timeText:'시간/텍스트',yellow:'노랑',red:'빨강',transparent:'투명 배경 (OBS)',text:'텍스트',textOnly:'텍스트만',clear:'지우기',thresholds:'경고',sound:'소리',progress:'진행 막대',message:'메시지',flash:'깜박임',send:'보내기',namePh:'이름',autoNext:'다음으로 자동 이동',goNext:'GO ▶ 다음 &nbsp;(N)',rundown:'런다운',notePh:'메모 (선택)…',cueImport:'⬆ 가져오기',cueExport:'⬇ CSV',copy:'복사',remoteLabel:'리모컨 (폰 / 태블릿)',shareOnline:'🌐 온라인 공유',stopSharing:'✕ 공유 중지',start:'▶ START',pause:'⏸ 일시정지',outLive:'화면 라이브',outClosed:'화면 닫힘',live:'라이브',connected:'연결됨'},
+    fr:{languageTitle:'Langue de l’interface',outLabel:'Sortie vers',sendScreen:'Envoyer à l’écran',mode:'Mode',modeCountdown:'Compte à rebours',modeCountup:'Chronomètre',modeClock:'Horloge',set:'Régler',quick:'Rapide',colors:'Couleurs',background:'Fond',timeText:'Temps/texte',yellow:'Jaune',red:'Rouge',transparent:'Fond transparent (OBS)',text:'Texte',textOnly:'Texte seul',clear:'Effacer',thresholds:'Alertes',sound:'Son',progress:'Barre de progression',message:'Message',flash:'Clignoter',send:'Envoyer',namePh:'Nom',autoNext:'Avancer automatiquement',goNext:'GO ▶ SUIVANT &nbsp;(N)',rundown:'CONDUCTEUR',notePh:'Note (optionnel)…',cueImport:'⬆ Importer',cueExport:'⬇ CSV',copy:'Copier',remoteLabel:'Télécommande (téléphone / tablette)',shareOnline:'🌐 Partager en ligne',stopSharing:'✕ Arrêter le partage',start:'▶ START',pause:'⏸ PAUSE',outLive:'ÉCRAN LIVE',outClosed:'ÉCRAN FERMÉ',live:'live',connected:'connecté'},
+    tr:{languageTitle:'Arayüz dili',outLabel:'Çıkış',sendScreen:'Ekrana gönder',mode:'Mod',modeCountdown:'Geri sayım',modeCountup:'Kronometre',modeClock:'Saat',set:'Ayarla',quick:'Hızlı',colors:'Renkler',background:'Arka plan',timeText:'Zaman/metin',yellow:'Sarı',red:'Kırmızı',transparent:'Şeffaf arka plan (OBS)',text:'Metin',textOnly:'Sadece metin',clear:'Temizle',thresholds:'Uyarılar',sound:'Ses',progress:'İlerleme çubuğu',message:'Mesaj',flash:'Yanıp sön',send:'Gönder',namePh:'Ad',autoNext:'Sonrakine otomatik geç',goNext:'GO ▶ SONRAKİ &nbsp;(N)',rundown:'AKIŞ',notePh:'Not (isteğe bağlı)…',cueImport:'⬆ İçe aktar',cueExport:'⬇ CSV',copy:'Kopyala',remoteLabel:'Uzaktan kumanda (telefon / tablet)',shareOnline:'🌐 Çevrimiçi paylaş',stopSharing:'✕ Paylaşımı durdur',start:'▶ START',pause:'⏸ DURAKLAT',outLive:'EKRAN CANLI',outClosed:'EKRAN KAPALI',live:'canlı',connected:'bağlı'},
+    vi:{languageTitle:'Ngôn ngữ giao diện',outLabel:'Xuất ra',sendScreen:'Gửi lên màn hình',mode:'Chế độ',modeCountdown:'Đếm ngược',modeCountup:'Bấm giờ',modeClock:'Đồng hồ',set:'Đặt',quick:'Nhanh',colors:'Màu',background:'Nền',timeText:'Thời gian/chữ',yellow:'Vàng',red:'Đỏ',transparent:'Nền trong suốt (OBS)',text:'Chữ',textOnly:'Chỉ chữ',clear:'Xóa',thresholds:'Cảnh báo',sound:'Âm thanh',progress:'Thanh tiến trình',message:'Tin nhắn',flash:'Nhấp nháy',send:'Gửi',namePh:'Tên',autoNext:'Tự chuyển mục sau',goNext:'GO ▶ TIẾP &nbsp;(N)',rundown:'RUNDOWN',notePh:'Ghi chú (tùy chọn)…',cueImport:'⬆ Nhập',cueExport:'⬇ CSV',copy:'Sao chép',remoteLabel:'Điều khiển (điện thoại / tablet)',shareOnline:'🌐 Chia sẻ online',stopSharing:'✕ Dừng chia sẻ',start:'▶ START',pause:'⏸ TẠM DỪNG',outLive:'MÀN HÌNH LIVE',outClosed:'MÀN HÌNH ĐÓNG',live:'live',connected:'đã kết nối'},
+    te:{languageTitle:'ఇంటర్‌ఫేస్ భాష',outLabel:'అవుట్‌పుట్',sendScreen:'స్క్రీన్‌కు పంపు',mode:'మోడ్',modeCountdown:'కౌంట్‌డౌన్',modeCountup:'స్టాప్‌వాచ్',modeClock:'గడియారం',set:'సెట్',quick:'త్వరిత',colors:'రంగులు',background:'నేపథ్యం',timeText:'సమయం/టెక్స్ట్',yellow:'పసుపు',red:'ఎరుపు',transparent:'పారదర్శక నేపథ్యం (OBS)',text:'టెక్స్ట్',textOnly:'టెక్స్ట్ మాత్రమే',clear:'తొలగించు',thresholds:'హెచ్చరికలు',sound:'శబ్దం',progress:'ప్రోగ్రెస్ బార్',message:'సందేశం',flash:'ఫ్లాష్',send:'పంపు',namePh:'పేరు',autoNext:'తదుపరికి ఆటో',goNext:'GO ▶ తదుపరి &nbsp;(N)',rundown:'రన్‌డౌన్',notePh:'గమనిక (ఐచ్చికం)…',cueImport:'⬆ దిగుమతి',cueExport:'⬇ CSV',copy:'కాపీ',remoteLabel:'రిమోట్ (ఫోన్ / టాబ్లెట్)',shareOnline:'🌐 ఆన్‌లైన్‌లో షేర్',stopSharing:'✕ షేర్ నిలిపివేయి',start:'▶ START',pause:'⏸ విరామం',outLive:'స్క్రీన్ లైవ్',outClosed:'స్క్రీన్ మూసింది',live:'లైవ్',connected:'కనెక్ట్ అయ్యింది'},
+    mr:{languageTitle:'इंटरफेस भाषा',outLabel:'आउटपुट',sendScreen:'स्क्रीनवर पाठवा',mode:'मोड',modeCountdown:'काउंटडाउन',modeCountup:'स्टॉपवॉच',modeClock:'घड्याळ',set:'सेट',quick:'जलद',colors:'रंग',background:'पार्श्वभूमी',timeText:'वेळ/मजकूर',yellow:'पिवळा',red:'लाल',transparent:'पारदर्शक पार्श्वभूमी (OBS)',text:'मजकूर',textOnly:'फक्त मजकूर',clear:'साफ करा',thresholds:'इशारे',sound:'आवाज',progress:'प्रगती पट्टी',message:'संदेश',flash:'फ्लॅश',send:'पाठवा',namePh:'नाव',autoNext:'पुढे ऑटो',goNext:'GO ▶ पुढे &nbsp;(N)',rundown:'रनडाउन',notePh:'टीप (पर्यायी)…',cueImport:'⬆ आयात',cueExport:'⬇ CSV',copy:'कॉपी',remoteLabel:'रिमोट (फोन / टॅबलेट)',shareOnline:'🌐 ऑनलाइन शेअर',stopSharing:'✕ शेअर थांबवा',start:'▶ START',pause:'⏸ विराम',outLive:'स्क्रीन लाइव्ह',outClosed:'स्क्रीन बंद',live:'लाइव्ह',connected:'जोडलेले'},
+    ta:{languageTitle:'இடைமுக மொழி',outLabel:'வெளியீடு',sendScreen:'திரைக்கு அனுப்பு',mode:'முறை',modeCountdown:'கவுண்ட்டவுன்',modeCountup:'ஸ்டாப்வாட்ச்',modeClock:'கடிகாரம்',set:'அமை',quick:'விரைவு',colors:'நிறங்கள்',background:'பின்னணி',timeText:'நேரம்/உரை',yellow:'மஞ்சள்',red:'சிவப்பு',transparent:'தெளிவான பின்னணி (OBS)',text:'உரை',textOnly:'உரை மட்டும்',clear:'அழி',thresholds:'எச்சரிக்கை',sound:'ஒலி',progress:'முன்னேற்ற பட்டை',message:'செய்தி',flash:'மின்னல்',send:'அனுப்பு',namePh:'பெயர்',autoNext:'அடுத்ததுக்கு தானாக',goNext:'GO ▶ அடுத்து &nbsp;(N)',rundown:'ரன்டவுன்',notePh:'குறிப்பு (விருப்பம்)…',cueImport:'⬆ இறக்குமதி',cueExport:'⬇ CSV',copy:'நகல்',remoteLabel:'ரிமோட் (போன் / டேப்லெட்)',shareOnline:'🌐 ஆன்லைனில் பகிர்',stopSharing:'✕ பகிர்வை நிறுத்து',start:'▶ START',pause:'⏸ இடைநிறுத்தம்',outLive:'திரை நேரலை',outClosed:'திரை மூடப்பட்டது',live:'நேரலை',connected:'இணைக்கப்பட்டது'},
+    ur:{languageTitle:'انٹرفیس زبان',outLabel:'آؤٹ پٹ',sendScreen:'اسکرین پر بھیجیں',mode:'موڈ',modeCountdown:'کاؤنٹ ڈاؤن',modeCountup:'اسٹاپ واچ',modeClock:'گھڑی',set:'سیٹ',quick:'فوری',colors:'رنگ',background:'پس منظر',timeText:'وقت/متن',yellow:'پیلا',red:'سرخ',transparent:'شفاف پس منظر (OBS)',text:'متن',textOnly:'صرف متن',clear:'صاف',thresholds:'انتباہات',sound:'آواز',progress:'پروگریس بار',message:'پیغام',flash:'فلیش',send:'بھیجیں',namePh:'نام',autoNext:'اگلے پر خودکار',goNext:'GO ▶ اگلا &nbsp;(N)',rundown:'رن ڈاؤن',notePh:'نوٹ (اختیاری)…',cueImport:'⬆ درآمد',cueExport:'⬇ CSV',copy:'کاپی',remoteLabel:'ریموٹ (فون / ٹیبلٹ)',shareOnline:'🌐 آن لائن شیئر',stopSharing:'✕ شیئر بند',start:'▶ START',pause:'⏸ وقفہ',outLive:'اسکرین لائیو',outClosed:'اسکرین بند',live:'لائیو',connected:'منسلک'},
+    it:{languageTitle:'Lingua interfaccia',outLabel:'Uscita su',sendScreen:'Invia allo schermo',mode:'Modalità',modeCountdown:'Conto alla rovescia',modeCountup:'Cronometro',modeClock:'Orologio',set:'Imposta',quick:'Rapido',colors:'Colori',background:'Sfondo',timeText:'Tempo/testo',yellow:'Giallo',red:'Rosso',transparent:'Sfondo trasparente (OBS)',text:'Testo',textOnly:'Solo testo',clear:'Cancella',thresholds:'Avvisi',sound:'Suono',progress:'Barra progresso',message:'Messaggio',flash:'Lampeggia',send:'Invia',namePh:'Nome',autoNext:'Avanza automaticamente',goNext:'GO ▶ SUCCESSIVO &nbsp;(N)',rundown:'RUNDOWN',notePh:'Nota (opzionale)…',cueImport:'⬆ Importa',cueExport:'⬇ CSV',copy:'Copia',remoteLabel:'Remoto (telefono / tablet)',shareOnline:'🌐 Condividi online',stopSharing:'✕ Interrompi condivisione',start:'▶ START',pause:'⏸ PAUSA',outLive:'SCHERMO LIVE',outClosed:'SCHERMO CHIUSO',live:'live',connected:'connesso'},
+    fa:{languageTitle:'زبان رابط',outLabel:'خروجی به',sendScreen:'ارسال به صفحه',mode:'حالت',modeCountdown:'شمارش معکوس',modeCountup:'کرنومتر',modeClock:'ساعت',set:'تنظیم',quick:'سریع',colors:'رنگ‌ها',background:'پس‌زمینه',timeText:'زمان/متن',yellow:'زرد',red:'قرمز',transparent:'پس‌زمینه شفاف (OBS)',text:'متن',textOnly:'فقط متن',clear:'پاک کردن',thresholds:'هشدارها',sound:'صدا',progress:'نوار پیشرفت',message:'پیام',flash:'چشمک‌زن',send:'ارسال',namePh:'نام',autoNext:'رفتن خودکار به بعدی',goNext:'GO ▶ بعدی &nbsp;(N)',rundown:'راندون',notePh:'یادداشت (اختیاری)…',cueImport:'⬆ وارد کردن',cueExport:'⬇ CSV',copy:'کپی',remoteLabel:'کنترل از راه دور (تلفن / تبلت)',shareOnline:'🌐 اشتراک آنلاین',stopSharing:'✕ توقف اشتراک',start:'▶ START',pause:'⏸ مکث',outLive:'صفحه زنده',outClosed:'صفحه بسته',live:'زنده',connected:'متصل'},
+    gu:{languageTitle:'ઇન્ટરફેસ ભાષા',outLabel:'આઉટપુટ',sendScreen:'સ્ક્રીન પર મોકલો',mode:'મોડ',modeCountdown:'કાઉન્ટડાઉન',modeCountup:'સ્ટોપવોચ',modeClock:'ઘડિયાળ',set:'સેટ',quick:'ઝડપી',colors:'રંગો',background:'પૃષ્ઠભૂમિ',timeText:'સમય/ટેક્સ્ટ',yellow:'પીળો',red:'લાલ',transparent:'પારદર્શક પૃષ્ઠભૂમિ (OBS)',text:'ટેક્સ્ટ',textOnly:'માત્ર ટેક્સ્ટ',clear:'સાફ',thresholds:'ચેતવણીઓ',sound:'અવાજ',progress:'પ્રગતિ પટ્ટી',message:'સંદેશ',flash:'ફ્લેશ',send:'મોકલો',namePh:'નામ',autoNext:'આગળ આપમેળે',goNext:'GO ▶ આગળ &nbsp;(N)',rundown:'રનડાઉન',notePh:'નોંધ (વૈકલ્પિક)…',cueImport:'⬆ આયાત',cueExport:'⬇ CSV',copy:'કૉપી',remoteLabel:'રિમોટ (ફોન / ટેબ્લેટ)',shareOnline:'🌐 ઓનલાઇન શેર',stopSharing:'✕ શેર બંધ',start:'▶ START',pause:'⏸ વિરામ',outLive:'સ્ક્રીન લાઇવ',outClosed:'સ્ક્રીન બંધ',live:'લાઇવ',connected:'જોડાયેલ'},
+    pl:{languageTitle:'Język interfejsu',outLabel:'Wyjście na',sendScreen:'Wyślij na ekran',mode:'Tryb',modeCountdown:'Odliczanie',modeCountup:'Stoper',modeClock:'Zegar',set:'Ustaw',quick:'Szybko',colors:'Kolory',background:'Tło',timeText:'Czas/tekst',yellow:'Żółty',red:'Czerwony',transparent:'Przezroczyste tło (OBS)',text:'Tekst',textOnly:'Tylko tekst',clear:'Wyczyść',thresholds:'Ostrzeżenia',sound:'Dźwięk',progress:'Pasek postępu',message:'Wiadomość',flash:'Migaj',send:'Wyślij',namePh:'Nazwa',autoNext:'Automatycznie dalej',goNext:'GO ▶ DALEJ &nbsp;(N)',rundown:'RUNDOWN',notePh:'Notatka (opcjonalnie)…',cueImport:'⬆ Import',cueExport:'⬇ CSV',copy:'Kopiuj',remoteLabel:'Pilot (telefon / tablet)',shareOnline:'🌐 Udostępnij online',stopSharing:'✕ Zatrzymaj udostępnianie',start:'▶ START',pause:'⏸ PAUZA',outLive:'EKRAN LIVE',outClosed:'EKRAN ZAMKNIĘTY',live:'live',connected:'połączono'},
+    uk:{languageTitle:'Мова інтерфейсу',outLabel:'Вивід на',sendScreen:'Надіслати на екран',mode:'Режим',modeCountdown:'Зворотний відлік',modeCountup:'Секундомір',modeClock:'Годинник',set:'Встановити',quick:'Швидко',colors:'Кольори',background:'Фон',timeText:'Час/текст',yellow:'Жовтий',red:'Червоний',transparent:'Прозорий фон (OBS)',text:'Текст',textOnly:'Лише текст',clear:'Очистити',thresholds:'Попередження',sound:'Звук',progress:'Індикатор прогресу',message:'Повідомлення',flash:'Блимати',send:'Надіслати',namePh:'Назва',autoNext:'Автоперехід далі',goNext:'GO ▶ ДАЛІ &nbsp;(N)',rundown:'ПЛАН',notePh:'Нотатка (необов’язково)…',cueImport:'⬆ Імпорт',cueExport:'⬇ CSV',copy:'Копіювати',remoteLabel:'Пульт (телефон / планшет)',shareOnline:'🌐 Поділитися онлайн',stopSharing:'✕ Зупинити доступ',start:'▶ START',pause:'⏸ ПАУЗА',outLive:'ЕКРАН АКТИВНИЙ',outClosed:'ЕКРАН ЗАКРИТО',live:'онлайн',connected:'підключено'},
+    ml:{languageTitle:'ഇന്റർഫേസ് ഭാഷ',outLabel:'ഔട്ട്പുട്ട്',sendScreen:'സ്ക്രീനിലേക്ക് അയയ്ക്കുക',mode:'മോഡ്',modeCountdown:'കൗണ്ട്ഡൗൺ',modeCountup:'സ്റ്റോപ്പ് വാച്ച്',modeClock:'ഘടികാരം',set:'സെറ്റ്',quick:'വേഗം',colors:'നിറങ്ങൾ',background:'പശ്ചാത്തലം',timeText:'സമയം/ടെക്സ്റ്റ്',yellow:'മഞ്ഞ',red:'ചുവപ്പ്',transparent:'സുതാര്യ പശ്ചാത്തലം (OBS)',text:'ടെക്സ്റ്റ്',textOnly:'ടെക്സ്റ്റ് മാത്രം',clear:'മായ്ക്കുക',thresholds:'മുന്നറിയിപ്പ്',sound:'ശബ്ദം',progress:'പുരോഗതി ബാർ',message:'സന്ദേശം',flash:'ഫ്ലാഷ്',send:'അയയ്ക്കുക',namePh:'പേര്',autoNext:'അടുത്തതിലേക്ക് ഓട്ടോ',goNext:'GO ▶ അടുത്തത് &nbsp;(N)',rundown:'റണ്ടൗൺ',notePh:'കുറിപ്പ് (ഐച്ഛികം)…',cueImport:'⬆ ഇറക്കുമതി',cueExport:'⬇ CSV',copy:'പകർപ്പ്',remoteLabel:'റിമോട്ട് (ഫോൺ / ടാബ്ലെറ്റ്)',shareOnline:'🌐 ഓൺലൈനിൽ പങ്കിടുക',stopSharing:'✕ പങ്കിടൽ നിർത്തുക',start:'▶ START',pause:'⏸ ഇടവേള',outLive:'സ്ക്രീൻ ലൈവ്',outClosed:'സ്ക്രീൻ അടച്ചു',live:'ലൈവ്',connected:'ബന്ധിപ്പിച്ചു'},
+    kn:{languageTitle:'ಇಂಟರ್ಫೇಸ್ ಭಾಷೆ',outLabel:'ಔಟ್‌ಪುಟ್',sendScreen:'ಸ್ಕ್ರೀನ್‌ಗೆ ಕಳುಹಿಸಿ',mode:'ಮೋಡ್',modeCountdown:'ಕೌಂಟ್‌ಡೌನ್',modeCountup:'ಸ್ಟಾಪ್‌ವಾಚ್',modeClock:'ಗಡಿಯಾರ',set:'ಸೆಟ್',quick:'ತ್ವರಿತ',colors:'ಬಣ್ಣಗಳು',background:'ಹಿನ್ನೆಲೆ',timeText:'ಸಮಯ/ಪಠ್ಯ',yellow:'ಹಳದಿ',red:'ಕೆಂಪು',transparent:'ಪಾರದರ್ಶಕ ಹಿನ್ನೆಲೆ (OBS)',text:'ಪಠ್ಯ',textOnly:'ಪಠ್ಯ ಮಾತ್ರ',clear:'ಅಳಿಸಿ',thresholds:'ಎಚ್ಚರಿಕೆಗಳು',sound:'ಧ್ವನಿ',progress:'ಪ್ರಗತಿ ಪಟ್ಟೆ',message:'ಸಂದೇಶ',flash:'ಫ್ಲ್ಯಾಶ್',send:'ಕಳುಹಿಸಿ',namePh:'ಹೆಸರು',autoNext:'ಮುಂದಿನದಕ್ಕೆ ಆಟೋ',goNext:'GO ▶ ಮುಂದಿನದು &nbsp;(N)',rundown:'ರನ್‌ಡೌನ್',notePh:'ಟಿಪ್ಪಣಿ (ಐಚ್ಛಿಕ)…',cueImport:'⬆ ಆಮದು',cueExport:'⬇ CSV',copy:'ನಕಲು',remoteLabel:'ರಿಮೋಟ್ (ಫೋನ್ / ಟ್ಯಾಬ್ಲೆಟ್)',shareOnline:'🌐 ಆನ್‌ಲೈನ್ ಹಂಚಿಕೆ',stopSharing:'✕ ಹಂಚಿಕೆ ನಿಲ್ಲಿಸಿ',start:'▶ START',pause:'⏸ ವಿರಾಮ',outLive:'ಸ್ಕ್ರೀನ್ ಲೈವ್',outClosed:'ಸ್ಕ್ರೀನ್ ಮುಚ್ಚಿದೆ',live:'ಲೈವ್',connected:'ಸಂಪರ್ಕಿತ'},
+    or:{languageTitle:'ଇଣ୍ଟରଫେସ୍ ଭାଷା',outLabel:'ଆଉଟପୁଟ୍',sendScreen:'ସ୍କ୍ରିନ୍‌କୁ ପଠାନ୍ତୁ',mode:'ମୋଡ୍',modeCountdown:'କାଉଣ୍ଟଡାଉନ୍',modeCountup:'ଷ୍ଟପୱାଚ୍',modeClock:'ଘଡ଼ି',set:'ସେଟ୍',quick:'ଦ୍ରୁତ',colors:'ରଙ୍ଗ',background:'ପୃଷ୍ଠଭୂମି',timeText:'ସମୟ/ଟେକ୍ସଟ୍',yellow:'ହଳଦିଆ',red:'ଲାଲ',transparent:'ସ୍ୱଚ୍ଛ ପୃଷ୍ଠଭୂମି (OBS)',text:'ଟେକ୍ସଟ୍',textOnly:'କେବଳ ଟେକ୍ସଟ୍',clear:'ସଫା',thresholds:'ଚେତାବନୀ',sound:'ଶବ୍ଦ',progress:'ପ୍ରଗତି ବାର୍',message:'ସନ୍ଦେଶ',flash:'ଫ୍ଲାଶ୍',send:'ପଠାନ୍ତୁ',namePh:'ନାମ',autoNext:'ପରବର୍ତ୍ତୀକୁ ଅଟୋ',goNext:'GO ▶ ପରବର୍ତ୍ତୀ &nbsp;(N)',rundown:'ରନଡାଉନ୍',notePh:'ଟିପ୍ପଣୀ (ଇଚ୍ଛାନୁସାରେ)…',cueImport:'⬆ ଆମଦାନି',cueExport:'⬇ CSV',copy:'କପି',remoteLabel:'ରିମୋଟ୍ (ଫୋନ୍ / ଟାବ୍ଲେଟ୍)',shareOnline:'🌐 ଅନଲାଇନ୍ ଶେୟାର୍',stopSharing:'✕ ଶେୟାର୍ ବନ୍ଦ',start:'▶ START',pause:'⏸ ବିରତି',outLive:'ସ୍କ୍ରିନ୍ ଲାଇଭ୍',outClosed:'ସ୍କ୍ରିନ୍ ବନ୍ଦ',live:'ଲାଇଭ୍',connected:'ସଂଯୁକ୍ତ'},
+    my:{languageTitle:'အင်တာဖေ့စ် ဘာသာစကား',outLabel:'ထုတ်ရန်',sendScreen:'စခရင်သို့ ပို့',mode:'မုဒ်',modeCountdown:'ရေတွက်လျှော့',modeCountup:'စတော်ပဝေါ့ခ်',modeClock:'နာရီ',set:'သတ်မှတ်',quick:'မြန်မြန်',colors:'အရောင်များ',background:'နောက်ခံ',timeText:'အချိန်/စာသား',yellow:'အဝါ',red:'အနီ',transparent:'ပွင့်လင်း နောက်ခံ (OBS)',text:'စာသား',textOnly:'စာသားသာ',clear:'ရှင်း',thresholds:'သတိပေးချက်',sound:'အသံ',progress:'တိုးတက်မှု ဘား',message:'မက်ဆေ့ခ်ျ',flash:'ဖလက်ရှ်',send:'ပို့',namePh:'အမည်',autoNext:'နောက်တစ်ခုသို့ အလိုအလျောက်',goNext:'GO ▶ နောက်တစ်ခု &nbsp;(N)',rundown:'RUNDOWN',notePh:'မှတ်ချက် (ရွေးချယ်နိုင်)…',cueImport:'⬆ တင်သွင်း',cueExport:'⬇ CSV',copy:'ကူးယူ',remoteLabel:'ရီမုတ် (ဖုန်း / တက်ဘလက်)',shareOnline:'🌐 အွန်လိုင်း မျှဝေ',stopSharing:'✕ မျှဝေမှု ရပ်',start:'▶ START',pause:'⏸ ခဏရပ်',outLive:'စခရင် လိုက်ဗ်',outClosed:'စခရင် ပိတ်',live:'လိုက်ဗ်',connected:'ချိတ်ဆက်ပြီး'},
+    th:{languageTitle:'ภาษาอินเทอร์เฟซ',outLabel:'ส่งออกไปยัง',sendScreen:'ส่งไปที่หน้าจอ',mode:'โหมด',modeCountdown:'นับถอยหลัง',modeCountup:'นาฬิกาจับเวลา',modeClock:'นาฬิกา',set:'ตั้งค่า',quick:'ด่วน',colors:'สี',background:'พื้นหลัง',timeText:'เวลา/ข้อความ',yellow:'เหลือง',red:'แดง',transparent:'พื้นหลังโปร่งใส (OBS)',text:'ข้อความ',textOnly:'ข้อความเท่านั้น',clear:'ล้าง',thresholds:'คำเตือน',sound:'เสียง',progress:'แถบความคืบหน้า',message:'ข้อความ',flash:'กะพริบ',send:'ส่ง',namePh:'ชื่อ',autoNext:'ไปถัดไปอัตโนมัติ',goNext:'GO ▶ ถัดไป &nbsp;(N)',rundown:'รันดาวน์',notePh:'หมายเหตุ (ไม่บังคับ)…',cueImport:'⬆ นำเข้า',cueExport:'⬇ CSV',copy:'คัดลอก',remoteLabel:'รีโมต (โทรศัพท์ / แท็บเล็ต)',shareOnline:'🌐 แชร์ออนไลน์',stopSharing:'✕ หยุดแชร์',start:'▶ START',pause:'⏸ พัก',outLive:'หน้าจอสด',outClosed:'ปิดหน้าจอ',live:'สด',connected:'เชื่อมต่อแล้ว'},
+    id:{languageTitle:'Bahasa antarmuka',outLabel:'Output ke',sendScreen:'Kirim ke layar',mode:'Mode',modeCountdown:'Hitung mundur',modeCountup:'Stopwatch',modeClock:'Jam',set:'Setel',quick:'Cepat',colors:'Warna',background:'Latar',timeText:'Waktu/teks',yellow:'Kuning',red:'Merah',transparent:'Latar transparan (OBS)',text:'Teks',textOnly:'Teks saja',clear:'Bersihkan',thresholds:'Peringatan',sound:'Suara',progress:'Bilah progres',message:'Pesan',flash:'Berkedip',send:'Kirim',namePh:'Nama',autoNext:'Otomatis ke berikutnya',goNext:'GO ▶ BERIKUTNYA &nbsp;(N)',rundown:'RUNDOWN',notePh:'Catatan (opsional)…',cueImport:'⬆ Impor',cueExport:'⬇ CSV',copy:'Salin',remoteLabel:'Remote (ponsel / tablet)',shareOnline:'🌐 Bagikan online',stopSharing:'✕ Berhenti berbagi',start:'▶ START',pause:'⏸ JEDA',outLive:'LAYAR LIVE',outClosed:'LAYAR TERTUTUP',live:'live',connected:'terhubung'},
+    nl:{languageTitle:'Interfacetaal',outLabel:'Uitvoer naar',sendScreen:'Naar scherm sturen',mode:'Modus',modeCountdown:'Aftellen',modeCountup:'Stopwatch',modeClock:'Klok',set:'Instellen',quick:'Snel',colors:'Kleuren',background:'Achtergrond',timeText:'Tijd/tekst',yellow:'Geel',red:'Rood',transparent:'Transparante achtergrond (OBS)',text:'Tekst',textOnly:'Alleen tekst',clear:'Wissen',thresholds:'Waarschuwingen',sound:'Geluid',progress:'Voortgangsbalk',message:'Bericht',flash:'Knipperen',send:'Versturen',namePh:'Naam',autoNext:'Automatisch verder',goNext:'GO ▶ VOLGENDE &nbsp;(N)',rundown:'DRAAIBOEK',notePh:'Notitie (optioneel)…',cueImport:'⬆ Importeren',cueExport:'⬇ CSV',copy:'Kopiëren',remoteLabel:'Afstandsbediening (telefoon / tablet)',shareOnline:'🌐 Online delen',stopSharing:'✕ Delen stoppen',start:'▶ START',pause:'⏸ PAUZE',outLive:'SCHERM LIVE',outClosed:'SCHERM GESLOTEN',live:'live',connected:'verbonden'},
+    ro:{languageTitle:'Limba interfeței',outLabel:'Ieșire către',sendScreen:'Trimite pe ecran',mode:'Mod',modeCountdown:'Numărătoare inversă',modeCountup:'Cronometru',modeClock:'Ceas',set:'Setează',quick:'Rapid',colors:'Culori',background:'Fundal',timeText:'Timp/text',yellow:'Galben',red:'Roșu',transparent:'Fundal transparent (OBS)',text:'Text',textOnly:'Doar text',clear:'Șterge',thresholds:'Avertizări',sound:'Sunet',progress:'Bară progres',message:'Mesaj',flash:'Clipește',send:'Trimite',namePh:'Nume',autoNext:'Avans automat',goNext:'GO ▶ URMĂTOR &nbsp;(N)',rundown:'RUNDOWN',notePh:'Notă (opțional)…',cueImport:'⬆ Import',cueExport:'⬇ CSV',copy:'Copiază',remoteLabel:'Telecomandă (telefon / tabletă)',shareOnline:'🌐 Distribuie online',stopSharing:'✕ Oprește distribuirea',start:'▶ START',pause:'⏸ PAUZĂ',outLive:'ECRAN LIVE',outClosed:'ECRAN ÎNCHIS',live:'live',connected:'conectat'},
+    el:{languageTitle:'Γλώσσα διεπαφής',outLabel:'Έξοδος σε',sendScreen:'Αποστολή στην οθόνη',mode:'Λειτουργία',modeCountdown:'Αντίστροφη μέτρηση',modeCountup:'Χρονόμετρο',modeClock:'Ρολόι',set:'Ορισμός',quick:'Γρήγορα',colors:'Χρώματα',background:'Φόντο',timeText:'Χρόνος/κείμενο',yellow:'Κίτρινο',red:'Κόκκινο',transparent:'Διαφανές φόντο (OBS)',text:'Κείμενο',textOnly:'Μόνο κείμενο',clear:'Καθαρισμός',thresholds:'Προειδοποιήσεις',sound:'Ήχος',progress:'Μπάρα προόδου',message:'Μήνυμα',flash:'Αναβόσβημα',send:'Αποστολή',namePh:'Όνομα',autoNext:'Αυτόματα στο επόμενο',goNext:'GO ▶ ΕΠΟΜΕΝΟ &nbsp;(N)',rundown:'RUNDOWN',notePh:'Σημείωση (προαιρετικά)…',cueImport:'⬆ Εισαγωγή',cueExport:'⬇ CSV',copy:'Αντιγραφή',remoteLabel:'Τηλεχειρισμός (τηλέφωνο / tablet)',shareOnline:'🌐 Κοινή χρήση online',stopSharing:'✕ Διακοπή κοινής χρήσης',start:'▶ START',pause:'⏸ ΠΑΥΣΗ',outLive:'ΟΘΟΝΗ LIVE',outClosed:'ΟΘΟΝΗ ΚΛΕΙΣΤΗ',live:'live',connected:'συνδεδεμένο'},
+    cs:{languageTitle:'Jazyk rozhraní',outLabel:'Výstup na',sendScreen:'Poslat na obrazovku',mode:'Režim',modeCountdown:'Odpočet',modeCountup:'Stopky',modeClock:'Hodiny',set:'Nastavit',quick:'Rychle',colors:'Barvy',background:'Pozadí',timeText:'Čas/text',yellow:'Žlutá',red:'Červená',transparent:'Průhledné pozadí (OBS)',text:'Text',textOnly:'Pouze text',clear:'Vymazat',thresholds:'Upozornění',sound:'Zvuk',progress:'Ukazatel průběhu',message:'Zpráva',flash:'Blikat',send:'Odeslat',namePh:'Název',autoNext:'Automaticky další',goNext:'GO ▶ DALŠÍ &nbsp;(N)',rundown:'RUNDOWN',notePh:'Poznámka (volitelné)…',cueImport:'⬆ Import',cueExport:'⬇ CSV',copy:'Kopírovat',remoteLabel:'Dálkové ovládání (telefon / tablet)',shareOnline:'🌐 Sdílet online',stopSharing:'✕ Zastavit sdílení',start:'▶ START',pause:'⏸ PAUZA',outLive:'OBRAZOVKA LIVE',outClosed:'OBRAZOVKA ZAVŘENÁ',live:'live',connected:'připojeno'},
+    sv:{languageTitle:'Gränssnittsspråk',outLabel:'Utgång till',sendScreen:'Skicka till skärm',mode:'Läge',modeCountdown:'Nedräkning',modeCountup:'Stoppur',modeClock:'Klocka',set:'Ställ in',quick:'Snabbt',colors:'Färger',background:'Bakgrund',timeText:'Tid/text',yellow:'Gul',red:'Röd',transparent:'Transparent bakgrund (OBS)',text:'Text',textOnly:'Endast text',clear:'Rensa',thresholds:'Varningar',sound:'Ljud',progress:'Förloppsindikator',message:'Meddelande',flash:'Blinka',send:'Skicka',namePh:'Namn',autoNext:'Auto till nästa',goNext:'GO ▶ NÄSTA &nbsp;(N)',rundown:'RUNDOWN',notePh:'Anteckning (valfri)…',cueImport:'⬆ Importera',cueExport:'⬇ CSV',copy:'Kopiera',remoteLabel:'Fjärrkontroll (telefon / surfplatta)',shareOnline:'🌐 Dela online',stopSharing:'✕ Stoppa delning',start:'▶ START',pause:'⏸ PAUS',outLive:'SKÄRM LIVE',outClosed:'SKÄRM STÄNGD',live:'live',connected:'ansluten'}
+  };
+
+  const lt = (lowerThird, graphics, speaker, title, extra, show, hide, fromCue, graphic, save, del, autoCue, gridSize, bottomCenter, sec, duration, posTitle, styleTitle, cueName, cueTitle, control = 'Live') => ({
+    gridSizeTitle:gridSize, posBC:bottomCenter,
+    lowerThird, ltControl:control, ltAssets:graphics,
+    ltNamePh:speaker, ltTitlePh:title, ltMetaPh:extra,
+    ltStyleTitle:styleTitle, ltStyleClean:'Clean', ltStyleGlass:'Glass', ltStyleBroadcast:'Broadcast', ltStyleSlab:'Solid',
+    ltPosTitle:posTitle, ltSeconds:sec, ltDurTitle:duration,
+    ltShow:show, ltHide:hide, ltFromCue:fromCue, ltGraphic:graphic,
+    ltSavePreset:save, ltDeletePreset:del, ltAutoCue:autoCue,
+    cueLtNamePh:cueName, cueLtTitlePh:cueTitle
+  });
+  const broadcastEn = lt('Lower third','Graphics','Speaker name','Title / role','Extra line','Show','Hide','From cue','Graphic','Save','Delete preset','Auto on GO/cue','Grid size','Bottom center','Sec','Duration in seconds; 0 = manual','Lower-third position','Lower-third style','Lower third name (optional)','Lower third title (optional)');
+  const broadcastSr = lt('Potpis','Grafika','Ime govornika','Titula / uloga','Dodatno','Pusti','Skloni','Iz cue-a','Grafika','Sačuvaj','Obriši preset','Auto na GO/cue','Veličina grida','Dole centar','Sek','Trajanje u sekundama; 0 = ručno','Pozicija potpisa','Stil potpisa','Potpis ime (opciono)','Potpis titula (opciono)');
+  const studioEn = {
+    studioPreview:'Preview', studioProgram:'Program', previewReady:'Ready',
+    cutToProgram:'Cut', transitionToProgram:'Transition', fadeToBlack:'Fade to black',
+    directProgram:'Direct Program', directProgramTitle:'Changes go straight to Program instead of Preview'
+  };
+  const studioSr = {
+    studioPreview:'Preview', studioProgram:'Program', previewReady:'Spremno',
+    cutToProgram:'Cut', transitionToProgram:'Transition', fadeToBlack:'Fade to black',
+    directProgram:'Direktno u Program', directProgramTitle:'Promene idu odmah u Program umesto u Preview'
+  };
+  const productionEn = {
+    scenes:'Scenes', newScene:'New scene', duplicate:'Duplicate', delete:'Delete',
+    addMedia:'Add media', addText:'Text', captureRefresh:'Refresh', windowCapture:'Window capture',
+    outputs:'OUTPUTS', outputAdd:'Add', outputApply:'Apply'
+  };
+  const productionSr = {
+    scenes:'Scene', newScene:'Nova scena', duplicate:'Dupliraj', delete:'Obriši',
+    addMedia:'Dodaj media', addText:'Tekst', captureRefresh:'Osveži', windowCapture:'Window capture',
+    outputs:'IZLAZI', outputAdd:'Dodaj', outputApply:'Primeni'
+  };
+  const ltStudioEn = {
+    languageDefault:'DEFAULT', languageFull:'FULL', languageCore:'CORE',
+    logoLabel:'Logo', ltPanelTitle:'Lower Third', ltEditStudio:'EDIT STUDIO', ltSectionText:'Text', ltSectionStyle:'Style', ltAccent:'Accent', ltLiveActions:'Live actions', ltGraphicsPresets:'Graphics and presets',
+    ltStudioName:'LOWER THIRD STUDIO', ltStudioNoTemplate:'No custom template', ltStudioCreateSelect:'Create or select a template.',
+    ltStudioSave:'SAVE', ltStudioTake:'TAKE', ltStudioPreview:'PREVIEW', ltStudioHide:'HIDE', ltStudioUndo:'Undo', ltStudioRedo:'Redo', ltStudioClose:'Close',
+    ltStudioCanvas:'CANVAS', ltStudioTemplatesLayers:'TEMPLATES & LAYERS', ltStudioInspector:'INSPECTOR', ltStudioTemplates:'Templates', ltStudioNew:'New', ltStudioRename:'Rename',
+    ltStudioImport:'Import Template', ltStudioExport:'Export Template', ltStudioLayers:'Layers', ltStudioAddDynamic:'Add dynamic text', ltStudioAddStatic:'Add static text', ltStudioAddShape:'Add shape', ltStudioAddLogo:'Add logo',
+    ltStudioSelectedPreview:'Selected cue preview', ltStudioFit:'Fit', ltStudioSelectLayer:'Select a layer to edit position, style and playback.',
+    ltStudioAnimation:'Animation', ltStudioNoAsset:'No asset', ltStudioIntroMode:'Intro mode', ltStudioIntroAsset:'Intro asset', ltStudioStartOffset:'Start offset', ltStudioDuration:'Duration', ltStudioTextReveal:'Text reveal delay',
+    ltStudioHoldMode:'Hold mode', ltStudioHoldAsset:'Hold asset', ltStudioLoopHold:'Loop hold media', ltStudioHoldLast:'Hold last frame', ltStudioOutroMode:'Outro mode', ltStudioOutroAsset:'Outro asset', ltStudioOutroDuration:'Outro duration', ltStudioFallbackFade:'Fallback fade', ltStudioPreviewSequence:'PREVIEW SEQUENCE',
+    ltStudioNone:'None', ltStudioSimpleFade:'Simple fade', ltStudioWebmMp4:'WebM / MP4', ltStudioStaticLayers:'Static layers', ltStudioHoldMedia:'Hold media',
+    ltStudioTransform:'Transform', ltStudioLayerName:'Layer name', ltStudioOpacity:'Opacity', ltStudioRotation:'Rotation', ltStudioContent:'Content', ltStudioAsset:'Asset', ltStudioMissingAsset:'Missing asset', ltStudioMediaFit:'Media fit', ltStudioPlayback:'Playback',
+    ltStudioContain:'Contain', ltStudioCover:'Cover', ltStudioFill:'Fill', ltStudioStatic:'Static', ltStudioPlayOnce:'Play once', ltStudioLoop:'Loop', ltStudioCropTop:'Crop top', ltStudioCropLeft:'Crop left', ltStudioField:'Field', ltStudioFallback:'Fallback', ltStudioText:'Text',
+    ltStudioShape:'Shape', ltStudioRectangle:'Rectangle', ltStudioRoundedRectangle:'Rounded rectangle', ltStudioLine:'Line', ltStudioTypography:'Typography', ltStudioFont:'Font', ltStudioSize:'Size', ltStudioWeight:'Weight', ltStudioAlign:'Align', ltStudioLeft:'Left', ltStudioCenter:'Center', ltStudioRight:'Right', ltStudioLineHeight:'Line height', ltStudioMaxLines:'Max lines', ltStudioItalic:'Italic', ltStudioAutoFit:'Auto-fit text',
+    ltStudioAppearance:'Appearance', ltStudioColor:'Color', ltStudioBackground:'Background', ltStudioBgColor:'BG color', ltStudioBgRadius:'BG radius', ltStudioPadding:'Padding', ltStudioShadow:'Shadow', ltStudioOutline:'Outline', ltStudioStroke:'Stroke', ltStudioStrokeWidth:'Stroke W', ltStudioRadius:'Radius',
+    ltStudioActions:'Actions', ltStudioFullWidth:'Full width', ltStudioFitMedia:'Fit media', ltStudioResetTransform:'Reset transform', ltStudioLoad:'Load', ltStudioUntitled:'Untitled', ltStudioLayerCount:'layers', ltStudioNoTemplates:'No custom templates yet.', ltStudioCreateToAdd:'Create a template to add layers.', ltStudioNoLayers:'No layers yet.', ltStudioValidPreview:'Create a valid template to preview.', ltStudioSelectedCue:'Selected cue', ltStudioLiveCue:'Live cue', ltStudioPreviewSpeaker:'Preview Speaker'
+    ,ltStudioUndoDone:'Undo applied. Save to persist.', ltStudioRedoDone:'Redo applied. Save to persist.', ltStudioUnsaved:'Unsaved changes.', ltStudioTemplateCreated:'Template created. Save after editing.', ltStudioTemplateDuplicated:'Template duplicated.', ltStudioTemplateRenamed:'Template renamed.', ltStudioTemplateDeleted:'Template deleted.', ltStudioCreateCustomFirst:'Create a custom template first.', ltStudioCannotSave:'Cannot save: {error}', ltStudioSaved:'Saved.', ltStudioExporting:'Exporting template package...', ltStudioExportCanceled:'Export canceled.', ltStudioExportFailed:'Export failed: {error}', ltStudioExported:'Template exported with {count} assets.', ltStudioOpeningPackage:'Opening template package...', ltStudioImportCanceled:'Import canceled.', ltStudioImportFailed:'Import failed: {error}', ltStudioImportValidation:'template validation error', ltStudioImportDuplicate:'a template with this ID already exists', ltStudioImported:'Template imported with {count} assets.', ltStudioLayerAdded:'Layer added. Save to persist.', ltStudioLayerMoved:'Layer moved.', ltStudioLayerRemoved:'Layer removed.', ltStudioCreateFirst:'Create a template first.', ltStudioLoadingMedia:'Loading media...', ltStudioMediaFailed:'Media import failed.', ltStudioVideoImported:'Video imported. Audio is muted by design.', ltStudioImageImported:'Image imported.', ltStudioTemplateLoaded:'Template loaded for editing.', ltStudioAnimationChanged:'Animation changed.', ltStudioSequenceLocal:'Preview sequence running locally. Program was not changed.', ltStudioPreviewUpdated:'Preview updated. Program was not changed.', ltStudioCannotTake:'Cannot TAKE: {error}', ltStudioRuntimeInvalid:'runtime validation failed', ltStudioLiveStatus:'Live. TAKE sent active template using LIVE cue.', ltStudioHiddenStatus:'Hidden. Cue and timer unchanged.', ltStudioReadyStatus:'Studio ready. PREVIEW is local; TAKE sends the template with LIVE cue data.', ltStudioLayerCentered:'Layer centered.', ltStudioLayerWidth:'Layer width adjusted.', ltStudioLayerFit:'Layer fit to canvas.', ltStudioTransformReset:'Transform reset.', ltStudioTemplateNamePrompt:'Template name', ltStudioTemplateDefault:'Lower third template', ltStudioRenamePrompt:'Rename template', ltStudioStaticPrompt:'Static text', ltStudioStaticDefault:'Static text', ltStudioFileTooLarge:'File too large (max 200 MB).', ltStudioSupportedMedia:'Supported: PNG, SVG, JPG, MP4/H.264 and WebM VP8/VP9.'
+  };
+  const ltStudioSr = {
+    languageDefault:'PODRAZUMEVANI', languageFull:'PUN', languageCore:'OSNOVNI',
+    logoLabel:'Logo', ltPanelTitle:'Potpis', ltEditStudio:'UREDI STUDIO', ltSectionText:'Tekst', ltSectionStyle:'Stil', ltAccent:'Akcenat', ltLiveActions:'Live akcije', ltGraphicsPresets:'Grafika i preseti',
+    ltStudioName:'STUDIO ZA POTPISE', ltStudioNoTemplate:'Nema custom šablona', ltStudioCreateSelect:'Napravite ili izaberite šablon.',
+    ltStudioSave:'SAČUVAJ', ltStudioTake:'PUSTI', ltStudioPreview:'PREVIEW', ltStudioHide:'SKLONI', ltStudioUndo:'Poništi', ltStudioRedo:'Ponovi', ltStudioClose:'Zatvori',
+    ltStudioCanvas:'PLATNO', ltStudioTemplatesLayers:'ŠABLONI I SLOJEVI', ltStudioInspector:'INSPEKTOR', ltStudioTemplates:'Šabloni', ltStudioNew:'Novi', ltStudioRename:'Preimenuj',
+    ltStudioImport:'Uvezi šablon', ltStudioExport:'Izvezi šablon', ltStudioLayers:'Slojevi', ltStudioAddDynamic:'Dodaj dinamički tekst', ltStudioAddStatic:'Dodaj statični tekst', ltStudioAddShape:'Dodaj oblik', ltStudioAddLogo:'Dodaj logo',
+    ltStudioSelectedPreview:'Preview izabranog cue-a', ltStudioFit:'Uklopi', ltStudioSelectLayer:'Izaberite sloj da uredite poziciju, stil i reprodukciju.',
+    ltStudioAnimation:'Animacija', ltStudioNoAsset:'Bez asseta', ltStudioIntroMode:'Intro režim', ltStudioIntroAsset:'Intro asset', ltStudioStartOffset:'Početni pomak', ltStudioDuration:'Trajanje', ltStudioTextReveal:'Kašnjenje teksta',
+    ltStudioHoldMode:'Hold režim', ltStudioHoldAsset:'Hold asset', ltStudioLoopHold:'Ponavljaj hold medij', ltStudioHoldLast:'Zadrži poslednji frejm', ltStudioOutroMode:'Outro režim', ltStudioOutroAsset:'Outro asset', ltStudioOutroDuration:'Outro trajanje', ltStudioFallbackFade:'Rezervni fade', ltStudioPreviewSequence:'PREVIEW SEKVENCA',
+    ltStudioNone:'Nema', ltStudioSimpleFade:'Jednostavan fade', ltStudioWebmMp4:'WebM / MP4', ltStudioStaticLayers:'Statični slojevi', ltStudioHoldMedia:'Hold medij',
+    ltStudioTransform:'Transformacija', ltStudioLayerName:'Naziv sloja', ltStudioOpacity:'Prozirnost', ltStudioRotation:'Rotacija', ltStudioContent:'Sadržaj', ltStudioAsset:'Asset', ltStudioMissingAsset:'Asset nedostaje', ltStudioMediaFit:'Uklapanje medija', ltStudioPlayback:'Reprodukcija',
+    ltStudioContain:'Uklopi', ltStudioCover:'Popuni', ltStudioFill:'Razvuci', ltStudioStatic:'Statično', ltStudioPlayOnce:'Pusti jednom', ltStudioLoop:'Ponavljaj', ltStudioCropTop:'Iseci gore', ltStudioCropLeft:'Iseci levo', ltStudioField:'Polje', ltStudioFallback:'Rezervni tekst', ltStudioText:'Tekst',
+    ltStudioShape:'Oblik', ltStudioRectangle:'Pravougaonik', ltStudioRoundedRectangle:'Zaobljen pravougaonik', ltStudioLine:'Linija', ltStudioTypography:'Tipografija', ltStudioFont:'Font', ltStudioSize:'Veličina', ltStudioWeight:'Debljina', ltStudioAlign:'Poravnanje', ltStudioLeft:'Levo', ltStudioCenter:'Centar', ltStudioRight:'Desno', ltStudioLineHeight:'Visina reda', ltStudioMaxLines:'Maks. redova', ltStudioItalic:'Kurziv', ltStudioAutoFit:'Automatski uklopi tekst',
+    ltStudioAppearance:'Izgled', ltStudioColor:'Boja', ltStudioBackground:'Pozadina', ltStudioBgColor:'Boja pozadine', ltStudioBgRadius:'Radijus pozadine', ltStudioPadding:'Unutrašnji razmak', ltStudioShadow:'Senka', ltStudioOutline:'Kontura', ltStudioStroke:'Linija', ltStudioStrokeWidth:'Debljina linije', ltStudioRadius:'Radijus',
+    ltStudioActions:'Akcije', ltStudioFullWidth:'Puna širina', ltStudioFitMedia:'Uklopi medij', ltStudioResetTransform:'Resetuj transformaciju', ltStudioLoad:'Učitaj', ltStudioUntitled:'Bez naziva', ltStudioLayerCount:'slojeva', ltStudioNoTemplates:'Još nema custom šablona.', ltStudioCreateToAdd:'Napravite šablon da biste dodali slojeve.', ltStudioNoLayers:'Još nema slojeva.', ltStudioValidPreview:'Napravite ispravan šablon za preview.', ltStudioSelectedCue:'Izabrani cue', ltStudioLiveCue:'Live cue', ltStudioPreviewSpeaker:'Preview govornik'
+    ,ltStudioUndoDone:'Poništeno. Sačuvajte da ostane.', ltStudioRedoDone:'Ponovljeno. Sačuvajte da ostane.', ltStudioUnsaved:'Nesačuvane izmene.', ltStudioTemplateCreated:'Šablon je napravljen. Sačuvajte posle uređivanja.', ltStudioTemplateDuplicated:'Šablon je dupliran.', ltStudioTemplateRenamed:'Šablon je preimenovan.', ltStudioTemplateDeleted:'Šablon je obrisan.', ltStudioCreateCustomFirst:'Prvo napravite custom šablon.', ltStudioCannotSave:'Nije moguće sačuvati: {error}', ltStudioSaved:'Sačuvano.', ltStudioExporting:'Izvozim paket šablona...', ltStudioExportCanceled:'Izvoz je otkazan.', ltStudioExportFailed:'Izvoz nije uspeo: {error}', ltStudioExported:'Šablon je izvezen sa {count} asseta.', ltStudioOpeningPackage:'Otvaram paket šablona...', ltStudioImportCanceled:'Uvoz je otkazan.', ltStudioImportFailed:'Uvoz nije uspeo: {error}', ltStudioImportValidation:'greška validacije šablona', ltStudioImportDuplicate:'šablon sa ovim ID-jem već postoji', ltStudioImported:'Šablon je uvezen sa {count} asseta.', ltStudioLayerAdded:'Sloj je dodat. Sačuvajte da ostane.', ltStudioLayerMoved:'Sloj je pomeren.', ltStudioLayerRemoved:'Sloj je uklonjen.', ltStudioCreateFirst:'Prvo napravite šablon.', ltStudioLoadingMedia:'Učitavam medij...', ltStudioMediaFailed:'Uvoz medija nije uspeo.', ltStudioVideoImported:'Video je uvezen. Zvuk je namenski utišan.', ltStudioImageImported:'Slika je uvezena.', ltStudioTemplateLoaded:'Šablon je učitan za uređivanje.', ltStudioAnimationChanged:'Animacija je promenjena.', ltStudioSequenceLocal:'Preview sekvence radi lokalno. Program nije promenjen.', ltStudioPreviewUpdated:'Preview je osvežen. Program nije promenjen.', ltStudioCannotTake:'Nije moguće pustiti: {error}', ltStudioRuntimeInvalid:'runtime validacija nije uspela', ltStudioLiveStatus:'Uživo. Aktivni šablon je pušten sa podacima LIVE cue-a.', ltStudioHiddenStatus:'Sklonjeno. Cue i tajmer nisu promenjeni.', ltStudioReadyStatus:'Studio je spreman. PREVIEW je lokalan; PUSTI šalje šablon sa podacima LIVE cue-a.', ltStudioLayerCentered:'Sloj je centriran.', ltStudioLayerWidth:'Širina sloja je podešena.', ltStudioLayerFit:'Sloj je uklopljen u platno.', ltStudioTransformReset:'Transformacija je resetovana.', ltStudioTemplateNamePrompt:'Naziv šablona', ltStudioTemplateDefault:'Šablon potpisa', ltStudioRenamePrompt:'Preimenuj šablon', ltStudioStaticPrompt:'Statični tekst', ltStudioStaticDefault:'Statični tekst', ltStudioFileTooLarge:'Fajl je prevelik (maks. 200 MB).', ltStudioSupportedMedia:'Podržano: PNG, SVG, JPG, MP4/H.264 i WebM VP8/VP9.'
+  };
+  const broadcastCore = {
+    es:lt('Rótulo','Gráficos','Nombre del ponente','Cargo / rol','Línea extra','Mostrar','Ocultar','Desde cue','Gráfico','Guardar','Borrar preset','Auto en GO/cue','Tamaño de cuadrícula','Abajo centro','Seg','Duración en segundos; 0 = manual','Posición del rótulo','Estilo del rótulo','Nombre de rótulo (opcional)','Título de rótulo (opcional)'),
+    zh:lt('下三分之一字幕','图形','发言人姓名','职务 / 角色','附加行','显示','隐藏','从 cue','图形','保存','删除预设','GO/cue 自动','网格大小','底部居中','秒','持续秒数；0 = 手动','字幕位置','字幕样式','字幕姓名（可选）','字幕标题（可选）'),
+    hi:lt('लोअर थर्ड','ग्राफिक्स','वक्ता का नाम','पद / भूमिका','अतिरिक्त पंक्ति','दिखाएँ','छिपाएँ','क्यू से','ग्राफिक','सहेजें','प्रीसेट हटाएँ','GO/cue पर ऑटो','ग्रिड आकार','नीचे केंद्र','सेक','सेकंड में अवधि; 0 = मैनुअल','लोअर थर्ड स्थिति','लोअर थर्ड शैली','लोअर थर्ड नाम (वैकल्पिक)','लोअर थर्ड शीर्षक (वैकल्पिक)'),
+    ar:lt('الشريط السفلي','رسومات','اسم المتحدث','المنصب / الدور','سطر إضافي','إظهار','إخفاء','من cue','رسم','حفظ','حذف preset','تلقائي عند GO/cue','حجم الشبكة','أسفل الوسط','ث','المدة بالثواني؛ 0 = يدوي','موضع الشريط السفلي','نمط الشريط السفلي','اسم الشريط السفلي (اختياري)','عنوان الشريط السفلي (اختياري)'),
+    pt:lt('Tarja inferior','Gráficos','Nome do palestrante','Cargo / função','Linha extra','Mostrar','Ocultar','Do cue','Gráfico','Salvar','Excluir preset','Auto no GO/cue','Tamanho da grade','Inferior centro','Seg','Duração em segundos; 0 = manual','Posição da tarja','Estilo da tarja','Nome da tarja (opcional)','Título da tarja (opcional)'),
+    bn:lt('লোয়ার থার্ড','গ্রাফিক্স','বক্তার নাম','পদবি / ভূমিকা','অতিরিক্ত লাইন','দেখান','লুকান','cue থেকে','গ্রাফিক','সংরক্ষণ','প্রিসেট মুছুন','GO/cue এ অটো','গ্রিড আকার','নিচে মাঝখানে','সেক','সময় সেকেন্ডে; 0 = ম্যানুয়াল','লোয়ার থার্ড অবস্থান','লোয়ার থার্ড স্টাইল','লোয়ার থার্ড নাম (ঐচ্ছিক)','লোয়ার থার্ড শিরোনাম (ঐচ্ছিক)'),
+    ru:lt('Нижняя плашка','Графика','Имя спикера','Должность / роль','Доп. строка','Показать','Скрыть','Из cue','Графика','Сохранить','Удалить пресет','Авто по GO/cue','Размер сетки','Снизу по центру','Сек','Длительность в секундах; 0 = вручную','Позиция плашки','Стиль плашки','Имя плашки (необязательно)','Заголовок плашки (необязательно)'),
+    ja:lt('ローワーサード','グラフィック','登壇者名','肩書き / 役割','追加行','表示','隠す','cue から','グラフィック','保存','プリセット削除','GO/cue で自動','グリッドサイズ','下中央','秒','秒数; 0 = 手動','ローワーサード位置','ローワーサードスタイル','ローワーサード名（任意）','ローワーサード肩書き（任意）'),
+    pa:lt('ਲੋਅਰ ਥਰਡ','ਗ੍ਰਾਫਿਕਸ','ਸਪੀਕਰ ਦਾ ਨਾਮ','ਟਾਈਟਲ / ਭੂਮਿਕਾ','ਵਾਧੂ ਲਾਈਨ','ਦਿਖਾਓ','ਲੁਕਾਓ','cue ਤੋਂ','ਗ੍ਰਾਫਿਕ','ਸੇਵ','ਪ੍ਰੀਸੈੱਟ ਮਿਟਾਓ','GO/cue ਤੇ ਆਟੋ','ਗ੍ਰਿਡ ਆਕਾਰ','ਹੇਠਾਂ ਕੇਂਦਰ','ਸੈਕ','ਅਵਧੀ ਸਕਿੰਟਾਂ ਵਿੱਚ; 0 = ਮੈਨੁਅਲ','ਲੋਅਰ ਥਰਡ ਸਥਿਤੀ','ਲੋਅਰ ਥਰਡ ਸ਼ੈਲੀ','ਲੋਅਰ ਥਰਡ ਨਾਮ (ਚੋਣਵਾਂ)','ਲੋਅਰ ਥਰਡ ਟਾਈਟਲ (ਚੋਣਵਾਂ)'),
+    de:lt('Bauchbinde','Grafiken','Name des Sprechers','Titel / Rolle','Zusatzzeile','Einblenden','Ausblenden','Aus Cue','Grafik','Speichern','Preset löschen','Auto bei GO/cue','Rastergröße','Unten mittig','Sek','Dauer in Sekunden; 0 = manuell','Bauchbinden-Position','Bauchbinden-Stil','Bauchbinden-Name (optional)','Bauchbinden-Titel (optional)'),
+    jv:lt('Lower third','Grafis','Jeneng pembicara','Judhul / peran','Baris tambahan','Tampil','Singidaken','Saka cue','Grafik','Simpen','Busak preset','Auto ing GO/cue','Ukuran grid','Ngisor tengah','Det','Durasi detik; 0 = manual','Posisi lower third','Gaya lower third','Jeneng lower third (opsional)','Judhul lower third (opsional)'),
+    ko:lt('로어 서드','그래픽','발표자 이름','직함 / 역할','추가 줄','표시','숨기기','cue에서','그래픽','저장','프리셋 삭제','GO/cue 자동','그리드 크기','하단 중앙','초','초 단위 지속시간; 0 = 수동','로어 서드 위치','로어 서드 스타일','로어 서드 이름 (선택)','로어 서드 직함 (선택)'),
+    fr:lt('Bandeau bas','Graphismes','Nom intervenant','Titre / rôle','Ligne extra','Afficher','Masquer','Depuis cue','Graphique','Enregistrer','Supprimer preset','Auto sur GO/cue','Taille grille','Bas centre','Sec','Durée en secondes; 0 = manuel','Position du bandeau','Style du bandeau','Nom du bandeau (optionnel)','Titre du bandeau (optionnel)'),
+    tr:lt('Alt bant','Grafikler','Konuşmacı adı','Ünvan / rol','Ek satır','Göster','Gizle','Cue’dan','Grafik','Kaydet','Preset sil','GO/cue otomatik','Grid boyutu','Alt orta','Sn','Saniye cinsinden süre; 0 = manuel','Alt bant pozisyonu','Alt bant stili','Alt bant adı (isteğe bağlı)','Alt bant ünvanı (isteğe bağlı)'),
+    vi:lt('Lower third','Đồ họa','Tên diễn giả','Chức danh / vai trò','Dòng thêm','Hiện','Ẩn','Từ cue','Đồ họa','Lưu','Xóa preset','Tự động khi GO/cue','Cỡ lưới','Dưới giữa','Giây','Thời lượng giây; 0 = thủ công','Vị trí lower third','Kiểu lower third','Tên lower third (tùy chọn)','Chức danh lower third (tùy chọn)'),
+    te:lt('లోయర్ థర్డ్','గ్రాఫిక్స్','వక్త పేరు','పదవి / పాత్ర','అదనపు పంక్తి','చూపు','దాచు','cue నుండి','గ్రాఫిక్','సేవ్','ప్రీసెట్ తొలగించు','GO/cue వద్ద ఆటో','గ్రిడ్ పరిమాణం','క్రింద మధ్య','సెక','వ్యవధి సెకన్లలో; 0 = మాన్యువల్','లోయర్ థర్డ్ స్థానం','లోయర్ థర్డ్ శైలి','లోయర్ థర్డ్ పేరు (ఐచ్చికం)','లోయర్ థర్డ్ శీర్షిక (ఐచ్చికం)'),
+    mr:lt('लोअर थर्ड','ग्राफिक्स','वक्त्याचे नाव','पद / भूमिका','अतिरिक्त ओळ','दाखवा','लपवा','cue मधून','ग्राफिक','सेव्ह','प्रीसेट हटवा','GO/cue वर ऑटो','ग्रिड आकार','खाली मध्य','सेक','कालावधी सेकंदात; 0 = मॅन्युअल','लोअर थर्ड स्थान','लोअर थर्ड शैली','लोअर थर्ड नाव (ऐच्छिक)','लोअर थर्ड शीर्षक (ऐच्छिक)'),
+    ta:lt('லோவர் தர்ட்','கிராபிக்ஸ்','பேச்சாளர் பெயர்','பதவி / பங்கு','கூடுதல் வரி','காட்டு','மறை','cue இலிருந்து','கிராபிக்','சேமி','பிரிசெட் நீக்கு','GO/cue இல் ஆட்டோ','கிரிட் அளவு','கீழ் மையம்','நொடி','நொடிகளில் காலம்; 0 = கைமுறை','லோவர் தர்ட் இடம்','லோவர் தர்ட் நடை','லோவர் தர்ட் பெயர் (விருப்பம்)','லோவர் தர்ட் தலைப்பு (விருப்பம்)'),
+    ur:lt('لوئر تھرڈ','گرافکس','اسپیکر کا نام','عنوان / کردار','اضافی لائن','دکھائیں','چھپائیں','cue سے','گرافک','محفوظ','پری سیٹ حذف','GO/cue پر آٹو','گرڈ سائز','نیچے مرکز','سیک','مدت سیکنڈ میں؛ 0 = دستی','لوئر تھرڈ پوزیشن','لوئر تھرڈ اسٹائل','لوئر تھرڈ نام (اختیاری)','لوئر تھرڈ عنوان (اختیاری)'),
+    it:lt('Sottopancia','Grafiche','Nome relatore','Titolo / ruolo','Riga extra','Mostra','Nascondi','Da cue','Grafica','Salva','Elimina preset','Auto su GO/cue','Dimensione griglia','Basso centro','Sec','Durata in secondi; 0 = manuale','Posizione sottopancia','Stile sottopancia','Nome sottopancia (opzionale)','Titolo sottopancia (opzionale)'),
+    fa:lt('زیرنویس پایین','گرافیک','نام سخنران','عنوان / نقش','خط اضافی','نمایش','پنهان','از cue','گرافیک','ذخیره','حذف preset','خودکار با GO/cue','اندازه شبکه','پایین مرکز','ثانیه','مدت به ثانیه؛ 0 = دستی','موقعیت زیرنویس','سبک زیرنویس','نام زیرنویس (اختیاری)','عنوان زیرنویس (اختیاری)'),
+    gu:lt('લોઅર થર્ડ','ગ્રાફિક્સ','વક્તાનું નામ','ટાઇટલ / ભૂમિકા','વધારાની લાઇન','બતાવો','છુપાવો','cue માંથી','ગ્રાફિક','સેવ','પ્રીસેટ કાઢી નાખો','GO/cue પર ઓટો','ગ્રિડ સાઇઝ','નીચે મધ્ય','સેક','અવધિ સેકન્ડમાં; 0 = મેન્યુઅલ','લોઅર થર્ડ સ્થિતિ','લોઅર થર્ડ સ્ટાઇલ','લોઅર થર્ડ નામ (વૈકલ્પિક)','લોઅર થર્ડ ટાઇટલ (વૈકલ્પિક)'),
+    pl:lt('Belka dolna','Grafika','Imię mówcy','Tytuł / rola','Dodatkowa linia','Pokaż','Ukryj','Z cue','Grafika','Zapisz','Usuń preset','Auto przy GO/cue','Rozmiar siatki','Dół środek','Sek','Czas w sekundach; 0 = ręcznie','Pozycja belki','Styl belki','Nazwa belki (opcjonalnie)','Tytuł belki (opcjonalnie)'),
+    uk:lt('Нижня плашка','Графіка','Імя спікера','Посада / роль','Додатковий рядок','Показати','Сховати','З cue','Графіка','Зберегти','Видалити пресет','Авто по GO/cue','Розмір сітки','Знизу по центру','Сек','Тривалість у секундах; 0 = вручну','Позиція плашки','Стиль плашки','Імя плашки (необов’язково)','Заголовок плашки (необов’язково)'),
+    ml:lt('ലോവർ തേർഡ്','ഗ്രാഫിക്സ്','സ്പീക്കറുടെ പേര്','പദവി / പങ്ക്','അധിക വരി','കാണിക്കുക','മറയ്ക്കുക','cueയിൽ നിന്ന്','ഗ്രാഫിക്','സേവ്','പ്രീസെറ്റ് നീക്കം','GO/cueൽ ഓട്ടോ','ഗ്രിഡ് വലുപ്പം','താഴെ മധ്യം','സെക്','ദൈർഘ്യം സെക്കൻഡിൽ; 0 = മാനുവൽ','ലോവർ തേർഡ് സ്ഥാനം','ലോവർ തേർഡ് ശൈലി','ലോവർ തേർഡ് പേര് (ഐച്ഛികം)','ലോവർ തേർഡ് തലക്കെട്ട് (ഐച്ഛികം)'),
+    kn:lt('ಲೋವರ್ ಥರ್ಡ್','ಗ್ರಾಫಿಕ್ಸ್','ವಕ್ತಾರರ ಹೆಸರು','ಹುದ್ದೆ / ಪಾತ್ರ','ಹೆಚ್ಚುವರಿ ಸಾಲು','ತೋರಿಸಿ','ಮರೆಮಾಡಿ','cue ಇಂದ','ಗ್ರಾಫಿಕ್','ಸೇವ್','ಪ್ರೀಸೆಟ್ ಅಳಿಸಿ','GO/cue ನಲ್ಲಿ ಆಟೋ','ಗ್ರಿಡ್ ಗಾತ್ರ','ಕೆಳ ಮಧ್ಯ','ಸೆಕ್','ಅವಧಿ ಸೆಕೆಂಡುಗಳಲ್ಲಿ; 0 = ಕೈಯಾರೆ','ಲೋವರ್ ಥರ್ಡ್ ಸ್ಥಾನ','ಲೋವರ್ ಥರ್ಡ್ ಶೈಲಿ','ಲೋವರ್ ಥರ್ಡ್ ಹೆಸರು (ಐಚ್ಛಿಕ)','ಲೋವರ್ ಥರ್ಡ್ ಶೀರ್ಷಿಕೆ (ಐಚ್ಛಿಕ)'),
+    or:lt('ଲୋଅର୍ ଥର୍ଡ','ଗ୍ରାଫିକ୍ସ','ବକ୍ତାଙ୍କ ନାମ','ପଦବୀ / ଭୂମିକା','ଅତିରିକ୍ତ ଲାଇନ୍','ଦେଖାନ୍ତୁ','ଲୁଚାନ୍ତୁ','cue ରୁ','ଗ୍ରାଫିକ୍','ସେଭ୍','ପ୍ରିସେଟ୍ ହଟାନ୍ତୁ','GO/cue ରେ ଅଟୋ','ଗ୍ରିଡ୍ ଆକାର','ତଳ ମଧ୍ୟ','ସେକ୍','ସମୟ ସେକେଣ୍ଡରେ; 0 = ମାନୁଆଲ୍','ଲୋଅର୍ ଥର୍ଡ ସ୍ଥାନ','ଲୋଅର୍ ଥର୍ଡ ଶୈଳୀ','ଲୋଅର୍ ଥର୍ଡ ନାମ (ଇଚ୍ଛାନୁସାରେ)','ଲୋଅର୍ ଥର୍ଡ ଶୀର୍ଷକ (ଇଚ୍ଛାନୁସାରେ)'),
+    my:lt('Lower third','ဂရပ်ဖစ်','စကားပြောသူအမည်','ရာထူး / အခန်းကဏ္ဍ','အပိုစာကြောင်း','ပြ','ဖျောက်','cue မှ','ဂရပ်ဖစ်','သိမ်း','preset ဖျက်','GO/cue တွင် အော်တို','ဂရစ်အရွယ်','အောက် အလယ်','စက္','ကြာချိန် စက္ကန့်; 0 = manual','Lower third တည်နေရာ','Lower third စတိုင်','Lower third အမည် (ရွေးချယ်နိုင်)','Lower third ခေါင်းစဉ် (ရွေးချယ်နိုင်)'),
+    th:lt('Lower third','กราฟิก','ชื่อผู้พูด','ตำแหน่ง / บทบาท','บรรทัดเสริม','แสดง','ซ่อน','จาก cue','กราฟิก','บันทึก','ลบ preset','อัตโนมัติเมื่อ GO/cue','ขนาดกริด','ล่างกลาง','วิ','ระยะเวลาเป็นวินาที; 0 = manual','ตำแหน่ง lower third','สไตล์ lower third','ชื่อ lower third (ไม่บังคับ)','ตำแหน่ง lower third (ไม่บังคับ)'),
+    id:lt('Lower third','Grafik','Nama pembicara','Jabatan / peran','Baris ekstra','Tampilkan','Sembunyikan','Dari cue','Grafik','Simpan','Hapus preset','Auto saat GO/cue','Ukuran grid','Bawah tengah','Det','Durasi dalam detik; 0 = manual','Posisi lower third','Gaya lower third','Nama lower third (opsional)','Judul lower third (opsional)'),
+    nl:lt('Lower third','Grafiek','Naam spreker','Titel / rol','Extra regel','Tonen','Verbergen','Uit cue','Grafiek','Opslaan','Preset verwijderen','Auto bij GO/cue','Rastergrootte','Onder midden','Sec','Duur in seconden; 0 = handmatig','Lower-third positie','Lower-third stijl','Lower-third naam (optioneel)','Lower-third titel (optioneel)'),
+    ro:lt('Burtieră','Grafică','Nume vorbitor','Titlu / rol','Linie extra','Afișează','Ascunde','Din cue','Grafică','Salvează','Șterge preset','Auto la GO/cue','Dimensiune grilă','Jos centru','Sec','Durată în secunde; 0 = manual','Poziție burtieră','Stil burtieră','Nume burtieră (opțional)','Titlu burtieră (opțional)'),
+    el:lt('Κάτω τίτλος','Γραφικά','Όνομα ομιλητή','Τίτλος / ρόλος','Έξτρα γραμμή','Εμφάνιση','Απόκρυψη','Από cue','Γραφικό','Αποθήκευση','Διαγραφή preset','Auto σε GO/cue','Μέγεθος πλέγματος','Κάτω κέντρο','Δευτ','Διάρκεια σε δευτερόλεπτα; 0 = χειροκίνητα','Θέση κάτω τίτλου','Στυλ κάτω τίτλου','Όνομα κάτω τίτλου (προαιρετικά)','Τίτλος κάτω τίτλου (προαιρετικά)'),
+    cs:lt('Spodní titulek','Grafika','Jméno řečníka','Titul / role','Extra řádek','Zobrazit','Skrýt','Z cue','Grafika','Uložit','Smazat preset','Auto při GO/cue','Velikost mřížky','Dole uprostřed','Sek','Doba v sekundách; 0 = ručně','Pozice titulku','Styl titulku','Jméno titulku (volitelné)','Nadpis titulku (volitelné)'),
+    sv:lt('Namnskylt','Grafik','Talarnamn','Titel / roll','Extra rad','Visa','Dölj','Från cue','Grafik','Spara','Ta bort preset','Auto vid GO/cue','Rutnätsstorlek','Nere mitten','Sek','Varaktighet i sekunder; 0 = manuellt','Position för namnskylt','Stil för namnskylt','Namn för namnskylt (valfritt)','Titel för namnskylt (valfritt)')
+  };
+  Object.assign(en, broadcastEn);
+  Object.assign(sr, broadcastSr);
+  Object.assign(en, studioEn);
+  Object.assign(sr, studioSr);
+  Object.assign(en, productionEn);
+  Object.assign(sr, productionSr);
+  Object.assign(en, ltStudioEn);
+  Object.assign(sr, ltStudioSr);
+  const studioCore = {
+    es:{studioPreview:'Preview',studioProgram:'Programa',previewReady:'Listo',cutToProgram:'Corte',transitionToProgram:'Transición',fadeToBlack:'Fundido a negro',directProgram:'Directo a Programa',directProgramTitle:'Los cambios van directo al Programa en vez de Preview'},
+    ar:{studioPreview:'معاينة',studioProgram:'البث',previewReady:'جاهز',cutToProgram:'قطع',transitionToProgram:'انتقال',fadeToBlack:'تلاشي إلى الأسود',directProgram:'مباشر إلى البث',directProgramTitle:'التغييرات تذهب مباشرة إلى البث بدلاً من المعاينة'},
+    de:{studioPreview:'Preview',studioProgram:'Program',previewReady:'Bereit',cutToProgram:'Cut',transitionToProgram:'Transition',fadeToBlack:'Fade to black',directProgram:'Direkt ins Program',directProgramTitle:'Änderungen gehen direkt ins Program statt in Preview'},
+    fr:{studioPreview:'Preview',studioProgram:'Programme',previewReady:'Prêt',cutToProgram:'Cut',transitionToProgram:'Transition',fadeToBlack:'Fondu au noir',directProgram:'Direct Programme',directProgramTitle:'Les changements vont directement au Programme au lieu du Preview'},
+    pt:{studioPreview:'Preview',studioProgram:'Programa',previewReady:'Pronto',cutToProgram:'Corte',transitionToProgram:'Transição',fadeToBlack:'Fade para preto',directProgram:'Direto no Programa',directProgramTitle:'As alterações vão direto para o Programa em vez do Preview'},
+    ru:{studioPreview:'Preview',studioProgram:'Программа',previewReady:'Готово',cutToProgram:'Cut',transitionToProgram:'Transition',fadeToBlack:'Fade to black',directProgram:'Сразу в Program',directProgramTitle:'Изменения идут сразу в Program вместо Preview'},
+    zh:{studioPreview:'预览',studioProgram:'节目',previewReady:'就绪',cutToProgram:'切换',transitionToProgram:'转场',fadeToBlack:'淡出到黑',directProgram:'直接到节目',directProgramTitle:'更改直接进入节目而不是预览'},
+    ja:{studioPreview:'プレビュー',studioProgram:'プログラム',previewReady:'準備完了',cutToProgram:'カット',transitionToProgram:'トランジション',fadeToBlack:'黒へフェード',directProgram:'直接プログラム',directProgramTitle:'変更をプレビューではなくプログラムへ直接送ります'},
+    ko:{studioPreview:'프리뷰',studioProgram:'프로그램',previewReady:'준비됨',cutToProgram:'컷',transitionToProgram:'전환',fadeToBlack:'검정으로 페이드',directProgram:'프로그램 직접 적용',directProgramTitle:'변경사항을 프리뷰 대신 프로그램에 바로 적용합니다'},
+    it:{studioPreview:'Preview',studioProgram:'Programma',previewReady:'Pronto',cutToProgram:'Cut',transitionToProgram:'Transizione',fadeToBlack:'Fade to black',directProgram:'Diretto al Programma',directProgramTitle:'Le modifiche vanno direttamente al Programma invece che al Preview'},
+    nl:{studioPreview:'Preview',studioProgram:'Programma',previewReady:'Klaar',cutToProgram:'Cut',transitionToProgram:'Transition',fadeToBlack:'Fade to black',directProgram:'Direct Programma',directProgramTitle:'Wijzigingen gaan direct naar Programma in plaats van Preview'},
+    pl:{studioPreview:'Preview',studioProgram:'Program',previewReady:'Gotowe',cutToProgram:'Cut',transitionToProgram:'Transition',fadeToBlack:'Fade to black',directProgram:'Prosto do Programu',directProgramTitle:'Zmiany idą od razu do Programu zamiast do Preview'},
+    tr:{studioPreview:'Preview',studioProgram:'Program',previewReady:'Hazır',cutToProgram:'Cut',transitionToProgram:'Transition',fadeToBlack:'Fade to black',directProgram:'Doğrudan Program',directProgramTitle:'Değişiklikler Preview yerine doğrudan Program’a gider'},
+    id:{studioPreview:'Preview',studioProgram:'Program',previewReady:'Siap',cutToProgram:'Cut',transitionToProgram:'Transisi',fadeToBlack:'Fade to black',directProgram:'Langsung ke Program',directProgramTitle:'Perubahan langsung ke Program, bukan ke Preview'}
+  };
+  Object.entries(studioCore).forEach(([code, pack]) => {
+    core[code] = Object.assign({}, core[code] || {}, pack);
+  });
+  Object.entries(broadcastCore).forEach(([code, pack]) => {
+    core[code] = Object.assign({}, core[code] || {}, pack);
+  });
+
+  const remoteEn = {
+    remoteWord:'Remote', connecting:'connecting…', live:'live', lost:'connection lost…',
+    start:'▶ START', pause:'⏸ PAUSE', correction:'Adjust', goNext:'GO ▶ NEXT',
+    quickDur:'Quick duration', msgToSpeaker:'Message to speaker',
+    preset1:'Speed up', preset2:'Wrap up', preset3:'STOP', ownMsg:'Your message…', send:'Send',
+    foot:'Works while ProTimer Studio is open on the computer.'
+  };
+  const remoteSr = {
+    remoteWord:'Daljinski', connecting:'povezivanje…', live:'uživo', lost:'veza pala…',
+    start:'▶ START', pause:'⏸ PAUZA', correction:'Korekcija', goNext:'GO ▶ SLEDEĆI',
+    quickDur:'Brzo trajanje', msgToSpeaker:'Poruka govorniku',
+    preset1:'Ubrzaj', preset2:'Završavaj', preset3:'STOP', ownMsg:'Svoja poruka…', send:'Pošalji',
+    foot:'Kontrola radi dok je ProTimer Studio otvoren na računaru.'
+  };
+
+  const backstageEn = {
+    now:'NOW', next:'NEXT', sched:'SCHEDULE', timeNow:'TIME NOW', plannedEnd:'Planned end',
+    projected:'Projected end', behind:'behind', ahead:'ahead', onTime:'ON TIME', started:'Started', ends:'Ends',
+    empty:'No items in the rundown', conn:'live', lost:'connection lost…', noNext:'— end of rundown —'
+  };
+  const backstageSr = {
+    now:'SADA', next:'SLEDI', sched:'RASPORED', timeNow:'TRENUTNO VREME', plannedEnd:'Planiran kraj',
+    projected:'Procena kraja', behind:'kasni', ahead:'ispred', onTime:'NA VREME', started:'Počelo', ends:'Kraj',
+    empty:'Nema tačaka u rundownu', conn:'uživo', lost:'veza pala…', noNext:'— kraj rundowna —'
+  };
+
+  const outputEn = {paused:'⏸ PAUSED', now:'NOW', next:'NEXT'};
+  const outputSr = {paused:'⏸ PAUZA', now:'SADA', next:'SLEDI'};
+
+  const remoteCore = {};
+  const backstageCore = {};
+  const outputCore = {};
+  LANGUAGES.forEach(l => {
+    const c = core[l.code] || {};
+    remoteCore[l.code] = {
+      remoteWord: c.remoteLabel ? c.remoteLabel.replace(/\s*\(.*/, '') : undefined,
+      live: c.live, start: c.start, pause: c.pause, goNext: c.goNext ? c.goNext.replace('&nbsp;(N)', '') : undefined,
+      send: c.send, quickDur: c.quick, msgToSpeaker: c.message, preset2: c.presets || undefined
+    };
+    backstageCore[l.code] = {
+      now: c.nowLabel, next: c.nextLabel, sched: c.rundown, timeNow: c.modeClock,
+      plannedEnd: c.plannedLabel, projected: c.projectedLabel, behind: c.late,
+      ahead: c.early, onTime: c.onTime, conn: c.live
+    };
+    outputCore[l.code] = { paused: c.pause, now: c.nowLabel, next: c.nextLabel };
+  });
+
+  function complete(base, overlays, exact){
+    const out = {};
+    LANGUAGES.forEach(l => {
+      out[l.code] = Object.assign({}, base, overlays[l.code] || {});
+    });
+    Object.assign(out, exact || {});
+    return out;
+  }
+
+  const I18N = complete(en, core, {en, sr:Object.assign({}, en, sr)});
+  const REMOTE = complete(remoteEn, remoteCore, {en:remoteEn, sr:Object.assign({}, remoteEn, remoteSr)});
+  const BACKSTAGE = complete(backstageEn, backstageCore, {en:backstageEn, sr:Object.assign({}, backstageEn, backstageSr)});
+  const OUTPUT = complete(outputEn, outputCore, {en:outputEn, sr:Object.assign({}, outputEn, outputSr)});
+
+  function normalizeLang(code){
+    return LANGUAGES.some(l => l.code === code) ? code : 'en';
+  }
+  function langMeta(code){
+    code = normalizeLang(code);
+    return LANGUAGES.find(l => l.code === code) || LANGUAGES[0];
+  }
+  function tr(pack, code, key){
+    code = normalizeLang(code);
+    return (pack[code] && pack[code][key]) || (pack.en && pack.en[key]) || key;
+  }
+
+  window.PT_LANGUAGES = LANGUAGES;
+  window.PT_I18N = I18N;
+  window.PT_I18N_REMOTE = REMOTE;
+  window.PT_I18N_BACKSTAGE = BACKSTAGE;
+  window.PT_I18N_OUTPUT = OUTPUT;
+  window.PT_I18N_UTIL = { normalizeLang, langMeta, tr };
+})();

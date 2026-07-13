@@ -1,0 +1,149 @@
+{
+  "name": "protimer-studio",
+  "productName": "ProTimer Studio",
+  "version": "0.9.0-beta.1",
+  "description": "Free open-source event rundown, stage timer, lower-third and multi-display control",
+  "main": "main.js",
+  "author": "Srdjan Kotarlic",
+  "license": "MIT",
+  "homepage": "https://srdjankotarlic.github.io/protimer-studio/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srdjankotarlic/protimer-studio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/srdjankotarlic/protimer-studio/issues"
+  },
+  "keywords": [
+    "stage-timer",
+    "event-production",
+    "live-production",
+    "rundown",
+    "lower-thirds",
+    "speaker-timer",
+    "obs",
+    "av"
+  ],
+  "scripts": {
+    "test": "node tools/check-free-build.js && node tools/check-public-site.js && node tools/run-test-suite.js modules",
+    "check:free": "node tools/check-free-build.js",
+    "check:site": "node tools/check-public-site.js",
+    "test:renderers:philips": "node tools/run-test-suite.js renderers",
+    "test:all:philips": "node tools/run-test-suite.js all",
+    "start": "electron .",
+    "smoke": "electron . --smoke",
+    "smoke:lt-soak": "node tools/run-lt-soak.js",
+    "smoke:output-routing": "node tools/run-smoke-on-display.js --source --output-routing-only",
+    "test:lt-package": "node test/lower-third-package.test.js",
+    "test:show-storage": "node test/show-repository.test.js",
+    "test:show-recovery": "electron test/show-recovery-renderer.test.js",
+    "test:show-package": "node test/show-package.test.js",
+    "test:show-preflight": "node test/show-preflight.test.js",
+    "test:show-setup-ui": "electron test/show-setup-renderer.test.js",
+    "test:screen-content": "node test/screen-content-model.test.js",
+    "test:screen-content-ui": "electron test/screen-content-renderer.test.js",
+    "test:control-api": "node test/control-api.test.js",
+    "test:control-api-ui": "electron test/control-api-renderer.test.js",
+    "test:report": "node test/report-model.test.js",
+    "test:output-routing": "node test/output-routing-model.test.js",
+    "test:report-ui": "electron test/report-renderer.test.js",
+    "test:beta-ui": "electron test/beta-usability-matrix.test.js",
+    "displays:list": "electron tools/list-displays.js",
+    "smoke:philips": "node tools/run-smoke-on-display.js --source",
+    "smoke:packaged:philips": "node tools/run-smoke-on-display.js --packaged",
+    "dist:mac": "node tools/write-build-info.js && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --arm64 -c.mac.identity=- -c.mac.hardenedRuntime=false -c.mac.notarize=false",
+    "dist:mac:release": "node tools/assert-release-signing.js mac && node tools/write-build-info.js && electron-builder --mac --arm64 -c.forceCodeSigning=true",
+    "dist:win": "node tools/write-build-info.js && electron-builder --win --x64",
+    "dist:win:release": "node tools/assert-release-signing.js win && node tools/write-build-info.js && electron-builder --win --x64 -c.forceCodeSigning=true",
+    "dist:all": "npm run dist:mac && npm run dist:win"
+  },
+  "devDependencies": {
+    "electron": "42.6.1",
+    "electron-builder": "26.15.3"
+  },
+  "allowScripts": {
+    "electron@42.6.1": true,
+    "electron-winstaller@5.4.0": true
+  },
+  "overrides": {
+    "axios": "^1.18.1"
+  },
+  "build": {
+    "appId": "com.srdjankotarlic.protimerstudio",
+    "productName": "ProTimer Studio",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist-installers"
+    },
+    "electronFuses": {
+      "runAsNode": false,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "controller.html",
+      "output.html",
+      "remote.html",
+      "backstage.html",
+      "signal.html",
+      "i18n.js",
+      "build-info.json",
+      "styles/**/*",
+      "build/icon.png",
+      "node_modules/**/*",
+      "tools/smoke-display.js",
+      "src/**/*",
+      "test/fixtures/**/*"
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": "arm64"
+        }
+      ],
+      "category": "public.app-category.utilities",
+      "icon": "build/icon.icns",
+      "artifactName": "ProTimer-Studio-${version}-${arch}.${ext}",
+      "hardenedRuntime": true,
+      "notarize": true
+    },
+    "dmg": {
+      "title": "ProTimer Studio ${version}"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": "x64"
+        },
+        {
+          "target": "portable",
+          "arch": "x64"
+        }
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "ProTimer Studio",
+      "artifactName": "ProTimer-Studio-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "ProTimer-Studio-${version}-portable.${ext}"
+    }
+  },
+  "dependencies": {
+    "archiver": "5.3.2",
+    "localtunnel": "^2.0.2",
+    "qrcode": "^1.5.4",
+    "yauzl": "2.10.0"
+  }
+}

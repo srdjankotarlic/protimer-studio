@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' http://127.0.0.1:* data: blob:; media-src 'self' http://127.0.0.1:* data: blob:; frame-src 'self' http://127.0.0.1:* data: blob:;">
+<title>ProTimer Studio — Output</title>
+<style>
+  *{box-sizing:border-box; user-select:none; margin:0;}
+  html,body{height:100%; overflow:hidden;
+    font-family:-apple-system, "Helvetica Neue", system-ui, sans-serif;}
+  body{background:#000; transition:background .15s;}
+  body.idle{cursor:none;}
+  body.flash::after{content:''; position:fixed; inset:0; background:var(--flashCol,#ff4540);
+    z-index:50; animation:zflash .4s steps(2,start) 6; pointer-events:none;}
+  @keyframes zflash{50%{opacity:0;}}
+
+  #sceneRoot{position:absolute; inset:0; z-index:2; overflow:hidden; pointer-events:none;}
+  .scene-layer{position:absolute; overflow:hidden; display:flex; align-items:center; justify-content:center;
+    opacity:var(--layerOpacity,1); transform:translateZ(0);}
+  .scene-layer img,.scene-layer video,.scene-layer iframe,.scene-layer object{width:100%; height:100%; border:0; display:block;}
+  .scene-layer.fit-contain img,.scene-layer.fit-contain video,.scene-layer.fit-contain iframe,.scene-layer.fit-contain object{object-fit:contain;}
+  .scene-layer.fit-cover img,.scene-layer.fit-cover video{object-fit:cover;}
+  .scene-layer.fit-fill img,.scene-layer.fit-fill video{object-fit:fill;}
+  .scene-text{width:100%; height:100%; display:flex; align-items:center; justify-content:center; text-align:center;
+    padding:4vh; font-weight:780; line-height:1.05; white-space:pre-wrap; word-break:break-word;}
+
+  .scene-frame{position:absolute; inset:0;}
+  #stage{position:absolute; inset:0; z-index:10; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;}
+
+  /* gornji tekst (labela / naziv koji korisnik ubaci) */
+  #text{font-weight:600; line-height:1.1; text-align:center; padding:0 5vw;
+    white-space:pre-wrap; word-break:break-word; display:none;}
+
+  /* glavni tajmer */
+  #timer{font-family:"SF Mono", ui-monospace, Menlo, monospace; font-weight:700;
+    font-variant-numeric:tabular-nums; line-height:.95; white-space:nowrap;}
+
+  /* donja poruka (alert) */
+  #msg{position:absolute; z-index:12; bottom:7vh; left:0; right:0; text-align:center;
+    font-size:6vh; font-weight:700; padding:0 5vw; line-height:1.15;
+    white-space:pre-wrap; display:none;}
+  #msg.flash{animation:pulse .8s steps(2,start) infinite;}
+  #timer.neg{animation:pulse 1s steps(2,start) infinite;}
+  @keyframes pulse{50%{opacity:.25;}}
+
+  /* tanka traka napretka (opciono) */
+  #prog{position:absolute; z-index:12; bottom:0; left:0; height:1vh; width:100%; display:none;}
+
+  /* NOW / NEXT traka */
+  #nownext{position:absolute; z-index:12; left:0; right:0; bottom:0; display:none; flex-direction:column;
+    font-family:-apple-system, system-ui, sans-serif;}
+  #nownext .nn{display:flex; justify-content:space-between; align-items:baseline; gap:3vw;
+    padding:1.3vh 3.5vw; border-top:1px solid rgba(255,255,255,.13);}
+  #nownext .nn .ttl{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;}
+  #nownext .nn .tag{flex:0 0 auto; font-size:1.9vh; letter-spacing:.18em; opacity:.55; font-weight:700;}
+  #nownext .now .ttl{font-size:4vh;}
+  #nownext .next{opacity:.62;} #nownext .next .ttl{font-size:3vh;}
+
+  #blackout{position:absolute; inset:0; background:#000; z-index:80; display:block; opacity:0; pointer-events:none; transition:opacity .28s ease;}
+  #blackout.on{opacity:1; pointer-events:auto;}
+  #lowerThird{position:fixed; z-index:20; display:none; align-items:center; gap:2.2vh; min-width:34vw; max-width:72vw;
+    padding:2.1vh 2.8vh; color:#fff; border-radius:1.2vh; pointer-events:none;
+    background:linear-gradient(180deg,rgba(18,19,23,.9),rgba(8,9,12,.88));
+    border:1px solid rgba(255,255,255,.16); box-shadow:0 2.8vh 9vh rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.08);
+    animation:ltIn .22s ease-out both;}
+  #ltCanvas{position:fixed; inset:0; z-index:20; display:none; pointer-events:none; overflow:hidden; isolation:isolate;}
+  .lt-design-root{position:absolute; left:0; top:0; transform-origin:0 0; overflow:visible; pointer-events:none;}
+  .lt-layer{position:absolute; overflow:hidden; pointer-events:none; transform-origin:50% 50%; contain:layout paint style;}
+  .lt-layer img,.lt-layer video{display:block; border:0; user-select:none; -webkit-user-drag:none;}
+  .lt-text-layer{display:flex; width:100%; height:100%; overflow:hidden;}
+  .lt-text-content{min-width:0; max-width:100%; overflow:hidden; white-space:pre-wrap; word-break:break-word;}
+  @keyframes ltIn{from{opacity:0;} to{opacity:1;}}
+  #lowerThird.lt-bl{left:5vw; bottom:8vh; transform-origin:bottom left;}
+  #lowerThird.lt-bc{left:50%; bottom:8vh; transform:translateX(-50%); transform-origin:bottom center;}
+  #lowerThird.lt-br{right:5vw; bottom:8vh; transform-origin:bottom right;}
+  #lowerThird.lt-tl{left:5vw; top:8vh; transform-origin:top left;}
+  #lowerThird.lt-tc{left:50%; top:8vh; transform:translateX(-50%); transform-origin:top center;}
+  #lowerThird.lt-tr{right:5vw; top:8vh; transform-origin:top right;}
+  #lowerThird.lt-bc,#lowerThird.lt-tc{text-align:center;}
+  #lowerThird.style-broadcast{border-left:.9vh solid var(--ltAccent,#30d158); border-radius:.8vh;}
+  #lowerThird.style-glass{background:rgba(20,22,28,.56); backdrop-filter:blur(2.6vh) saturate(1.25);}
+  #lowerThird.style-slab{background:#f5f5f7; color:#0d0e10; border-color:rgba(255,255,255,.5);}
+  #lowerThird.style-slab .lt-title,#lowerThird.style-slab .lt-meta{color:rgba(0,0,0,.64);}
+  #lowerThird.size-s{min-width:28vw; padding:1.6vh 2.1vh; gap:1.6vh;}
+  #lowerThird.size-s #ltImg{width:6.4vh; height:6.4vh;}
+  #lowerThird.size-s #ltName{font-size:3.3vh;}
+  #lowerThird.size-s #ltTitle{font-size:1.9vh;}
+  #lowerThird.size-l{min-width:42vw; padding:2.8vh 3.4vh; gap:2.8vh;}
+  #lowerThird.size-l #ltImg{width:10vh; height:10vh;}
+  #lowerThird.size-l #ltName{font-size:5.1vh;}
+  #lowerThird.size-l #ltTitle{font-size:2.8vh;}
+  #ltImg{width:8vh; height:8vh; object-fit:contain; display:none; flex:0 0 auto;}
+  #ltCopy{min-width:0;}
+  #ltName{font-weight:780; font-size:4.2vh; line-height:1.05; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  #ltTitle{font-weight:560; font-size:2.3vh; color:rgba(255,255,255,.73); margin-top:.55vh; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  #ltMeta{font-weight:700; font-size:1.65vh; color:rgba(255,255,255,.52); margin-top:.7vh; letter-spacing:.12em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+  /* providni (frameless) prozor — prevlačenje za pomeranje */
+  body.overlay #stage{ -webkit-app-region: drag; }
+</style>
+</head>
+<body>
+  <div id="sceneRoot"></div>
+  <div id="stage">
+    <div id="text"></div>
+    <div id="timer">--:--</div>
+  </div>
+  <div id="msg"></div>
+  <div id="nownext"></div>
+  <div id="prog"></div>
+  <div id="blackout"></div>
+  <div id="paused" style="display:none; position:fixed; top:12px; right:14px; z-index:60;
+    font:700 2.2vh/1 -apple-system,system-ui,sans-serif; letter-spacing:.12em; color:rgba(255,255,255,.85);
+    background:rgba(0,0,0,.5); padding:1vh 1.6vh; border-radius:1.2vh; pointer-events:none;">⏸ PAUZA</div>
+  <img id="logo" alt="" style="display:none; position:fixed; z-index:5; pointer-events:none; max-width:40vw; object-fit:contain;">
+  <div id="lowerThird">
+    <img id="ltImg" alt="">
+    <div id="ltCopy">
+      <div id="ltName"></div>
+      <div id="ltTitle"></div>
+      <div id="ltMeta"></div>
+    </div>
+  </div>
+  <div id="ltCanvas" aria-hidden="true"></div>
+
+<script src="i18n.js?v=20260703-i18n2"></script>
+<script>
+const IS_ELECTRON = !!window.pt;
+const api = window.pt || null;
+const OUT_I18N = window.PT_I18N_OUTPUT || { en:{paused:'⏸ PAUSED', now:'NOW', next:'NEXT'}, sr:{paused:'⏸ PAUZA', now:'SADA', next:'SLEDI'} };
+const langUtil = window.PT_I18N_UTIL || { normalizeLang:c=>(OUT_I18N[c]?c:'en'), langMeta:c=>({}) };
+function outLang(){ return langUtil.normalizeLang((S && S.lang) || 'en'); }
+function outT(key){ const l=outLang(); return (OUT_I18N[l] && OUT_I18N[l][key]) || OUT_I18N.en[key] || key; }
+
+let S = null, prevRem = null, lastKey = '', lastSceneKey = '', lastLtRuntimeKey = '', ltSequenceTimer = null;
+const ltPhaseMediaFailures = new Map();
+const ltPhaseAnchors = new Map();
+let isFS = false, fitMode = false, lastFitH = 0;   // kompaktan prozor (prati tajmer)
+if (IS_ELECTRON) api.onWinFs(v => { isFS = !!v; lastKey = ''; lastFitH = 0; });
+
+const FONT_MAP={mono:'"SF Mono",ui-monospace,Menlo,monospace',grotesk:'-apple-system,"Helvetica Neue",Arial,sans-serif',serif:'Georgia,"Times New Roman",serif',display:'"Arial Black",Impact,sans-serif'};
+const $ = id => document.getElementById(id);
+const LT_RENDER_DEBUG_PARAMS = new URLSearchParams(location.search);
+const LT_RENDER_DEBUG_ENABLED = LT_RENDER_DEBUG_PARAMS.get('ptSmoke') === '1';
+function updateLowerThirdRenderDebug(reason){
+  if(!LT_RENDER_DEBUG_ENABLED) return;
+  const canvas=$('ltCanvas');
+  const legacy=$('lowerThird');
+  const visible=el=>!!el && getComputedStyle(el).display!=='none' && getComputedStyle(el).visibility!=='hidden';
+  const visibleLayers=canvas ? [...canvas.querySelectorAll('[data-layer-id]')].filter(visible) : [];
+  window.__PT_LT_RENDER_DEBUG__={
+    browserWindowId:Number(LT_RENDER_DEBUG_PARAMS.get('browserWindowId'))||0,
+    webContentsId:Number(LT_RENDER_DEBUG_PARAMS.get('webContentsId'))||0,
+    templateId:canvas ? (canvas.dataset.templateId||'') : '',
+    instanceId:canvas ? (canvas.dataset.instanceId||'') : '',
+    phase:canvas ? (canvas.dataset.phase||'') : '',
+    renderedAt:Date.now(),
+    reason:String(reason||''),
+    visibleLayerCount:visibleLayers.length,
+    renderedText:canvas ? [...canvas.querySelectorAll('.lt-text-content')].map(el=>el.textContent).join('|') : '',
+    videoCount:canvas ? canvas.querySelectorAll('video').length : 0,
+    legacyVisible:visible(legacy),
+    runtimeVisible:visible(canvas)
+  };
+}
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmtSecs(s, neg){
+  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), x=s%60;
+  return (neg?'−':'') + (h>0 ? `${h}:${pad(m)}:${pad(x)}` : `${m}:${pad(x)}`);
+}
+function fmtMs(ms){ return ms>=0 ? fmtSecs(Math.ceil(ms/1000),false) : fmtSecs(Math.floor(-ms/1000),true); }
+
+function applyState(s){
+  const fitStateChanged=!S || !!s.fitWindow!==!!S.fitWindow || !!s.gridOn!==!!S.gridOn;
+  if (S && (s.mode!==S.mode || s.durationMs!==S.durationMs)) prevRem = null;
+  S = s;
+  const meta = langUtil.langMeta(outLang());
+  document.documentElement.lang = outLang();
+  document.documentElement.dir = meta.dir || 'ltr';
+  // PRO: logo na ekranu
+  const lg = $('logo');
+  if (s.logo){
+    if (lg.src !== s.logo) lg.src = s.logo;
+    lg.style.height = (s.logoSize || 16) + 'vh';
+    const m = '3vh', pos = s.logoPos || 'tr';
+    lg.style.top = pos[0]==='t' ? m : ''; lg.style.bottom = pos[0]==='b' ? m : '';
+    lg.style.left = pos[1]==='l' ? m : (pos[1]==='c' ? '50%' : '');
+    lg.style.right = pos[1]==='r' ? m : '';
+    lg.style.transform = pos[1]==='c' ? 'translateX(-50%)' : '';
+    lg.style.display = 'block';
+  } else lg.style.display = 'none';
+  // State-driven overlays must not depend on a future animation frame. Chromium may
+  // suspend RAF after repeated hidden/video viewport transitions during long shows.
+  renderLowerThird();
+  if(fitStateChanged) lastFitH=0;
+  fitMode=IS_ELECTRON && !!S.fitWindow && !isFS && !S.gridOn;
+  if(fitMode) requestFit();
+}
+
+// media:// → HTTP URL (Electron: 127.0.0.1 baza iz state-a; browser/OBS: relativno)
+function mediaSrc(src){
+  return (typeof src==='string' && src.startsWith('media://'))
+    ? ((S && S._mediaBase) || '') + '/media/' + src.slice(8)
+    : src;
+}
+function ltPhaseMediaFailureKey(instanceId, phase, layerId){
+  return String(instanceId || '') + '|' + String(phase || '') + '|' + String(layerId || '');
+}
+function recordLtPhaseMediaFailure(layer, canvas){
+  if(!layer || !layer.id || !canvas) return;
+  if(layer.__phaseMediaActive !== true) return;
+  const instanceId=canvas.dataset.instanceId || '';
+  const phase=canvas.dataset.phase || '';
+  if(!instanceId || !phase) return;
+  const key=ltPhaseMediaFailureKey(instanceId, phase, layer.id);
+  if(!ltPhaseMediaFailures.has(key)){
+    if(ltPhaseMediaFailures.size>80) ltPhaseMediaFailures.clear();
+    ltPhaseMediaFailures.set(key, Date.now());
+  }
+  lastLtRuntimeKey='';
+  scheduleLtSequenceTick(40);
+}
+function ltLocalPhaseStartedAt(rt, phase, fallback){
+  const id=rt && rt.instanceId;
+  if(!id || (phase!=='intro' && phase!=='outro')) return fallback;
+  const key=String(id) + '|' + phase + '|' + String(fallback || 0);
+  if(!ltPhaseAnchors.has(key)){
+    if(ltPhaseAnchors.size>120) ltPhaseAnchors.clear();
+    ltPhaseAnchors.set(key, Date.now());
+  }
+  return ltPhaseAnchors.get(key);
+}
+function activeScene(){
+  if(!S) return null;
+  const scenes = Array.isArray(S.scenes) ? S.scenes : [];
+  return scenes.find(sc => sc.id === S.activeSceneId) || scenes[0] || null;
+}
+
+function pct(v, fallback){
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.max(-100, Math.min(200, n)) : fallback;
+}
+
+function renderScene(){
+  const root=$('sceneRoot');
+  if(!root || !S) return;
+  const scene=activeScene();
+  const layers=(scene && Array.isArray(scene.layers)) ? scene.layers.filter(l=>l && l.visible!==false) : [];
+  const key=(S._mediaBase||'')+'|'+JSON.stringify(layers.map(l=>({
+    id:l.id,type:l.type,name:l.name,src:l.src,sourceId:l.sourceId,sourceName:l.sourceName,
+    x:l.x,y:l.y,w:l.w,h:l.h,opacity:l.opacity,fit:l.fit,text:l.text,color:l.color,bg:l.bg,page:l.page
+  })));
+  if(key===lastSceneKey) return;
+  lastSceneKey=key;
+  const fadeMs = Math.max(0, Math.min(2000, Number(S.sceneFadeMs ?? 0)));
+  const oldFrames=[...root.children];
+  const frame=document.createElement('div');
+  frame.className='scene-frame';
+  if(fadeMs>0 && oldFrames.length){
+    frame.style.opacity='0';
+    frame.style.transition=`opacity ${fadeMs}ms ease`;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ frame.style.opacity='1'; }));
+    oldFrames.forEach(f=>{
+      f.style.transition=`opacity ${fadeMs}ms ease`;
+      f.style.opacity='0';
+      setTimeout(()=>{ try{ f.remove(); }catch(e){} }, fadeMs+80);
+    });
+  } else {
+    oldFrames.forEach(f=>{ try{ f.remove(); }catch(e){} });
+  }
+  root.appendChild(frame);
+  layers.forEach(layer=>{
+    if(layer.type==='timer') return;   // tajmer renderuje #stage, ne scena
+    const d=document.createElement('div');
+    d.className='scene-layer fit-'+(layer.fit||'cover');
+    d.style.left=pct(layer.x,0)+'%';
+    d.style.top=pct(layer.y,0)+'%';
+    d.style.width=Math.max(1,pct(layer.w,100))+'%';
+    d.style.height=Math.max(1,pct(layer.h,100))+'%';
+    d.style.setProperty('--layerOpacity', Math.max(0, Math.min(1, Number(layer.opacity ?? 1))));
+    if(layer.bg) d.style.background=layer.bg;
+
+    if(layer.type==='image' && layer.src){
+      const img=document.createElement('img');
+      img.src=mediaSrc(layer.src);
+      img.alt=layer.name||'';
+      d.appendChild(img);
+    } else if(layer.type==='video' && layer.src){
+      const v=document.createElement('video');
+      v.src=mediaSrc(layer.src);
+      v.autoplay=true; v.loop=true; v.muted=true; v.playsInline=true;
+      d.appendChild(v);
+    } else if(layer.type==='pdf' && layer.src){
+      const f=document.createElement('iframe');
+      f.src=mediaSrc(layer.src)+'#page='+Math.max(1,Number(layer.page)||1);
+      d.appendChild(f);
+    } else if(layer.type==='text'){
+      const tx=document.createElement('div');
+      tx.className='scene-text';
+      tx.textContent=Object.prototype.hasOwnProperty.call(layer,'text') ? String(layer.text || '') : (layer.name || '');
+      tx.style.color=layer.color || '#ffffff';
+      tx.style.background=layer.bg || 'transparent';
+      tx.style.fontSize=(Number(layer.fontSize)||8)+'vh';
+      d.appendChild(tx);
+    }
+    frame.appendChild(d);
+  });
+}
+
+// Tajmer kao LEJER scene: prvi vidljivi 'timer' lejer određuje kutiju #stage;
+// scena sa lejerima ali BEZ tajmera = čista media scena (bez tajmera na ekranu);
+// prazna scena (legacy) = tajmer preko celog ekrana. Grid mod pozicionira sam PROZOR pa lejer važi unutar njega.
+let lastStageKey = '';
+function applyTimerLayerStage(){
+  const stage = $('stage');
+  if (!stage) return;
+  const scene = S ? activeScene() : null;
+  const layers = (scene && Array.isArray(scene.layers)) ? scene.layers.filter(l => l && l.visible !== false) : [];
+  const tl = layers.find(l => l.type === 'timer');
+  let key, css;
+  if (tl){
+    const x = pct(tl.x, 0), y = pct(tl.y, 0), w = Math.max(1, pct(tl.w, 100)), h = Math.max(1, pct(tl.h, 100));
+    key = `tl|${x}|${y}|${w}|${h}|${tl.opacity ?? 1}`;
+    css = () => { stage.style.display = 'flex'; stage.style.inset = 'auto';
+      stage.style.left = x + '%'; stage.style.top = y + '%';
+      stage.style.width = w + '%'; stage.style.height = h + '%';
+      stage.style.opacity = String(Math.max(0, Math.min(1, Number(tl.opacity ?? 1)))); };
+  } else if (layers.length){
+    key = 'none';
+    css = () => { stage.style.display = 'none'; };
+  } else {
+    key = 'full';
+    css = () => { stage.style.display = 'flex'; stage.style.inset = '0';
+      stage.style.left = stage.style.top = stage.style.width = stage.style.height = ''; stage.style.opacity = ''; };
+  }
+  if (key !== lastStageKey){ lastStageKey = key; css(); lastKey=''; }
+}
+
+// --- prijem stanja: Electron (IPC) ili browser/OBS (SSE) ---
+if (IS_ELECTRON){
+  api.onState(applyState);
+} else {
+  const connect = () => {
+    const es = new EventSource('/events');
+    es.onmessage = e => { try { applyState(JSON.parse(e.data)); } catch(_){} };
+    es.onerror = () => { es.close(); setTimeout(connect, 1000); };
+  };
+  connect();
+}
+
+function render(){
+  requestAnimationFrame(render);
+  const now = Date.now();
+  const d = new Date();
+
+  // dok ne stigne stanje — prikaži tačno vreme
+  if (!S){ paint(`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`, '#ffffff', '#000000', false, '', '', false, null); return; }
+
+  const bg = S.transparent ? 'transparent' : (S.bgColor || '#000000');
+  document.body.classList.toggle('overlay', !!S.transparent);
+  let fg = S.fgColor || '#ffffff';
+  let text, neg = false, prog = null;
+
+  if (S.mode === 'clock'){
+    let h = d.getHours(), suf = '';
+    if (S.clock12){ suf = h >= 12 ? ' PM' : ' AM'; h = h % 12 || 12; }
+    text = `${S.clock12 ? h : pad(h)}:${pad(d.getMinutes())}:${pad(d.getSeconds())}${suf}`;
+  } else if (S.mode === 'countup'){
+    const el = S.running ? S.elapsedMs + (now - S.startAt) : S.elapsedMs;
+    text = fmtSecs(Math.floor(el/1000), false);
+  } else {
+    let rem = S.running ? S.endAt - now : S.remMs;
+    if (!S.overtime && rem < 0) rem = 0;
+    if (S.useWarnColors){
+      if (rem <= S.redSec*1000) fg = S.warnRed || '#ff4540';
+      else if (rem <= S.yellowSec*1000) fg = S.warnYellow || '#ffc23a';
+    }
+    if (rem < 0){ fg = S.warnRed || '#ff4540'; neg = true; }
+    prog = S.durationMs > 0 ? Math.max(0, Math.min(1, rem / S.durationMs)) : 0;
+    text = fmtMs(rem);
+    if (S.running && S.flashZero && prevRem !== null && prevRem > 0 && rem <= 0) doFlash(fg);
+    // PRO: zvučni signali na prelazima žuto/crveno/nula (samo dok tajmer radi)
+    if (S.running && S.chimes && prevRem !== null){
+      if (prevRem > 0 && rem <= 0) chime(3);
+      else if (prevRem > S.redSec*1000 && rem <= S.redSec*1000) chime(2);
+      else if (prevRem > S.yellowSec*1000 && rem <= S.yellowSec*1000) chime(1);
+    }
+    if (S.running) prevRem = rem;
+  }
+
+  // kompaktan prozor: kad NIJE fullscreen i opcija je uključena → tajmer puni širinu, prozor prati visinu
+  // tajmer UVEK puni prozor; grid se realizuje veličinom/pozicijom samog PROZORA (main proces)
+  applyTimerLayerStage();   // tajmer je LEJER scene: pozicionira/gasi #stage
+  // fit (kompaktan prozor) — samo ako NIJE grid i NIJE fullscreen
+  fitMode = IS_ELECTRON && !!S.fitWindow && !isFS && !S.gridOn;
+
+  $('timer').style.fontFamily = FONT_MAP[S.font] || FONT_MAP.mono;
+  // PRO: ⏸ indikator kad je odbrojavanje pauzirano usred tačke
+  const midPause = S.mode==='countdown' && !S.running && S.remMs > 0 && S.remMs !== S.durationMs;
+  $('paused').style.display = (midPause && !S.blackout) ? 'block' : 'none';
+  $('paused').textContent = outT('paused');
+
+  renderScene();
+  paint(text, fg, bg, neg, S.text || '', S.message ? S.message.text : '',
+        S.message && S.message.flash, S.showProgress ? prog : null);
+
+  if (fitMode) requestFit();
+  renderNowNext(fg);
+  renderLowerThird();
+  $('blackout').classList.toggle('on', !!S.blackout);
+}
+
+// kompaktan prozor: traži od main-a da visina prozora bude tačno koliko i tajmer (+mali rub)
+function requestFit(){
+  const tEl=$('timer'), txtEl=$('text');
+  if (tEl.style.display==='none') return;
+  let h = tEl.getBoundingClientRect().height;
+  if (txtEl.style.display!=='none') h += txtEl.getBoundingClientRect().height + h*0.06;
+  const want = Math.round(h * 1.34);
+  if (h > 4 && Math.abs(want - lastFitH) > 4){ lastFitH = want; api.fitWindow(want); }
+}
+
+function renderNowNext(fg){
+  const el = $('nownext');
+  const cues = S.cues || [];
+  if (!S.showNowNext || S.currentCue == null || S.currentCue < 0 || !cues.length){
+    el.style.display = 'none'; $('msg').style.bottom = '';
+    return;
+  }
+  const cur = cues[S.currentCue], nxt = cues[S.currentCue + 1];
+  const NOW = outT('now'), NEXT = outT('next');
+  let html = `<div class="nn now"><span class="ttl"></span><span class="tag">${NOW}</span></div>`;
+  if (nxt) html += `<div class="nn next"><span class="ttl"></span><span class="tag">${NEXT}</span></div>`;
+  el.innerHTML = html;
+  el.querySelector('.now .ttl').textContent = cur ? cur.name : '';
+  if (nxt) el.querySelector('.next .ttl').textContent = nxt.name;
+  el.style.color = fg;
+  el.style.bottom = S.showProgress ? '1vh' : '0';
+  el.style.display = 'flex';
+  $('msg').style.bottom = nxt ? '17vh' : '12vh';
+}
+
+function isLowerThirdRuntimeValid(lt){
+  const rt=lt && lt.runtime;
+  return !!(lt && lt.visible && (!lt.until || Date.now()<lt.until) &&
+    lt.runtimeVersion===1 && rt && rt.version===1 && rt.visible!==false &&
+    Array.isArray(rt.resolvedLayers));
+}
+function runtimeCanvas(rt){
+  const c=(rt && rt.canvas) || {};
+  const w=Number(c.width), h=Number(c.height);
+  return {width:Number.isFinite(w) ? Math.max(320, Math.min(7680, w)) : 1920,
+          height:Number.isFinite(h) ? Math.max(180, Math.min(4320, h)) : 1080};
+}
+function runtimeScaleSpec(rt){
+  const c=runtimeCanvas(rt);
+  const scale=Math.min(innerWidth / c.width, innerHeight / c.height);
+  return {canvas:c, scale, left:(innerWidth - c.width * scale) / 2, top:(innerHeight - c.height * scale) / 2};
+}
+function anchorOffset(anchor,w,h){
+  const a=anchor || 'tl';
+  const ax=a[1]==='c' ? -w/2 : (a[1]==='r' ? -w : 0);
+  const ay=a[0]==='m' ? -h/2 : (a[0]==='b' ? -h : 0);
+  return {x:ax,y:ay};
+}
+function layerNumber(v, fallback){
+  const n=Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+function layerBox(layer){
+  const w=Math.max(1, layerNumber(layer.width, 100));
+  const h=Math.max(1, layerNumber(layer.height, 100));
+  const off=anchorOffset(layer.anchor, w, h);
+  return {x:layerNumber(layer.x,0)+off.x, y:layerNumber(layer.y,0)+off.y, w, h};
+}
+function setLayerBase(el, layer, order){
+  const b=layerBox(layer);
+  const extra=String(el.className || '').trim();
+  el.className=('lt-layer lt-'+(layer.type || 'layer')+(extra ? ' '+extra : '')).trim();
+  el.dataset.layerId=layer.id || '';
+  el.dataset.layerType=layer.type || '';
+  el.dataset.zIndex=String(layerNumber(layer.zIndex,0));
+  el.style.left=b.x+'px'; el.style.top=b.y+'px';
+  el.style.width=b.w+'px'; el.style.height=b.h+'px';
+  el.style.opacity=String(Math.max(0, Math.min(1, layerNumber(layer.opacity,1))));
+  el.style.zIndex=String(order);
+  const rot=layerNumber(layer.rotation,0);
+  el.style.transform=rot ? `rotate(${rot}deg)` : '';
+}
+function mediaLayerElement(layer, canvas){
+  const src=mediaSrc(layer.src || layer.assetId || '');
+  const el=document.createElement('div');
+  if(!src){
+    el.dataset.missing='1';
+    recordLtPhaseMediaFailure(layer, canvas);
+    el.style.display='none';
+    return el;
+  }
+  const media = layer.mediaKind==='video' ? document.createElement('video') : document.createElement('img');
+  if(media.tagName==='IMG'){
+    media.alt='';
+    media.decoding='async';
+    media.draggable=false;
+    media.onerror=()=>{
+      el.dataset.error='media';
+      el.style.display='none';
+      recordLtPhaseMediaFailure(layer, canvas);
+      if(canvas) canvas.dataset.lastError='media:'+String(layer.id||'');
+    };
+  } else {
+    media.muted=true;
+    media.defaultMuted=true;
+    media.playsInline=true;
+    media.autoplay=true;
+    media.controls=false;
+    media.preload='auto';
+    media.disablePictureInPicture=true;
+    media.loop=layer.playbackMode==='loop-until-hide' || layer.playbackMode==='loop';
+    media.style.visibility='hidden';
+    let started=false;
+    const ready=()=>{
+      if(started) return;
+      started=true;
+      el.dataset.ready='1';
+      media.style.visibility='visible';
+      const begin=()=>{
+        const p=media.play();
+        if(p && p.catch) p.catch(()=>{ el.dataset.playBlocked='1'; });
+      };
+      const offsetSec=Math.max(0, layerNumber(layer.startOffsetMs,0))/1000;
+      if(offsetSec>0 && Number.isFinite(media.duration) && media.duration>0){
+        const target=Math.min(offsetSec, Math.max(0, media.duration-0.05));
+        el.dataset.startOffsetMs=String(Math.round(target*1000));
+        let settled=false;
+        const afterSeek=()=>{ if(settled) return; settled=true; begin(); };
+        media.addEventListener('seeked', afterSeek, {once:true});
+        try{ media.currentTime=target; }catch(e){ afterSeek(); }
+        setTimeout(afterSeek, 500);
+      } else begin();
+    };
+    media.addEventListener('loadeddata', ready, {once:true});
+    media.addEventListener('canplay', ready, {once:true});
+    media.addEventListener('ended', ()=>{
+      el.dataset.ended='1';
+      if(layer.playbackMode==='play-once-hide') el.style.display='none';
+      if(layer.playbackMode==='play-once-hold') el.dataset.holdLastFrame='1';
+    });
+    media.onerror=()=>{
+      el.dataset.error='media';
+      el.style.display='none';
+      recordLtPhaseMediaFailure(layer, canvas);
+      if(canvas) canvas.dataset.lastError='media:'+String(layer.id||'');
+    };
+  }
+  media.src=src;
+  media.style.position='absolute';
+  const crop=layer.crop || {};
+  const top=Math.max(0, layerNumber(crop.top,0)), right=Math.max(0, layerNumber(crop.right,0));
+  const bottom=Math.max(0, layerNumber(crop.bottom,0)), left=Math.max(0, layerNumber(crop.left,0));
+  media.style.left=(-left)+'px'; media.style.top=(-top)+'px';
+  media.style.width=`calc(100% + ${left + right}px)`;
+  media.style.height=`calc(100% + ${top + bottom}px)`;
+  media.style.objectFit=layer.fit==='fill' ? 'fill' : (layer.fit==='cover' ? 'cover' : 'contain');
+  el.appendChild(media);
+  return el;
+}
+function textLayerElement(layer){
+  const el=document.createElement('div');
+  el.className='lt-text-layer';
+  const va=layer.verticalAlign || 'middle';
+  el.style.alignItems=va==='top' ? 'flex-start' : (va==='bottom' ? 'flex-end' : 'center');
+  el.style.justifyContent=layer.textAlign==='center' ? 'center' : (layer.textAlign==='right' ? 'flex-end' : 'flex-start');
+  const pad=layer.padding || {};
+  el.style.padding=[pad.top||0,pad.right||0,pad.bottom||0,pad.left||0].map(v=>Math.max(0, layerNumber(v,0))+'px').join(' ');
+  const bg=layer.background || {};
+  if(bg.enabled){
+    el.style.background=bg.color || 'rgba(0,0,0,.55)';
+    el.style.borderRadius=Math.max(0, layerNumber(bg.radius,0))+'px';
+  }
+  const tx=document.createElement('div');
+  tx.className='lt-text-content';
+  tx.textContent=String(layer.resolvedText != null ? layer.resolvedText : (layer.text || ''));
+  tx.style.fontFamily=layer.fontFamily || '-apple-system, system-ui, sans-serif';
+  tx.style.fontSize=Math.max(4, layerNumber(layer.fontSize,48))+'px';
+  tx.style.fontWeight=String(layer.fontWeight || 700);
+  tx.style.fontStyle=layer.fontStyle || 'normal';
+  tx.style.color=layer.color || '#ffffff';
+  tx.style.textAlign=layer.textAlign || 'left';
+  tx.style.lineHeight=String(layer.lineHeight || 1.15);
+  const maxLines=Math.max(1, Math.min(10, parseInt(layer.maxLines,10)||1));
+  if(maxLines===1){
+    tx.style.display='block';
+    tx.style.whiteSpace='nowrap';
+    tx.style.wordBreak='normal';
+    tx.style.textOverflow='ellipsis';
+  } else {
+    tx.style.display='-webkit-box';
+    tx.style.whiteSpace='pre-wrap';
+    tx.style.wordBreak='break-word';
+    tx.style.webkitBoxOrient='vertical';
+    tx.style.webkitLineClamp=String(maxLines);
+  }
+  const outline=layer.outline || {};
+  if(outline.enabled) tx.style.webkitTextStroke=Math.max(0, layerNumber(outline.width,2))+'px '+(outline.color||'#000');
+  const sh=layer.shadow || {};
+  if(sh.enabled) tx.style.textShadow=`${layerNumber(sh.offsetX,0)}px ${layerNumber(sh.offsetY,2)}px ${Math.max(0, layerNumber(sh.blur,8))}px ${sh.color||'rgba(0,0,0,.6)'}`;
+  el.appendChild(tx);
+  return el;
+}
+function textFitsLayer(el,tx){
+  if(!el || !tx) return false;
+  const style=getComputedStyle(el);
+  const availableWidth=Math.max(0,el.clientWidth-parseFloat(style.paddingLeft||0)-parseFloat(style.paddingRight||0));
+  const availableHeight=Math.max(0,el.clientHeight-parseFloat(style.paddingTop||0)-parseFloat(style.paddingBottom||0));
+  return tx.scrollWidth<=availableWidth+1 && tx.scrollHeight<=availableHeight+1;
+}
+function autoFitTextLayer(el,layer){
+  const tx=el&&el.querySelector('.lt-text-content');
+  if(!tx || !layer || layer.autoFit===false) return;
+  delete tx.dataset.autoFit;
+  const preferred=Math.min(layerNumber(layer.fontSize,48),layerNumber(layer.maxFontSize,layerNumber(layer.fontSize,48)));
+  const minimum=Math.min(preferred,layerNumber(layer.minFontSize,18));
+  let low=minimum,high=preferred,best=minimum;
+  tx.style.fontSize=high+'px';
+  if(textFitsLayer(el,tx)) return;
+  for(let i=0;i<10;i++){
+    const mid=(low+high)/2;
+    tx.style.fontSize=mid+'px';
+    if(textFitsLayer(el,tx)){best=mid;low=mid;}else high=mid;
+  }
+  tx.style.fontSize=best+'px';
+  tx.dataset.autoFit='1';
+}
+function shapeLayerElement(layer){
+  const el=document.createElement('div');
+  if(layer.shape==='line'){
+    el.style.height=Math.max(1, layerNumber(layer.strokeWidth, Math.max(1, layer.height || 2)))+'px';
+    el.style.top=(layerBox(layer).y + Math.max(0, layerNumber(layer.height,2))/2)+'px';
+    el.style.background=layer.stroke || layer.fill || '#ffffff';
+    el.style.borderRadius='999px';
+  } else {
+    el.style.background=layer.fill || 'rgba(0,0,0,.55)';
+    if(layer.stroke){ el.style.border=Math.max(0, layerNumber(layer.strokeWidth,1))+'px solid '+layer.stroke; }
+    el.style.borderRadius=(layer.shape==='roundedRectangle' ? Math.max(0, layerNumber(layer.radius,12)) : 0)+'px';
+  }
+  return el;
+}
+function renderResolvedLayer(layer, canvas, order){
+  if(!layer || layer.visible===false) return null;
+  const box=(layer.type==='media' || layer.type==='logo') ? mediaLayerElement(layer, canvas)
+    : ((layer.type==='dynamicText' || layer.type==='staticText') ? textLayerElement(layer)
+    : (layer.type==='shape' ? shapeLayerElement(layer) : null));
+  if(!box) return null;
+  setLayerBase(box, layer, order);
+  return box;
+}
+function clearLtSequenceTimer(){
+  if(ltSequenceTimer){ clearTimeout(ltSequenceTimer); ltSequenceTimer=null; }
+}
+function scheduleLtSequenceTick(ms){
+  clearLtSequenceTimer();
+  if(!Number.isFinite(ms)) return;
+  const wait=Math.max(40, Math.min(260, ms));
+  ltSequenceTimer=setTimeout(()=>{ ltSequenceTimer=null; lastLtRuntimeKey=''; renderLowerThird(); }, wait);
+}
+function lowerThirdPhaseConfig(rt, phase){
+  const plan=(rt && rt.phasePlan) || {};
+  return plan[phase] || null;
+}
+function lowerThirdPhaseDuration(phase, cfg, rt){
+  const explicit=Number(rt && rt.phase===phase ? rt.phaseDurationMs : NaN);
+  if(Number.isFinite(explicit) && explicit>=0) return explicit;
+  const d=Number(cfg && cfg.durationMs);
+  if(Number.isFinite(d) && d>=0) return d;
+  if(phase==='intro') return 900;
+  if(phase==='outro') return 700;
+  return null;
+}
+function phaseMode(cfg){
+  return String((cfg && cfg.mode) || 'static');
+}
+function effectiveLowerThirdRuntime(rt){
+  const now=Date.now();
+  const baseStarted=Number(rt.startedAt)||now;
+  let phase=rt.phase || 'hold';
+  let phaseStarted=Number(rt.phaseStartedAt)||baseStarted;
+  phaseStarted=ltLocalPhaseStartedAt(rt, phase, phaseStarted);
+  let cfg=lowerThirdPhaseConfig(rt, phase);
+  let duration=lowerThirdPhaseDuration(phase, cfg, rt);
+  if(phase==='intro' && duration != null && now-phaseStarted>=duration){
+    phase='hold';
+    phaseStarted=phaseStarted+duration;
+    cfg=lowerThirdPhaseConfig(rt, phase);
+    duration=lowerThirdPhaseDuration(phase, cfg, rt);
+  }
+  const plan=(rt && rt.phasePlan) || {};
+  const phaseMediaIds=['intro','hold','outro']
+    .map(name=>plan[name] && plan[name].mediaLayerId)
+    .filter(Boolean);
+  let activeMediaId=cfg && cfg.mediaLayerId;
+  const failedAt=activeMediaId ? ltPhaseMediaFailures.get(ltPhaseMediaFailureKey(rt.instanceId, phase, activeMediaId)) : 0;
+  if(failedAt && phase==='intro'){
+    phase='hold';
+    phaseStarted=failedAt;
+    cfg=lowerThirdPhaseConfig(rt, phase);
+    duration=lowerThirdPhaseDuration(phase, cfg, rt);
+    activeMediaId=cfg && cfg.mediaLayerId;
+  } else if(failedAt && phase==='outro'){
+    return { hidden:true, nextTickMs:null };
+  }
+  if(phase==='outro' && duration != null && now-phaseStarted>=duration){
+    return { hidden:true, nextTickMs:null };
+  }
+  const elapsed=Math.max(0, now-phaseStarted);
+  const layers=[...(rt.resolvedLayers||[])].map(l=>Object.assign({}, l));
+  const revealDelay=Math.max(0, Number((cfg && cfg.textRevealDelayMs)||0));
+  const revealAt=phase==='intro' ? (phaseStarted + revealDelay) : 0;
+  layers.forEach(layer=>{
+    if((layer.type==='media' || layer.type==='logo') && phaseMediaIds.includes(layer.id) && activeMediaId && layer.id!==activeMediaId) layer.visible=false;
+    if((layer.type==='dynamicText' || layer.type==='staticText') && phase==='intro' && now<revealAt) layer.visible=false;
+    if((layer.type==='media' || layer.type==='logo') && cfg && cfg.mediaLayerId && layer.id===cfg.mediaLayerId){
+      layer.__phaseMediaActive=true;
+      layer.startOffsetMs=Math.max(0, Number(cfg.startOffsetMs)||0);
+      if(phase==='hold') layer.playbackMode=cfg.loop ? 'loop-until-hide' : (cfg.holdLastFrame ? 'play-once-hold' : 'play-once-hide');
+      if(phase==='intro' || phase==='outro') layer.playbackMode='play-once-hold';
+    }
+  });
+  let opacity=1;
+  const mode=phaseMode(cfg);
+  const fadeDuration=Math.max(1, Number((cfg && cfg.transition && cfg.transition.durationMs) || duration || 220));
+  if(phase==='intro' && (mode==='fade' || (cfg && cfg.transition && cfg.transition.type==='fade'))){
+    opacity=Math.max(0, Math.min(1, elapsed/fadeDuration));
+  } else if(phase==='outro' && (mode==='fade' || !cfg || (cfg.transition && cfg.transition.type==='fade'))){
+    opacity=Math.max(0, Math.min(1, 1-(elapsed/fadeDuration)));
+  }
+  let nextTickMs=null;
+  if(phase==='intro'){
+    if(now<revealAt) nextTickMs=Math.max(40, revealAt-now);
+    if(duration != null) nextTickMs=Math.min(nextTickMs==null?duration:nextTickMs, Math.max(40, duration-elapsed));
+    if(opacity<1) nextTickMs=80;
+  } else if(phase==='outro'){
+    nextTickMs=opacity>0 ? 80 : 40;
+  }
+  return {
+    runtime:Object.assign({}, rt, {
+      phase, phaseStartedAt:phaseStarted, phaseDurationMs:duration,
+      resolvedLayers:layers, sequenceOpacity:opacity
+    }),
+    hidden:false,
+    nextTickMs
+  };
+}
+function clearRuntimeLowerThird(){
+  const canvas=$('ltCanvas');
+  if(!canvas) return;
+  clearLtSequenceTimer();
+  canvas.querySelectorAll('video').forEach(v=>{ try{ v.pause(); v.removeAttribute('src'); v.load(); }catch(e){} });
+  canvas.replaceChildren();
+  canvas.style.display='none';
+  canvas.dataset.runtimeActive='0';
+  canvas.dataset.templateId='';
+  canvas.dataset.instanceId='';
+  canvas.dataset.phase='';
+  ltPhaseMediaFailures.clear();
+  lastLtRuntimeKey='';
+  updateLowerThirdRenderDebug('clear');
+}
+function renderRuntimeLowerThird(lt){
+  const canvas=$('ltCanvas');
+  if(!canvas) return false;
+  if(!isLowerThirdRuntimeValid(lt)){
+    clearRuntimeLowerThird();
+    return false;
+  }
+  const eff=effectiveLowerThirdRuntime(lt.runtime);
+  if(eff.hidden){
+    clearRuntimeLowerThird();
+    return true;
+  }
+  const rt=eff.runtime;
+  const scaleSpec=runtimeScaleSpec(rt);
+  const key=innerWidth+'x'+innerHeight+'|'+JSON.stringify(rt);
+  if(canvas.dataset.templateId!==(rt.templateId || '') || canvas.dataset.instanceId!==(rt.instanceId || '')){
+    canvas.dataset.lastError='';
+  }
+  canvas.dataset.runtimeActive='1';
+  canvas.dataset.templateId=rt.templateId || '';
+  canvas.dataset.instanceId=rt.instanceId || '';
+  canvas.dataset.phase=rt.phase || 'hold';
+  canvas.dataset.scale=String(scaleSpec.scale);
+  canvas.style.display='block';
+  if(eff.nextTickMs != null) scheduleLtSequenceTick(eff.nextTickMs);
+  if(key===lastLtRuntimeKey){ updateLowerThirdRenderDebug('runtime-stable'); return true; }
+  lastLtRuntimeKey=key;
+  canvas.querySelectorAll('video').forEach(v=>{ try{ v.pause(); v.removeAttribute('src'); v.load(); }catch(e){} });
+  canvas.replaceChildren();
+  const root=document.createElement('div');
+  root.className='lt-design-root';
+  root.dataset.canvasWidth=String(scaleSpec.canvas.width);
+  root.dataset.canvasHeight=String(scaleSpec.canvas.height);
+  root.dataset.scale=String(scaleSpec.scale);
+  root.style.width=scaleSpec.canvas.width+'px';
+  root.style.height=scaleSpec.canvas.height+'px';
+  root.style.opacity=String(Math.max(0, Math.min(1, Number(rt.sequenceOpacity ?? 1))));
+  root.style.transform=`translate(${scaleSpec.left}px, ${scaleSpec.top}px) scale(${scaleSpec.scale})`;
+  canvas.appendChild(root);
+  [...(rt.resolvedLayers||[])]
+    .map((layer,index)=>({layer,index,z:layerNumber(layer && layer.zIndex,0)}))
+    .sort((a,b)=>(a.z-b.z) || (a.index-b.index))
+    .forEach((entry,order)=>{
+      const el=renderResolvedLayer(entry.layer, canvas, order + 1);
+      if(el){ root.appendChild(el); if(entry.layer.type==='dynamicText' || entry.layer.type==='staticText') autoFitTextLayer(el,entry.layer); }
+    });
+  updateLowerThirdRenderDebug('runtime-render');
+  return true;
+}
+function renderLowerThird(){
+  const box=$('lowerThird');
+  const lt=(S && S.lowerThird) || {};
+  if(renderRuntimeLowerThird(lt)){
+    box.style.display='none';
+    updateLowerThirdRenderDebug('runtime-visible');
+    return;
+  }
+  const visible=!!(lt.visible && (!lt.until || Date.now()<lt.until) && (lt.name || lt.title || lt.meta || lt.graphic));
+  if(!visible){ box.style.display='none'; updateLowerThirdRenderDebug('hidden'); return; }
+  box.className='lt-'+(lt.pos||'bl')+' style-'+(lt.style||'clean')+' size-'+(lt.size||'m');
+  box.style.setProperty('--ltAccent', lt.accent || S.fgColor || '#30d158');
+  $('ltName').textContent=lt.name||'';
+  $('ltTitle').textContent=lt.title||'';
+  $('ltMeta').textContent=lt.meta||'';
+  $('ltTitle').style.display=lt.title?'block':'none';
+  $('ltMeta').style.display=lt.meta?'block':'none';
+  const img=$('ltImg');
+  if(lt.graphic){ if(img.src!==lt.graphic) img.src=lt.graphic; img.style.display='block'; }
+  else { img.removeAttribute('src'); img.style.display='none'; }
+  box.style.display='flex';
+  updateLowerThirdRenderDebug('legacy-visible');
+}
+
+function paint(timeText, fg, bg, neg, bigText, msgText, msgFlash, prog){
+  document.body.style.background = bg;
+
+  const tEl = $('timer'), txtEl = $('text'), st = $('stage');
+  // veličina referentne oblasti = #stage (ceo ekran, ili kockica grida)
+  const sw = st.clientWidth || innerWidth, sh = st.clientHeight || innerHeight;
+  const textOnly = S && S.textOnly && bigText;
+
+  // tekst (labela ili samostalno)
+  if (bigText){
+    txtEl.style.display = 'block';
+    txtEl.textContent = bigText;
+    txtEl.style.color = fg;
+    txtEl.style.fontSize = textOnly
+      ? Math.min(sw*0.9/Math.max(6, bigText.length*0.55), sh*0.5) + 'px'
+      : Math.min(sh*0.12, sw*0.06) + 'px';
+    txtEl.style.marginBottom = textOnly ? '0' : (sh*0.02)+'px';
+  } else {
+    txtEl.style.display = 'none';
+  }
+
+  // tajmer
+  if (textOnly){
+    tEl.style.display = 'none';
+  } else {
+    tEl.style.display = 'block';
+    tEl.textContent = timeText;
+    tEl.style.color = fg;
+    tEl.className = neg ? 'neg' : '';
+    if (fitMode){
+      // puni širinu prozora; rezervisana dužina (stabilna) da se prozor ne trza po cifri
+      const refLen = Math.max(timeText.length, fmtMs(S.durationMs||0).length, 4);
+      tEl.style.fontSize = Math.max(14, sw*0.86/(refLen*0.6)) + 'px';
+    } else {
+      const key = timeText.length + '|' + Math.round(sw) + 'x' + Math.round(sh) + '|' + (bigText?1:0);
+      if (key !== lastKey){
+        lastKey = key;
+        const avail = bigText ? sh*0.6 : sh*0.7;
+        tEl.style.fontSize = Math.min(sw*0.92/(timeText.length*0.6), avail) + 'px';
+      }
+    }
+  }
+
+  // poruka
+  const mEl = $('msg');
+  if (msgText){ mEl.style.display='block'; mEl.textContent=msgText; mEl.style.color=fg; mEl.className = msgFlash?'flash':''; }
+  else mEl.style.display='none';
+
+  // traka napretka
+  const pEl = $('prog');
+  if (prog !== null){ pEl.style.display='block'; pEl.style.width=(prog*100)+'%'; pEl.style.background=fg; }
+  else pEl.style.display='none';
+}
+
+function doFlash(col){
+  document.body.style.setProperty('--flashCol', col);
+  document.body.classList.remove('flash'); void document.body.offsetWidth;
+  document.body.classList.add('flash');
+}
+
+// PRO: chime — n kratkih tonova (1=žuto, 2=crveno, 3=nula); viši ton za nulu
+let audioCtx = null;
+function chime(n){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const t0 = audioCtx.currentTime;
+    for(let i=0;i<n;i++){
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.frequency.value = n===3 ? (i===2?1318:880) : (n===2?740:587);
+      o.connect(g); g.connect(audioCtx.destination);
+      const t=t0+i*0.28;
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(0.5,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+0.24);
+      o.start(t); o.stop(t+0.26);
+    }
+  }catch(e){}
+}
+document.body.addEventListener('animationend', e => {
+  if (e.target === document.body || e.animationName === 'zflash') document.body.classList.remove('flash');
+});
+
+// ---------- Electron-only: čist ekran, BEZ vidljivih kontrola (kontrola je u kontrolnom prozoru) ----------
+// zadržano samo: sakrivanje kursora na mirovanje + nevidljive prečice (Esc / dupli klik za pun ekran)
+if (IS_ELECTRON){
+  let idleT=null;
+  const wake = () => { document.body.classList.remove('idle'); clearTimeout(idleT);
+    idleT=setTimeout(()=>document.body.classList.add('idle'),2000); };
+  document.addEventListener('mousemove', wake); wake();
+  document.addEventListener('keydown', e => { if (e.key==='Escape') api.exitFullscreen(); });
+  document.addEventListener('dblclick', () => api.toggleFullscreen());
+}
+
+window.addEventListener('resize', () => { lastKey=''; lastLtRuntimeKey=''; renderLowerThird(); });
+requestAnimationFrame(render);
+</script>
+</body>
+</html>
