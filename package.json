@@ -51,10 +51,10 @@
     "displays:list": "electron tools/list-displays.js",
     "smoke:philips": "node tools/run-smoke-on-display.js --source",
     "smoke:packaged:philips": "node tools/run-smoke-on-display.js --packaged",
-    "dist:mac": "node tools/write-build-info.js && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --arm64 -c.mac.identity=- -c.mac.hardenedRuntime=false -c.mac.notarize=false",
-    "dist:mac:release": "node tools/assert-release-signing.js mac && node tools/write-build-info.js && electron-builder --mac --arm64 -c.forceCodeSigning=true",
-    "dist:win": "node tools/write-build-info.js && electron-builder --win --x64",
-    "dist:win:release": "node tools/assert-release-signing.js win && node tools/write-build-info.js && electron-builder --win --x64 -c.forceCodeSigning=true",
+    "dist:mac": "node tools/write-build-info.js && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --arm64 --publish never -c.mac.identity=- -c.mac.hardenedRuntime=false -c.mac.notarize=false",
+    "dist:mac:release": "node tools/assert-release-signing.js mac && node tools/write-build-info.js && electron-builder --mac --arm64 --publish never -c.forceCodeSigning=true",
+    "dist:win": "node tools/write-build-info.js && electron-builder --win --x64 --publish never",
+    "dist:win:release": "node tools/assert-release-signing.js win && node tools/write-build-info.js && electron-builder --win --x64 --publish never -c.forceCodeSigning=true",
     "dist:all": "npm run dist:mac && npm run dist:win"
   },
   "devDependencies": {

@@ -33,12 +33,16 @@ if (!scripts) {
   process.exit(2);
 }
 
-const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const isWindows = process.platform === 'win32';
+const runner = isWindows ? (process.env.ComSpec || 'cmd.exe') : 'npm';
 const startedAt = Date.now();
 
 for (const script of scripts) {
   console.log(`\n=== ${script} ===`);
-  const result = spawnSync(npm, ['run', script], {
+  const args = isWindows
+    ? ['/d', '/s', '/c', `npm run ${script}`]
+    : ['run', script];
+  const result = spawnSync(runner, args, {
     cwd: process.cwd(),
     env: process.env,
     stdio: 'inherit'
