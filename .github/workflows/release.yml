@@ -14,8 +14,8 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -28,7 +28,7 @@ jobs:
           "dist-installers/mac-arm64/ProTimer Studio.app/Contents/MacOS/ProTimer Studio" --print-build-info
           hdiutil verify dist-installers/ProTimer-Studio-*-arm64.dmg
           node node_modules/@electron/fuses/dist/bin.js read --app "dist-installers/mac-arm64/ProTimer Studio.app"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: macos-arm64
           path: dist-installers/ProTimer-Studio-*-arm64.dmg
@@ -38,8 +38,8 @@ jobs:
     runs-on: windows-2025
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -53,7 +53,7 @@ jobs:
           if (-not (Test-Path "dist-installers/win-unpacked/ProTimer Studio.exe")) { throw "Missing unpacked app" }
           if (-not (Test-Path "dist-installers/ProTimer-Studio-Setup-*.exe")) { throw "Missing installer" }
           if (-not (Test-Path "dist-installers/ProTimer-Studio-*-portable.exe")) { throw "Missing portable app" }
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: windows-x64
           path: |
@@ -66,8 +66,8 @@ jobs:
     needs: [macos-arm64, windows-x64]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           pattern: "*"
           path: release-assets
