@@ -153,6 +153,19 @@ app.whenReady().then(async () => {
 
   const initialState = await json(win, '__betaState()');
 
+  const sidebarToggle = await json(win, `(async()=>{
+    applyCompactMode(false); applyAdvancedMode(false); closeDrawers(); setSidebarCollapsed(false,false);
+    const button=document.getElementById('btnRundownDrawer'), sidebar=document.getElementById('primarySidebar'), operator=document.querySelector('.operator-main');
+    const before={sidebar:__visible(sidebar),operator:__rect(operator),state:__betaState(),expanded:button.getAttribute('aria-expanded')};
+    button.click(); await new Promise(resolve=>setTimeout(resolve,240));
+    const collapsed={classOn:document.body.classList.contains('sidebar-collapsed'),sidebar:__visible(sidebar),operator:__rect(operator),state:__betaState(),expanded:button.getAttribute('aria-expanded')};
+    button.click(); await new Promise(resolve=>setTimeout(resolve,240));
+    const restored={classOff:!document.body.classList.contains('sidebar-collapsed'),sidebar:__visible(sidebar),operator:__rect(operator),state:__betaState(),expanded:button.getAttribute('aria-expanded')};
+    return {before,collapsed,restored};
+  })()`);
+  check('BETA_SIDEBAR_TOGGLE_WIDE_OK', sidebarToggle.before.sidebar && sidebarToggle.before.expanded==='true' && sidebarToggle.collapsed.classOn && !sidebarToggle.collapsed.sidebar && sidebarToggle.collapsed.expanded==='false' && sidebarToggle.collapsed.operator.w>sidebarToggle.before.operator.w+150 && sidebarToggle.restored.classOff && sidebarToggle.restored.sidebar && sidebarToggle.restored.expanded==='true' && JSON.stringify(sidebarToggle.before.state)===JSON.stringify(sidebarToggle.collapsed.state) && JSON.stringify(sidebarToggle.before.state)===JSON.stringify(sidebarToggle.restored.state), JSON.stringify(sidebarToggle));
+  await capture(win, '1440x900-sidebar-restored');
+
   for (const size of sizes) {
     await setSize(win, size);
 
@@ -274,7 +287,7 @@ app.whenReady().then(async () => {
     check('BETA_STATE_' + size.name + '_OK', state.running && state.endAt === initialState.endAt && state.currentCue === initialState.currentCue && state.selectedCue === initialState.selectedCue && state.outputOpen === initialState.outputOpen && state.programScene === initialState.programScene && state.message === initialState.message, JSON.stringify({ initialState, state }));
   }
 
-  const expectedChecks = 1 + sizes.length * 13;
+  const expectedChecks = 2 + sizes.length * 13;
   console.log('BETA_USABILITY_MATRIX_OK ' + checks + '/' + expectedChecks + ' artifacts=' + artifactDirectory);
   win.destroy();
   fs.rmSync(profile, { recursive: true, force: true });

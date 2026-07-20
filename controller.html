@@ -2045,9 +2045,24 @@
     gap:4px;
   }
   .shell-layout .card-rundown .cue-meta .times{
+    position:static !important;
+    inset:auto !important;
+    width:auto !important;
+    min-width:0 !important;
     max-width:100%;
+    margin-left:auto;
+    overflow:visible !important;
+    opacity:1 !important;
     line-height:1.25;
     white-space:nowrap;
+  }
+  .shell-layout .card-rundown .cue-meta .cue-badge{
+    position:static !important;
+    inset:auto !important;
+    opacity:1 !important;
+  }
+  .shell-layout .card-rundown .cue-titleline .ltmark{
+    opacity:1 !important;
   }
   .shell-layout .card-rundown .cue-actions{
     grid-column:2 !important;
@@ -3216,8 +3231,14 @@
 
 <div class="topbar app-header">
   <div class="brand"><img class="brand-mark" src="build/icon.png" alt=""><span>ProTimer</span><span class="probadge">STUDIO</span></div>
+  <button id="btnRundownDrawer" class="ghost tb-drawerbtn sidebar-toggle" type="button"
+    aria-label="Toggle navigation sidebar" aria-controls="primarySidebar" aria-expanded="true"
+    data-i18n-title="sidebarToggle" title="Show or hide navigation">
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path>
+    </svg>
+  </button>
   <div class="grow"></div>
-  <button id="btnRundownDrawer" class="ghost tb-drawerbtn" aria-label="Rundown" data-i18n="rundownBtn">Rundown</button>
   <button id="btnMsgDrawer" class="ghost tb-drawerbtn" aria-label="Poruke" data-i18n="msgOutBtn">Poruke<span class="tb-badge" id="msgBadge"></span></button>
   <button id="btnSettingsDrawer" class="ghost tb-drawerbtn" aria-label="Podešavanja" data-i18n="settingsBtn" title="Podešavanja">Podešavanja</button>
   <div class="legacy-output-picker" aria-hidden="true">
@@ -3235,7 +3256,7 @@
 <div class="drawer-scrim" id="drawerScrim"></div>
 
 <div class="main operator-workspace">
-  <div class="col-run primary-sidebar">
+  <div class="col-run primary-sidebar" id="primarySidebar">
     <div class="sidebar-view-tabs" role="tablist" aria-label="Show workflow">
       <button id="btnSidebarRundown" class="active" role="tab" aria-selected="true" data-i18n="rundown">RUNDOWN</button>
       <button id="btnSidebarSlides" role="tab" aria-selected="false" data-i18n="slides">SLIDES</button>
@@ -4032,7 +4053,7 @@ const I18N = {
     badgeLive:'U PROGRAMU', badgeSelected:'IZABRANO', badgeNext:'SLEDI', badgeSkipped:'PRESKOČENO',
     goSelectedBtn:'KRENI ▶ {name}', goAutoStart:'Auto-start na GO', goAutoTitle:'GO odmah pokreće tajmer novog reda',
     advanced:'Napredno', advancedTitle:'Preview/Program režija (Cut/Transition). Isključeno: sve ide direktno na Program.',
-    rundownBtn:'Rundown', msgOutBtn:'Poruke', settingsBtn:'Podešavanja', compactMode:'Kompaktan režim', compactTitle:'Kompaktan operater: samo tajmer, START, GO, ±, poruka; rundown u draweru.', fsMenu:'⛶ Pun ekran', closeMenu:'✕ Zatvori izlaz',
+    rundownBtn:'Rundown', sidebarToggle:'Prikaži ili sakrij navigaciju', msgOutBtn:'Poruke', settingsBtn:'Podešavanja', compactMode:'Kompaktan režim', compactTitle:'Kompaktan operater: samo tajmer, START, GO, ±, poruka; rundown u draweru.', fsMenu:'⛶ Pun ekran', closeMenu:'✕ Zatvori izlaz',
     inspTitle:'Izvor', inspOpacity:'Prozirnost', inspFitTitle:'Kako medij popunjava kutiju',
     fitCover:'Popuni', fitContain:'Uklopi', fitFill:'Razvuci', inspCenter:'Centriraj', inspFull:'Ceo ekran',
     inspFontTitle:'Veličina teksta (% visine)', layerNamePrompt:'Naziv izvora:', textLayerPrompt:'Tekst izvora:',
@@ -4128,7 +4149,7 @@ const I18N = {
     badgeLive:'LIVE', badgeSelected:'SELECTED', badgeNext:'NEXT', badgeSkipped:'SKIPPED',
     goSelectedBtn:'GO ▶ {name}', goAutoStart:'Auto-start on GO', goAutoTitle:'GO immediately starts the new item timer',
     advanced:'Advanced', advancedTitle:'Preview/Program workflow (Cut/Transition). Off: everything goes straight to Program.',
-    rundownBtn:'Rundown', msgOutBtn:'Message', settingsBtn:'Settings', compactMode:'Compact mode', compactTitle:'Compact operator: only timer, START, GO, ±, message; rundown in a drawer.', fsMenu:'⛶ Fullscreen', closeMenu:'✕ Close output',
+    rundownBtn:'Rundown', sidebarToggle:'Show or hide navigation', msgOutBtn:'Message', settingsBtn:'Settings', compactMode:'Compact mode', compactTitle:'Compact operator: only timer, START, GO, ±, message; rundown in a drawer.', fsMenu:'⛶ Fullscreen', closeMenu:'✕ Close output',
     inspTitle:'Source', inspOpacity:'Opacity', inspFitTitle:'How media fills the box',
     fitCover:'Cover', fitContain:'Fit', fitFill:'Stretch', inspCenter:'Center', inspFull:'Full screen',
     inspFontTitle:'Text size (% of height)', layerNamePrompt:'Source name:', textLayerPrompt:'Source text:',
@@ -5541,6 +5562,7 @@ function load(){
   renderScenesUI();
   renderContentItems();
   setSidebarView(localStorage.getItem('pt_sidebar_view')==='slides'?'slides':'rundown');
+  setSidebarCollapsed(localStorage.getItem('pt_sidebar_collapsed')==='1', false);
   renderCues();
 }
 
@@ -8297,13 +8319,30 @@ $('chkCompact').addEventListener('change',e=>{
   localStorage.setItem('pt_compact', e.target.checked?'1':'');
   applyCompactMode(e.target.checked);
 });
-function closeDrawers(){ document.body.classList.remove('dr-right','dr-run','dr-setup'); }
-function toggleDrawer(cls){ const had=document.body.classList.contains(cls); closeDrawers(); if(!had) document.body.classList.add(cls); }
-$('btnRundownDrawer').addEventListener('click',()=>toggleDrawer('dr-run'));
+function sidebarUsesDrawer(){ return document.body.classList.contains('compact') || window.matchMedia('(max-width:1100px)').matches; }
+function updateSidebarToggle(){
+  const btn=$('btnRundownDrawer'); if(!btn) return;
+  const expanded=sidebarUsesDrawer() ? document.body.classList.contains('dr-run') : !document.body.classList.contains('sidebar-collapsed');
+  btn.setAttribute('aria-expanded', expanded?'true':'false');
+  btn.classList.toggle('active', expanded);
+}
+function setSidebarCollapsed(collapsed, persist=true){
+  document.body.classList.toggle('sidebar-collapsed', !!collapsed);
+  if(persist) localStorage.setItem('pt_sidebar_collapsed', collapsed?'1':'');
+  updateSidebarToggle();
+}
+function closeDrawers(){ document.body.classList.remove('dr-right','dr-run','dr-setup'); updateSidebarToggle(); }
+function toggleDrawer(cls){ const had=document.body.classList.contains(cls); closeDrawers(); if(!had) document.body.classList.add(cls); updateSidebarToggle(); }
+function toggleNavigationSidebar(){
+  if(sidebarUsesDrawer()) toggleDrawer('dr-run');
+  else setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed'));
+}
+$('btnRundownDrawer').addEventListener('click',toggleNavigationSidebar);
 $('btnMsgDrawer').addEventListener('click',()=>toggleDrawer('dr-right'));
 $('btnSettingsDrawer').addEventListener('click',()=>toggleDrawer('dr-setup'));
 if($('btnSetupClose')) $('btnSetupClose').addEventListener('click',closeDrawers);
 $('drawerScrim').addEventListener('click',closeDrawers);
+window.addEventListener('resize',updateSidebarToggle);
 // overflow (⋯) meni — body-level popover, not clipped by the header/shell.
 function positionTopbarMenu(){
   const btn=$('btnTb'), menu=$('tbMenu');
