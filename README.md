@@ -120,9 +120,9 @@ This beta exists to learn from real operators. Start with the [public beta feedb
 
 Contributions are welcome; read [CONTRIBUTING.md](CONTRIBUTING.md) first. Security issues should use GitHub's private vulnerability reporting instead of a public issue.
 
-## Srpski
+## Language support
 
-ProTimer Studio je besplatna open-source aplikacija za stage timer, rundown, poruke govorniku, potpise, sadržaj za ekrane i više izlaza. Engleski je podrazumevani jezik, a kompletan srpski interfejs bira se u vrhu aplikacije. Za početak pogledajte [kratko uputstvo na srpskom](docs/USER-GUIDE.md#brzi-početak-na-srpskom).
+English is the default interface. Serbian also has full interface coverage and can be selected from the language menu. The other 35 language packs cover core operator controls and use English fallback for advanced areas; see [Languages](docs/LOCALIZATION.md) for the exact coverage policy.
 
 ## License
 

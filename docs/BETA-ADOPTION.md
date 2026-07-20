@@ -29,13 +29,7 @@ Ask for the app version, OS, CPU, display arrangement and exact reproduction ste
 
 ## Natural outreach copy
 
-### Serbian
-
-Napravio sam ProTimer Studio, besplatan open-source alat za rundown, stage timer, potpise i više izlaznih ekrana u live produkciji. Tražim nekoliko AV operatera koji bi ga probali van programa i iskreno rekli šta je nejasno ili ne radi na njihovom setupu.
-
-Mac i Windows beta: https://srdjankotarlic.github.io/protimer-studio/
-
-### English
+### Suggested post
 
 I built ProTimer Studio, a free open-source rundown, stage timer, lower-third and multi-display tool for live events. I am looking for a few operators who can test it off-air and tell me what is unclear or fails on their setup.
 
