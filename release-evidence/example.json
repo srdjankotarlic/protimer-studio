@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "releaseTag": "v1.0.0",
+  "commit": "REPLACE_WITH_FULL_40_CHARACTER_TAG_COMMIT",
+  "candidateRunId": 0,
+  "verifiedAt": "REPLACE_WITH_UTC_TIMESTAMP",
+  "artifacts": {
+    "ProTimer-Studio-1.0.0-arm64.dmg": "REPLACE_WITH_SHA256",
+    "ProTimer-Studio-Setup-1.0.0.exe": "REPLACE_WITH_SHA256",
+    "ProTimer-Studio-1.0.0-portable.exe": "REPLACE_WITH_SHA256"
+  },
+  "gates": {
+    "sourceDisplaySmoke": {
+      "passed": false,
+      "completedAt": "REPLACE_WITH_UTC_TIMESTAMP",
+      "display": "PHL 243V7",
+      "evidence": "REPLACE_WITH_EVIDENCE_PATH_OR_URL"
+    },
+    "packagedDisplaySmoke": {
+      "passed": false,
+      "completedAt": "REPLACE_WITH_UTC_TIMESTAMP",
+      "display": "PHL 243V7",
+      "evidence": "REPLACE_WITH_EVIDENCE_PATH_OR_URL"
+    },
+    "macCleanInstall": {
+      "passed": false,
+      "completedAt": "REPLACE_WITH_UTC_TIMESTAMP",
+      "evidence": "REPLACE_WITH_EVIDENCE_PATH_OR_URL",
+      "os": "REPLACE_WITH_MACOS_VERSION",
+      "hardware": "REPLACE_WITH_MAC_MODEL",
+      "artifact": "ProTimer-Studio-1.0.0-arm64.dmg",
+      "checks": {
+        "install": false,
+        "launch": false,
+        "gatekeeper": false,
+        "multiDisplay": false,
+        "networkViews": false,
+        "quit": false
+      }
+    },
+    "windowsCleanInstall": {
+      "passed": false,
+      "completedAt": "REPLACE_WITH_UTC_TIMESTAMP",
+      "evidence": "REPLACE_WITH_EVIDENCE_PATH_OR_URL",
+      "os": "REPLACE_WITH_WINDOWS_VERSION",
+      "hardware": "REPLACE_WITH_PC_AND_DISPLAY_SETUP",
+      "artifacts": [
+        "ProTimer-Studio-Setup-1.0.0.exe",
+        "ProTimer-Studio-1.0.0-portable.exe"
+      ],
+      "checks": {
+        "installer": false,
+        "portable": false,
+        "launch": false,
+        "firewall": false,
+        "multiDisplay": false,
+        "uninstall": false
+      }
+    },
+    "externalOperatorBeta": {
+      "passed": false,
+      "completedAt": "REPLACE_WITH_UTC_TIMESTAMP",
+      "evidence": "REPLACE_WITH_EVIDENCE_PATH_OR_URL",
+      "operators": 0,
+      "releaseBlockers": 0
+    },
+    "releaseDocsReview": {
+      "passed": false,
+      "completedAt": "REPLACE_WITH_UTC_TIMESTAMP",
+      "evidence": "REPLACE_WITH_EVIDENCE_PATH_OR_URL",
+      "files": [
+        "README.md",
+        "docs/KNOWN-LIMITATIONS.md",
+        "docs/SYSTEM-REQUIREMENTS.md",
+        "docs/PRIVACY.md"
+      ]
+    }
+  }
+}

@@ -3193,7 +3193,7 @@
         <h3 data-i18n="rundown" style="margin:0">RUNDOWN</h3>
         <button id="btnCueImport" class="mini ghost" data-i18n="cueImport" data-i18n-title="cueImportTitle" title="Uvezi CSV / nalepi iz Excel-a ili Sheets-a (naziv, trajanje, beleška)">Uvoz</button>
         <button id="btnCueExport" class="mini ghost" data-i18n="cueExport" data-i18n-title="cueExportTitle" title="Izvezi rundown kao CSV">CSV</button>
-        <button id="btnReport" class="mini ghost" data-i18n="report" data-i18n-title="reportTitle" title="Izveštaj: planirano vs. stvarno po tački (PRO)">Izveštaj</button>
+        <button id="btnReport" class="mini ghost" data-i18n="report" data-i18n-title="reportTitle" title="Izveštaj: planirano vs. stvarno po tački">Izveštaj</button>
         <input type="file" id="cueFile" accept=".csv,.txt,.tsv" style="display:none">
         <div class="grow"></div>
         <button id="btnCueEdit" class="mini ghost cue-editor-toggle" data-i18n="cueEditSelected" data-i18n-title="cueEditorTitle" title="Open cue editor">Edit selected</button>
@@ -3426,7 +3426,7 @@
         <input type="time" id="targetInput">
         <button id="btnTarget" data-i18n-title="targetTitle" title="Odbrojavanje do tačnog vremena" data-i18n="startTarget">Start</button>
         <div class="sep"></div>
-        <label class="chk" data-i18n-title="schedTitle" title="Tajmer sam krene u zadato vreme (PRO)"><input type="checkbox" id="chkSched"> <span data-i18n="schedLabel">Auto-start u</span></label>
+        <label class="chk" data-i18n-title="schedTitle" title="Tajmer sam krene u zadato vreme"><input type="checkbox" id="chkSched"> <span data-i18n="schedLabel">Auto-start u</span></label>
         <input type="time" id="schedInput">
         <label class="chk"><input type="checkbox" id="chk12h"> <span data-i18n="h12">12h (AM/PM)</span></label>
         <label class="chk" data-i18n-title="goAutoTitle" title="GO odmah pokreće tajmer novog reda"><input type="checkbox" id="chkGoAuto" checked> <span data-i18n="goAutoStart">Auto-start na GO</span></label>
@@ -3466,7 +3466,7 @@
         <label class="chk"><input type="checkbox" id="chkWarn" checked> <span data-i18n="warnColors">Boje upozorenja</span></label>
         <span class="warn-sw"><span class="tag" data-i18n="tagY">Ž</span><input type="color" id="warnYellow" value="#ffc23a" data-i18n-title="yellow" title="Žuto"></span>
         <span class="warn-sw"><span class="tag" data-i18n="tagR">C</span><input type="color" id="warnRed" value="#ff4540" data-i18n-title="red" title="Crveno"></span>
-        <label class="chk" data-i18n-title="chimesTitle" title="Zvučni signal na ekranu: 1 ton žuto · 2 tona crveno · 3 tona nula (PRO)"><input type="checkbox" id="chkChimes"> <span data-i18n="chimes">Zvuk</span></label>
+        <label class="chk" data-i18n-title="chimesTitle" title="Zvučni signal na ekranu: 1 ton žuto · 2 tona crveno · 3 tona nula"><input type="checkbox" id="chkChimes"> <span data-i18n="chimes">Zvuk</span></label>
         <div class="sep"></div>
         <label class="chk"><input type="checkbox" id="chkTransparent"> <span data-i18n="transparent">Providna pozadina (OBS)</span></label>
       </div>
@@ -3598,7 +3598,7 @@
         <button class="mini ghost qrbtn" data-qr="netBackstage" title="QR kod">QR</button>
         <button id="btnCopyBackstage" class="mini ghost" data-i18n="copy">Kopiraj</button>
       </div>
-      <div class="lbl" style="margin-bottom:5px" data-i18n="signalLabel">Signal svetlo (govornica · PRO)</div>
+      <div class="lbl" style="margin-bottom:5px" data-i18n="signalLabel">Signal svetlo (govornica)</div>
       <div class="net-url">
         <span id="netSignal" style="color:#5be37f">—</span>
         <button class="mini ghost qrbtn" data-qr="netSignal" title="QR kod">QR</button>
@@ -4023,7 +4023,7 @@ const I18N = {
     preflightCheck_showSaved:'Show je sačuvan', preflightCheck_autosaveWritable:'Autosave je upisiv', preflightCheck_rundownValid:'Rundown je ispravan', preflightCheck_missingAssets:'Svi asseti postoje', preflightCheck_speakerScreen:'Ekran govornika', preflightCheck_programBrowser:'Program / browser output', preflightCheck_backstage:'Backstage', preflightCheck_phoneRemote:'Telefon daljinski', preflightCheck_apiCompanion:'API / Companion', preflightCheck_soundChime:'Zvuk / chime', preflightCheck_lowerThirdTemplate:'Lower-third template', preflightCheck_displayAssignment:'Dodela ekrana', preflightCheck_outputResolution:'Rezolucija izlaza', preflightCheck_recoveryStatus:'Recovery stanje',
     slides:'SLIDES', slideMedia:'Medija', slideHolding:'Holding', slideLogo:'Logo', slideTimer:'Tajmer', slideBlank:'Prazno', slideSelected:'Izabrano', slideTake:'TAKE', slideClear:'CLEAR', slideEmpty:'Dodajte sliku, video, PDF, holding tekst, logo ili tajmer.', slideNamePrompt:'Naziv sadržaja:', slideHoldingPrompt:'Holding tekst:', slideLogoMissing:'Prvo dodajte logo u brendingu.', slideCount:'{n} stavki', slidePage:'Strana {n}',
     cueContent:'Vezani sadržaj ekrana', cueContentAuto:'Auto TAKE sadržaja na GO', cueContentNone:'Bez vezanog sadržaja',
-    backstageLabel:'Backstage (raspored / crew)', signalLabel:'Signal svetlo (govornica · PRO)', onTime:'NA VREME', late:'kasni', early:'ispred',
+    backstageLabel:'Backstage (raspored / crew)', signalLabel:'Signal svetlo (govornica)', onTime:'NA VREME', late:'kasni', early:'ispred',
     apiLabel:'API (Stream Deck / Companion)', apiTitle:'Autorizovani URL za Companion / Stream Deck. Podržava GO, tajmer, poruke, potpise i sadržaj ekrana.',
     nowLabel:'SADA', nextLabel:'SLEDI', endLabel:'Kraj', plannedLabel:'Planirano', projectedLabel:'Procena',
     netTitle:'MREŽA → OBS · TELEFON', screenOBS:'Ekran (OBS / monitor)', copy:'Kopiraj',
@@ -4032,8 +4032,8 @@ const I18N = {
     connecting:'Povezivanje…', stopSharing:'Prekini deljenje', shareFail:'Nije uspelo, pokušaj opet',
     shareNote:'QR = skeniraj telefonom (ista Wi-Fi). „Deli online" = link sa bilo koje mreže.',
     netNote:'Svi uređaji moraju biti na <b>ISTOJ Wi-Fi</b> mreži. OBS: <b>Browser Source</b> → Ekran URL („Providna pozadina" za overlay; NDI preko DistroAV). Telefon: otvori Daljinski URL. OSC: UDP port <b>7879</b>; GO, tajmer, poruke, potpisi i Slides koriste <b>/protimer/…</b> adrese.',
-    chimes:'Zvuk', chimesTitle:'Zvučni signal na ekranu: 1 ton žuto · 2 tona crveno · 3 tona nula (PRO)',
-    schedLabel:'Auto-start u', schedTitle:'Tajmer sam krene u zadato vreme (PRO)',
+    chimes:'Zvuk', chimesTitle:'Zvučni signal na ekranu: 1 ton žuto · 2 tona crveno · 3 tona nula',
+    schedLabel:'Auto-start u', schedTitle:'Tajmer sam krene u zadato vreme',
     logoBtn:'Logo slika', logoBig:'Slika je prevelika (max 8 MB).',
     posTR:'Gore desno', posTL:'Gore levo', posTC:'Gore centar', posBL:'Dole levo', posBC:'Dole centar', posBR:'Dole desno',
     lowerThird:'Potpis', ltControl:'Live', ltAssets:'Grafika',
@@ -4049,7 +4049,7 @@ const I18N = {
     presets:'Brze', presetHint:'dupli klik = izmeni', presetEdit:'Tekst preseta:',
     fontTitle:'Font cifara tajmera', fontMono:'Mono (klasik)', fontGrotesk:'Moderni', fontSerif:'Elegantni', fontDisplay:'Masivni',
     h12:'12h (AM/PM)',
-    report:'Izveštaj', reportTitle:'Izveštaj: planirano vs. stvarno po tački (PRO)',
+    report:'Izveštaj', reportTitle:'Izveštaj: planirano vs. stvarno po tački',
     reportEmpty:'Nema rundown stavki za izveštaj.',
     reportClear:'Izveštaj izvezen. Očistiti dnevnik za sledeći događaj?',
     reportEyebrow:'POST-SHOW IZVEŠTAJ', reportGenerated:'Generisano', reportTotalPlanned:'Ukupno planirano', reportTotalActual:'Ukupno stvarno', reportFinalDelay:'Završno kašnjenje', reportOvertime:'Prekoračenja', reportLongestOvertime:'Najduže prekoračenje', reportBreaks:'Pauze', reportSkipped:'Preskočeno',
@@ -4119,7 +4119,7 @@ const I18N = {
     preflightCheck_showSaved:'Show saved', preflightCheck_autosaveWritable:'Autosave writable', preflightCheck_rundownValid:'Rundown valid', preflightCheck_missingAssets:'Assets available', preflightCheck_speakerScreen:'Speaker screen', preflightCheck_programBrowser:'Program / browser output', preflightCheck_backstage:'Backstage', preflightCheck_phoneRemote:'Phone remote', preflightCheck_apiCompanion:'API / Companion', preflightCheck_soundChime:'Sound / chime', preflightCheck_lowerThirdTemplate:'Lower-third template', preflightCheck_displayAssignment:'Display assignment', preflightCheck_outputResolution:'Output resolution', preflightCheck_recoveryStatus:'Recovery status',
     slides:'SLIDES', slideMedia:'Media', slideHolding:'Holding', slideLogo:'Logo', slideTimer:'Timer', slideBlank:'Blank', slideSelected:'Selected', slideTake:'TAKE', slideClear:'CLEAR', slideEmpty:'Add an image, video, PDF, holding text, logo or timer.', slideNamePrompt:'Content name:', slideHoldingPrompt:'Holding text:', slideLogoMissing:'Add a branding logo first.', slideCount:'{n} items', slidePage:'Page {n}',
     cueContent:'Linked screen content', cueContentAuto:'Auto TAKE content on GO', cueContentNone:'No linked content',
-    backstageLabel:'Backstage (schedule / crew)', signalLabel:'Signal light (podium · PRO)', onTime:'ON TIME', late:'behind', early:'ahead',
+    backstageLabel:'Backstage (schedule / crew)', signalLabel:'Signal light (podium)', onTime:'ON TIME', late:'behind', early:'ahead',
     apiLabel:'API (Stream Deck / Companion)', apiTitle:'Authenticated Companion / Stream Deck URL for GO, timer, message, lower-third and screen-content actions.',
     nowLabel:'NOW', nextLabel:'NEXT', endLabel:'End', plannedLabel:'Planned', projectedLabel:'Projected',
     netTitle:'NETWORK → OBS · PHONE', screenOBS:'Screen (OBS / monitor)', copy:'Copy',
@@ -4128,8 +4128,8 @@ const I18N = {
     connecting:'Connecting…', stopSharing:'Stop sharing', shareFail:'Failed, try again',
     shareNote:'QR = scan with a phone (same Wi-Fi). “Share online” = a link that works from any network.',
     netNote:'All devices must be on the <b>SAME Wi-Fi</b> network. OBS: <b>Browser Source</b> → Screen URL (enable “Transparent background” for overlay; NDI via DistroAV). Phone: open the Remote URL. OSC: UDP port <b>7879</b>; GO, timer, message, lower-third and Slides actions use <b>/protimer/…</b> addresses.',
-    chimes:'Sound', chimesTitle:'Audible chime on screen: 1 tone yellow · 2 tones red · 3 tones zero (PRO)',
-    schedLabel:'Auto-start at', schedTitle:'Timer starts by itself at the set time (PRO)',
+    chimes:'Sound', chimesTitle:'Audible chime on screen: 1 tone yellow · 2 tones red · 3 tones zero',
+    schedLabel:'Auto-start at', schedTitle:'Timer starts by itself at the set time',
     logoBtn:'Logo image', logoBig:'Image too large (max 8 MB).',
     posTR:'Top right', posTL:'Top left', posTC:'Top center', posBL:'Bottom left', posBC:'Bottom center', posBR:'Bottom right',
     lowerThird:'Lower third', ltControl:'Live', ltAssets:'Graphics',
@@ -4145,7 +4145,7 @@ const I18N = {
     presets:'Quick', presetHint:'double-click = edit', presetEdit:'Preset text:',
     fontTitle:'Timer digits font', fontMono:'Mono (classic)', fontGrotesk:'Modern', fontSerif:'Elegant', fontDisplay:'Bold',
     h12:'12h (AM/PM)',
-    report:'Report', reportTitle:'Report: planned vs. actual per item (PRO)',
+    report:'Report', reportTitle:'Report: planned vs. actual per item',
     reportEmpty:'There are no rundown items to report.',
     reportClear:'Report exported. Clear the log for the next event?',
     reportEyebrow:'POST-SHOW REPORT', reportGenerated:'Generated', reportTotalPlanned:'Total planned', reportTotalActual:'Total actual', reportFinalDelay:'Final delay', reportOvertime:'Overtime segments', reportLongestOvertime:'Longest overtime', reportBreaks:'Breaks', reportSkipped:'Skipped',
@@ -8272,6 +8272,7 @@ $('btnAbout')?.addEventListener('click',async()=>{
     'ProTimer Studio',
     'Version: '+(info.version || '1.0.0'),
     'Commit: '+(info.commit || 'unknown'),
+    'Source state: '+(info.dirty ? 'modified (non-release build)' : 'clean'),
     'Built: '+(info.buildTimestamp || 'unknown'),
     'Packaged: '+(info.isPackaged ? 'yes' : 'no'),
     'App path: '+(info.appPath || info.exePath || 'unknown')

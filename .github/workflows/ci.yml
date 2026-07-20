@@ -20,7 +20,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Syntax checks
-        run: node --check main.js && node --check preload.js && node --check i18n.js && node --check tools/check-free-build.js && node --check tools/check-public-site.js && node --check tools/run-test-suite.js
+        run: node --check main.js && node --check preload.js && node --check i18n.js && node --check tools/check-free-build.js && node --check tools/check-public-site.js && node --check tools/check-packaged-free-build.js && node --check tools/assert-release-tag.js && node --check tools/verify-release-evidence.js && node --check tools/run-test-suite.js
       - name: Free-build contract
         run: npm run check:free
       - name: Public site contract

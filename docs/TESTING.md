@@ -6,7 +6,7 @@
 npm test
 ```
 
-Runs 68 checks across lower-third packages, show storage and recovery data, portable show packages, preflight, screen-content models, control API normalization, post-show reports, pure output-routing rules and fail-closed release-signing preflight. This suite is deterministic and runs in GitHub Actions.
+Runs 93 checks across lower-third packages, show storage and recovery data, portable show packages, preflight, screen-content models, control API normalization, post-show reports, pure output-routing rules, localization, build provenance, signing preflight and exact-artifact release evidence. This suite is deterministic and runs in GitHub Actions.
 
 ## Local renderer suite
 
@@ -52,6 +52,8 @@ The soak waits for the expected runtime instance and stable rendered DOM. It doe
 
 Passing automated checks do not replace signing, notarization or Windows hardware QA. See [PUBLIC-BETA-VERIFICATION.md](PUBLIC-BETA-VERIFICATION.md) and [KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md).
 
-The manual **Build signed stable release** workflow is intentionally unusable without real protected signing secrets. It validates an exact stable tag, runs the headless suite, signs on native platform runners, verifies notarization or Authenticode timestamps, attests the binaries and only then creates a stable GitHub Release.
+The manual **Build signed stable candidate** workflow is intentionally unusable without real protected signing secrets. It validates an exact stable tag, runs the headless suite, signs on native platform runners, verifies notarization or Authenticode timestamps, attests the binaries and creates a private draft release.
+
+The separate **Publish verified stable release** workflow remains blocked until `release-evidence/<version>.json` binds that exact candidate's hashes to designated-display smoke, physical Mac/Windows installation, external operator beta and release-document review. See [release evidence](../release-evidence/README.md).
 
 Both beta and stable package jobs run `npm run check:packaged-free -- PATH/TO/app.asar` against the actual Mac and Windows archive, rather than inferring packaged contents from the source tree.

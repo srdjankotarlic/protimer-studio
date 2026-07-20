@@ -8,9 +8,14 @@ At the last local check, this Mac had no valid `Developer ID Application` identi
 
 Never commit certificates, private keys or passwords. Inject them through the local keychain or protected CI secrets.
 
-## Automated stable release gate
+## Automated stable release gates
 
-`.github/workflows/stable-release.yml` is the only automated path that publishes a stable GitHub Release. It is manual and fail-closed. It accepts only an existing `vMAJOR.MINOR.PATCH` tag whose value matches `package.json`, whose commit is on `main`, and whose confirmation input is exactly `PUBLISH`.
+Stable delivery is deliberately split into two manual, fail-closed workflows:
+
+1. `.github/workflows/stable-release.yml` builds a signed candidate and creates a **private draft** GitHub Release. It accepts only an existing `vMAJOR.MINOR.PATCH` tag whose value matches `package.json`, whose commit is on `main`, and whose workflow run is launched from that exact tag ref with confirmation `BUILD`.
+2. `.github/workflows/publish-stable.yml` publishes that draft only after a committed `release-evidence/<version>.json` proves physical and external QA against the exact candidate hashes. Its confirmation is `PUBLISH`.
+
+The unsigned beta workflow accepts only `vMAJOR.MINOR.PATCH-beta.NUMBER` tags. A stable tag cannot trigger or publish an unsigned beta artifact.
 
 Configure these protected GitHub Actions secrets before using it:
 
@@ -24,7 +29,7 @@ Configure these protected GitHub Actions secrets before using it:
 | `WINDOWS_CERT_PFX_BASE64` | Base64-encoded exportable Authenticode `.pfx`. |
 | `WINDOWS_CERT_PASSWORD` | Password protecting that `.pfx`. |
 
-The workflow decodes credentials only into the ephemeral runner, builds natively on macOS and Windows, and refuses to publish unless all of these checks pass:
+The candidate workflow decodes credentials only into the ephemeral runner, builds natively on macOS and Windows, and refuses to create a draft unless all of these checks pass:
 
 - package version, exact tag and `main` ancestry;
 - deterministic tests and dependency audit;
@@ -33,7 +38,18 @@ The workflow decodes credentials only into the ephemeral runner, builds natively
 - packaged CLI boot and hardened Electron fuses;
 - SHA-256 checksums and GitHub provenance attestations.
 
-Create and push a stable tag only after all product and hardware gates below pass. Then open **Actions → Build signed stable release → Run workflow**, enter the tag and type `PUBLISH`. Missing, malformed or invalid credentials stop the run before a release is created.
+Create and push a stable tag only after source readiness gates pass. Then launch the candidate workflow from the exact tag ref:
+
+```bash
+gh workflow run stable-release.yml \
+  --ref v1.0.0 \
+  -f tag=v1.0.0 \
+  -f confirmation=BUILD
+```
+
+Missing, malformed or invalid credentials stop the run before a draft is created. Download the draft DMG/EXE files and test those exact signed candidates. Copy `release-evidence/example.json` to `release-evidence/1.0.0.json`, fill it only with real retained evidence and the draft checksums, then commit it to `main` without moving the release tag.
+
+After review, run **Publish verified stable release** with the same tag and confirmation `PUBLISH`. That workflow verifies the draft state, candidate run ID and commit, checks every SHA-256, verifies GitHub attestations and validates all required evidence before making the release public. See [stable release evidence](../release-evidence/README.md).
 
 ## macOS
 
@@ -101,9 +117,9 @@ npm run dist:win:release
 
 The final installer and portable executable must be checked on a clean physical Windows x64 machine. Validate signature details in file Properties and with `Get-AuthenticodeSignature`; run installation, first launch, output routing and uninstall before a stable public release.
 
-## Stable release gate
+## Stable release evidence
 
-Do not upload a package to a store until all of these are true:
+Do not publish or upload a stable package until all of these are true:
 
 - source and packaged smoke pass on the designated PHL 243V7 test display;
 - the artifact is built from a clean, pushed commit;
@@ -112,6 +128,8 @@ Do not upload a package to a store until all of these are true:
 - Windows signing and clean-machine QA pass for Windows packages;
 - known limitations and system requirements match the actual artifact;
 - an external operator beta has completed without a release-blocking issue.
+
+The publish workflow enforces these manual gates through `release-evidence/<version>.json`. In particular, Mac and Windows records name the exact signed candidate artifact, and the recorded hashes must equal the files in the private draft release. A planned test, placeholder or unchecked item fails validation.
 
 The GitHub Actions beta workflow intentionally publishes unsigned prereleases with SHA-256 checksums and clear operating-system warnings. It does not label those artifacts as signed or production-certified.
 

@@ -13,7 +13,10 @@ const groups = {
     'test:control-api',
     'test:report',
     'test:output-routing',
-    'test:release-signing'
+    'test:release-signing',
+    'test:release-evidence',
+    'test:localization',
+    'test:build-info'
   ],
   renderers: [
     'test:show-recovery',

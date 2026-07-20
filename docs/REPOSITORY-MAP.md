@@ -25,6 +25,7 @@ Current public repository map. Line counts are approximate and should be checked
 | `src/control-api/` | Canonical HTTP/OSC command and status normalization. |
 | `src/report/` | Canonical post-show report and safe CSV generation. |
 | `src/output-routing/` | Pure output config, display resolution and geometry rules. |
+| `src/release/` | Stable/beta tag policy, artifact names, checksums and exact-candidate evidence validation. |
 
 ## Styling and assets
 
@@ -37,7 +38,7 @@ Current public repository map. Line counts are approximate and should be checked
 ## Tests
 
 - `tools/run-test-suite.js`: cross-platform aggregate module/renderer runner.
-- `npm test`: 68 headless checks across nine scripts.
+- `npm test`: 93 headless checks across twelve scripts.
 - `test/*-renderer.test.js`: five real Electron workflow suites pinned to PHL 243V7.
 - `test/beta-usability-matrix.test.js`: 53 responsive checks at four viewport sizes.
 - `main.js --smoke`: source/packaged integration and visual assertions.
@@ -53,11 +54,13 @@ Generated evidence lives under `artifacts/generated/` and is not release code. `
 | `tools/smoke-display.js` | Strict PHL 243V7 test-display resolver; absence or ambiguity aborts. |
 | `tools/run-smoke-on-display.js` | Source/packaged smoke launcher and focused routing mode. |
 | `tools/list-displays.js` | Physical display inventory. |
-| `tools/write-build-info.js` | Build commit/timestamp metadata. |
+| `tools/write-build-info.js` | Build commit/timestamp metadata with explicit clean/dirty source state. |
 | `tools/assert-release-signing.js` | Fail-closed signing and notarization credential preflight. |
 | `tools/check-packaged-free-build.js` | Actual ASAR audit for MIT metadata and forbidden licensing material. |
+| `tools/assert-release-tag.js` | Exact package-version and beta/stable tag classifier. |
+| `tools/verify-release-evidence.js` | Exact commit/artifact/physical-QA evidence gate for stable publication. |
 
-`.github/workflows/stable-release.yml` is the manual signed stable-release gate. It requires an exact stable tag, protected credentials and native signature verification before publication.
+`.github/workflows/stable-release.yml` builds and verifies a signed candidate, then creates a private draft release. `.github/workflows/publish-stable.yml` publishes that draft only after the committed evidence manifest matches its run, commit and artifact hashes.
 
 ## Release and product documents
 
@@ -69,6 +72,8 @@ Generated evidence lives under `artifacts/generated/` and is not release code. `
 - `docs/KNOWN-LIMITATIONS.md`: claims that must remain qualified.
 - `docs/COMPANION.md`: control integration.
 - `docs/SIGNING-AND-RELEASE.md`: signing secrets, verification commands and stable release gate.
+- `docs/RELEASE-READINESS.md`: requirement-by-requirement evidence and current blockers.
+- `release-evidence/`: intentionally fail-closed exact-artifact hardware/operator QA records.
 - `SECURITY.md`: network and local-control security model.
 - `CONTRIBUTING.md`, `SUPPORT.md`: public contribution and support paths.
 

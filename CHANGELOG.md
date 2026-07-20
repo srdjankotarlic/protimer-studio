@@ -12,11 +12,15 @@ All notable changes to ProTimer Studio are documented here.
 - Added a fail-closed signed stable-release workflow for Developer ID/notarized Mac and Authenticode-signed Windows artifacts.
 - Added GitHub artifact provenance attestations to future beta and stable release pipelines.
 - Added a packaged `app.asar` contract that blocks release artifacts containing activation code, key generators or private keys.
+- Restricted unsigned release tags to exact beta tags so a stable tag cannot publish an unsigned prerelease.
+- Split stable delivery into a signed private candidate and a separate publication gate tied to exact artifact hashes, designated-display smoke, physical Mac/Windows QA and external operator evidence.
+- Removed stale paid-tier labels from the free UI and added a headless 37-pack localization/fallback contract.
+- Build metadata now discloses dirty source state and records the full commit, preventing local modified packages from masquerading as exact release builds.
 
 ### Verification pending
 
 - Electron 43.1.1 has passed the headless suite and a local Apple Silicon package/CLI/DMG/fuse check. The full designated-display source and packaged regression remains required before the next published beta.
-- The stable workflow cannot produce or publish a stable release until real signing credentials are installed and both signature-verification jobs pass.
+- The stable candidate cannot be built until real signing credentials are installed; publication remains blocked until the exact signed artifacts also pass the retained physical/operator evidence gate.
 
 ## 0.9.0-beta.1 - Public beta
 

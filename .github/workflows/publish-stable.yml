@@ -1,0 +1,137 @@
+name: Publish verified stable release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing signed draft tag, for example v1.0.0
+        required: true
+        type: string
+      confirmation:
+        description: Type PUBLISH after exact-artifact physical QA is complete
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  attestations: read
+
+concurrency:
+  group: publish-stable-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Validate tag, draft and retained release evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          if [[ "$RELEASE_CONFIRMATION" != "PUBLISH" ]]; then
+            echo "Stable publication blocked: confirmation must be PUBLISH." >&2
+            exit 1
+          fi
+          node -e "const {classifyTag}=require('./src/release/evidence.js'); if(classifyTag(process.argv[1])!=='stable') process.exit(1)" "$RELEASE_TAG" || {
+            echo "Stable publication blocked: tag must be vMAJOR.MINOR.PATCH." >&2
+            exit 1
+          }
+          git fetch origin main --tags
+          tag_commit="$(git rev-list -n 1 "$RELEASE_TAG")"
+          if [[ -z "$tag_commit" ]]; then
+            echo "Stable publication blocked: tag does not exist." >&2
+            exit 1
+          fi
+          package_version="$(git show "$RELEASE_TAG:package.json" | node -e "let s=''; process.stdin.on('data',d=>s+=d); process.stdin.on('end',()=>process.stdout.write(JSON.parse(s).version));")"
+          if [[ "$RELEASE_TAG" != "v$package_version" ]]; then
+            echo "Stable publication blocked: tag does not match tagged package version." >&2
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$tag_commit" origin/main; then
+            echo "Stable publication blocked: tagged commit is not on origin/main." >&2
+            exit 1
+          fi
+
+          evidence_path="release-evidence/${RELEASE_TAG#v}.json"
+          if [[ ! -f "$evidence_path" ]]; then
+            echo "Stable publication blocked: missing $evidence_path on main." >&2
+            exit 1
+          fi
+
+          draft_json="$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,isPrerelease,tagName,url)"
+          if [[ "$(jq -r '.isDraft' <<< "$draft_json")" != "true" ]]; then
+            echo "Stable publication blocked: release is not a private draft." >&2
+            exit 1
+          fi
+          if [[ "$(jq -r '.isPrerelease' <<< "$draft_json")" != "false" ]]; then
+            echo "Stable publication blocked: stable draft is marked as a prerelease." >&2
+            exit 1
+          fi
+
+          mkdir release-assets
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir release-assets
+          candidate_meta="release-assets/CANDIDATE-METADATA.json"
+          if [[ ! -f "$candidate_meta" ]]; then
+            echo "Stable publication blocked: candidate metadata is missing." >&2
+            exit 1
+          fi
+          meta_tag="$(jq -r '.releaseTag' "$candidate_meta")"
+          meta_commit="$(jq -r '.commit' "$candidate_meta")"
+          meta_run_id="$(jq -r '.candidateRunId' "$candidate_meta")"
+          if [[ ! "$meta_run_id" =~ ^[1-9][0-9]*$ ]]; then
+            echo "Stable publication blocked: candidate run ID is invalid." >&2
+            exit 1
+          fi
+          if [[ "$meta_tag" != "$RELEASE_TAG" || "$meta_commit" != "$tag_commit" ]]; then
+            echo "Stable publication blocked: draft metadata does not match tag and commit." >&2
+            exit 1
+          fi
+
+          evidence_run_id="$(node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync(process.argv[1])); process.stdout.write(String(d.candidateRunId));" "$evidence_path")"
+          if [[ "$evidence_run_id" != "$meta_run_id" ]]; then
+            echo "Stable publication blocked: evidence references a different candidate run." >&2
+            exit 1
+          fi
+          run_json="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$meta_run_id")"
+          if [[ "$(jq -r '.conclusion' <<< "$run_json")" != "success" \
+             || "$(jq -r '.head_sha' <<< "$run_json")" != "$tag_commit" \
+             || "$(jq -r '.path' <<< "$run_json")" != ".github/workflows/stable-release.yml" ]]; then
+            echo "Stable publication blocked: candidate workflow run is not a successful exact-commit build." >&2
+            exit 1
+          fi
+
+          (cd release-assets && sha256sum -c SHA256SUMS.txt)
+          node tools/verify-release-evidence.js "$evidence_path" \
+            --tag "$RELEASE_TAG" \
+            --commit "$tag_commit" \
+            --checksums release-assets/SHA256SUMS.txt
+
+          signer_workflow="${GITHUB_SERVER_URL#https://}/$GITHUB_REPOSITORY/.github/workflows/stable-release.yml"
+          for artifact in release-assets/ProTimer-Studio-*.dmg release-assets/ProTimer-Studio-*.exe; do
+            [[ -f "$artifact" ]] || continue
+            gh attestation verify "$artifact" \
+              --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$signer_workflow" \
+              --source-digest "$tag_commit"
+          done
+      - name: Publish the verified draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: >-
+          gh release edit "$RELEASE_TAG"
+          --repo "$GITHUB_REPOSITORY"
+          --draft=false
+          --latest
+          --title "ProTimer Studio $RELEASE_TAG"

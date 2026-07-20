@@ -16,6 +16,7 @@ const requiredSnippets = [
   '"@type": "SoftwareApplication"',
   '"@type": "FAQPage"',
   'https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.1',
+  'https://github.com/srdjankotarlic/protimer-studio/discussions/1',
 ];
 
 for (const snippet of requiredSnippets) {

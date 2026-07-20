@@ -17,6 +17,8 @@ Arabic, Urdu and Persian use RTL document direction. All packs inherit missing k
 
 ## Verification
 
+`npm run test:localization` verifies the 37 unique language codes, English/Serbian FULL boundary, CORE fallback completeness across controller/remote/backstage/output packs, exact RTL metadata and absence of legacy trial/PRO-gating labels. It runs in headless CI.
+
 `npm run smoke:philips` switches through all 37 packs, checks document language/direction, verifies complete runtime dictionaries, confirms English restoration, and opens Lower Third Studio in Serbian to verify its static controls and inspector.
 
 Native-language editorial review is still required before promoting any `CORE` pack to `FULL`.

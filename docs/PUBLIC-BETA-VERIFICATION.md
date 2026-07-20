@@ -29,4 +29,6 @@ These gaps are why the release is labelled **public beta**, not stable or produc
 
 ## Work after Beta 1
 
-Current `main` advances to Electron 43.1.1, 68 headless checks, explicit macOS entitlements and a fail-closed signed stable-release workflow. A local Apple Silicon package passes CLI boot, DMG integrity, ad-hoc signature and fuse checks. These post-release checks do not retroactively change the published Beta 1 artifact and do not replace the pending designated-display or physical Windows passes.
+Current `main` advances to Electron 43.1.1, 93 headless checks, explicit macOS entitlements and separate fail-closed signed-candidate/publication workflows. Native GitHub runners successfully build and inspect the actual Apple Silicon DMG, Windows installer and Windows portable package, including the packaged MIT/free-build contract. A local Apple Silicon package also passes CLI boot, DMG integrity, ad-hoc signature and fuse checks.
+
+The designated-display inventory on 2026-07-20 found only the Built-in Retina Display, so no visible test was opened and the PHL 243V7 source/packaged gate remains pending. These post-release checks do not retroactively change the published Beta 1 artifact and do not replace physical Windows installation or external operator testing.

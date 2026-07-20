@@ -81,6 +81,8 @@ function getBuildInfo() {
     version: app.getVersion(),
     productName: app.name || 'ProTimer Studio',
     commit: fileInfo.commit || 'dev',
+    commitFull: fileInfo.commitFull || '',
+    dirty: fileInfo.dirty === true,
     buildTimestamp: fileInfo.buildTimestamp || '',
     source: fileInfo.source || (app.isPackaged ? 'packaged' : 'source'),
     isPackaged: app.isPackaged,

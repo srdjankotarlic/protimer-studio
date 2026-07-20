@@ -83,6 +83,8 @@ The app serves output, remote, backstage and Signal Light pages on the productio
 - [Companion / HTTP / OSC](docs/COMPANION.md)
 - [Testing](docs/TESTING.md)
 - [Signing and release](docs/SIGNING-AND-RELEASE.md)
+- [Release readiness](docs/RELEASE-READINESS.md)
+- [Public beta adoption](docs/BETA-ADOPTION.md)
 - [Public beta verification](docs/PUBLIC-BETA-VERIFICATION.md)
 - [Architecture](ARCHITECTURE.md)
 - [Privacy](docs/PRIVACY.md)
@@ -114,7 +116,7 @@ npm run dist:win
 
 ## Feedback
 
-This beta exists to learn from real operators. Please open a [bug report](https://github.com/srdjankotarlic/protimer-studio/issues/new?template=bug_report.yml) with the app version, operating system, display setup and reproducible steps. Feature ideas belong in [Discussions](https://github.com/srdjankotarlic/protimer-studio/discussions).
+This beta exists to learn from real operators. Start with the [public beta feedback thread](https://github.com/srdjankotarlic/protimer-studio/discussions/1), or open a [bug report](https://github.com/srdjankotarlic/protimer-studio/issues/new?template=bug_report.yml) with the app version, operating system, display setup and reproducible steps.
 
 Contributions are welcome; read [CONTRIBUTING.md](CONTRIBUTING.md) first. Security issues should use GitHub's private vulnerability reporting instead of a public issue.
 
