@@ -37,7 +37,7 @@ Current public repository map. Line counts are approximate and should be checked
 ## Tests
 
 - `tools/run-test-suite.js`: cross-platform aggregate module/renderer runner.
-- `npm test`: 59 headless checks across eight scripts.
+- `npm test`: 68 headless checks across nine scripts.
 - `test/*-renderer.test.js`: five real Electron workflow suites pinned to PHL 243V7.
 - `test/beta-usability-matrix.test.js`: 53 responsive checks at four viewport sizes.
 - `main.js --smoke`: source/packaged integration and visual assertions.
@@ -54,6 +54,10 @@ Generated evidence lives under `artifacts/generated/` and is not release code. `
 | `tools/run-smoke-on-display.js` | Source/packaged smoke launcher and focused routing mode. |
 | `tools/list-displays.js` | Physical display inventory. |
 | `tools/write-build-info.js` | Build commit/timestamp metadata. |
+| `tools/assert-release-signing.js` | Fail-closed signing and notarization credential preflight. |
+| `tools/check-packaged-free-build.js` | Actual ASAR audit for MIT metadata and forbidden licensing material. |
+
+`.github/workflows/stable-release.yml` is the manual signed stable-release gate. It requires an exact stable tag, protected credentials and native signature verification before publication.
 
 ## Release and product documents
 
@@ -64,6 +68,7 @@ Generated evidence lives under `artifacts/generated/` and is not release code. `
 - `docs/PUBLIC-BETA-VERIFICATION.md`: verified release evidence and explicit gaps.
 - `docs/KNOWN-LIMITATIONS.md`: claims that must remain qualified.
 - `docs/COMPANION.md`: control integration.
+- `docs/SIGNING-AND-RELEASE.md`: signing secrets, verification commands and stable release gate.
 - `SECURITY.md`: network and local-control security model.
 - `CONTRIBUTING.md`, `SUPPORT.md`: public contribution and support paths.
 

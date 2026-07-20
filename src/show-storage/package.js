@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const archiver = require('archiver');
+const { ZipArchive } = require('archiver');
 const yauzl = require('yauzl');
 const { validateShowDocument, MAX_SHOW_BYTES } = require('./repository.js');
 const LT = require('../lower-third/validate.js');
@@ -156,7 +156,7 @@ async function writeZip(destination, entries) {
   try {
     await new Promise((resolve, reject) => {
       const output = fs.createWriteStream(temp, { flags: 'wx' });
-      const archive = archiver('zip', { zlib: { level: 9 } });
+      const archive = new ZipArchive({ zlib: { level: 9 } });
       let settled = false;
       const done = error => {
         if (settled) return;

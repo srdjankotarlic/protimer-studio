@@ -12,7 +12,8 @@ const groups = {
     'test:screen-content',
     'test:control-api',
     'test:report',
-    'test:output-routing'
+    'test:output-routing',
+    'test:release-signing'
   ],
   renderers: [
     'test:show-recovery',

@@ -8,6 +8,33 @@ At the last local check, this Mac had no valid `Developer ID Application` identi
 
 Never commit certificates, private keys or passwords. Inject them through the local keychain or protected CI secrets.
 
+## Automated stable release gate
+
+`.github/workflows/stable-release.yml` is the only automated path that publishes a stable GitHub Release. It is manual and fail-closed. It accepts only an existing `vMAJOR.MINOR.PATCH` tag whose value matches `package.json`, whose commit is on `main`, and whose confirmation input is exactly `PUBLISH`.
+
+Configure these protected GitHub Actions secrets before using it:
+
+| Secret | Value |
+|---|---|
+| `MAC_CERT_P12_BASE64` | Base64-encoded Developer ID Application `.p12`. |
+| `MAC_CERT_PASSWORD` | Password protecting that `.p12`. |
+| `APPLE_API_KEY_P8_BASE64` | Base64-encoded App Store Connect API `.p8` key. |
+| `APPLE_API_KEY_ID` | App Store Connect API key ID. |
+| `APPLE_API_ISSUER` | App Store Connect issuer ID. |
+| `WINDOWS_CERT_PFX_BASE64` | Base64-encoded exportable Authenticode `.pfx`. |
+| `WINDOWS_CERT_PASSWORD` | Password protecting that `.pfx`. |
+
+The workflow decodes credentials only into the ephemeral runner, builds natively on macOS and Windows, and refuses to publish unless all of these checks pass:
+
+- package version, exact tag and `main` ancestry;
+- deterministic tests and dependency audit;
+- Developer ID authority, strict bundle verification, Gatekeeper assessment, notarization ticket and DMG integrity;
+- Windows Authenticode status and trusted timestamp on the app, installer and portable executable;
+- packaged CLI boot and hardened Electron fuses;
+- SHA-256 checksums and GitHub provenance attestations.
+
+Create and push a stable tag only after all product and hardware gates below pass. Then open **Actions → Build signed stable release → Run workflow**, enter the tag and type `PUBLISH`. Missing, malformed or invalid credentials stop the run before a release is created.
+
 ## macOS
 
 Public distribution outside the Mac App Store requires:
@@ -22,7 +49,9 @@ Supported electron-builder credential paths:
 - signing: `CSC_LINK` + `CSC_KEY_PASSWORD`, or a valid Developer ID identity in the macOS keychain;
 - preferred notarization API key: `APPLE_API_KEY` + `APPLE_API_KEY_ID` + `APPLE_API_ISSUER`;
 - alternative Apple ID flow: `APPLE_ID` + `APPLE_APP_SPECIFIC_PASSWORD` + `APPLE_TEAM_ID`;
-- alternative keychain profile: `APPLE_KEYCHAIN` + `APPLE_KEYCHAIN_PROFILE`.
+- alternative keychain profile: `APPLE_KEYCHAIN_PROFILE`, with optional `APPLE_KEYCHAIN`.
+
+The repository includes explicit JIT/unsigned-executable-memory entitlements required by the Electron Hardened Runtime. It does not grant disabled-library-validation or App Sandbox exceptions that the current runtime does not need.
 
 Local ad-hoc signed QA build:
 
@@ -85,5 +114,11 @@ Do not upload a package to a store until all of these are true:
 - an external operator beta has completed without a release-blocking issue.
 
 The GitHub Actions beta workflow intentionally publishes unsigned prereleases with SHA-256 checksums and clear operating-system warnings. It does not label those artifacts as signed or production-certified.
+
+Future beta and stable workflows also create GitHub provenance attestations for the binaries. Users can verify a downloaded artifact with:
+
+```bash
+gh attestation verify PATH/TO/ARTIFACT -R srdjankotarlic/protimer-studio
+```
 
 References: [electron-builder code signing](https://www.electron.build/docs/features/code-signing/), [electron-builder macOS](https://www.electron.build/mac/), [Apple notarization](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution).

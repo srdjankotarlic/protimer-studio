@@ -28,7 +28,7 @@ function fail(message) {
 if (platform === 'mac') {
   const hasNotaryApi = has('APPLE_API_KEY', 'APPLE_API_KEY_ID', 'APPLE_API_ISSUER');
   const hasAppleId = has('APPLE_ID', 'APPLE_APP_SPECIFIC_PASSWORD', 'APPLE_TEAM_ID');
-  const hasKeychainProfile = has('APPLE_KEYCHAIN', 'APPLE_KEYCHAIN_PROFILE');
+  const hasKeychainProfile = has('APPLE_KEYCHAIN_PROFILE');
 
   if (!hasMacIdentity()) {
     fail('Developer ID Application identity or CSC_LINK/CSC_NAME is missing.');
@@ -45,7 +45,7 @@ if (platform === 'win') {
     has('WIN_CSC_LINK', 'WIN_CSC_KEY_PASSWORD') ||
     has('CSC_LINK', 'CSC_KEY_PASSWORD');
   if (!hasWindowsCertificate) {
-    fail('WIN_CSC_LINK/WIN_CSC_KEY_PASSWORD (or CSC equivalents) are missing.');
+    fail('Windows signing certificate credentials WIN_CSC_LINK/WIN_CSC_KEY_PASSWORD (or CSC equivalents) are missing.');
   }
   console.log('RELEASE_SIGNING_READY: Windows signing inputs detected.');
   process.exit(0);

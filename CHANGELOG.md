@@ -2,6 +2,22 @@
 
 All notable changes to ProTimer Studio are documented here.
 
+## Unreleased
+
+### Changed
+
+- Upgraded the development runtime from Electron 42.6.1 to current stable Electron 43.1.1.
+- Upgraded the ZIP package stack to Archiver 8.0.0 and yauzl 3.4.0 while preserving show/template package validation contracts.
+- Added explicit macOS Hardened Runtime entitlements and encrypted Chromium cookie storage in packaged builds.
+- Added a fail-closed signed stable-release workflow for Developer ID/notarized Mac and Authenticode-signed Windows artifacts.
+- Added GitHub artifact provenance attestations to future beta and stable release pipelines.
+- Added a packaged `app.asar` contract that blocks release artifacts containing activation code, key generators or private keys.
+
+### Verification pending
+
+- Electron 43.1.1 has passed the headless suite and a local Apple Silicon package/CLI/DMG/fuse check. The full designated-display source and packaged regression remains required before the next published beta.
+- The stable workflow cannot produce or publish a stable release until real signing credentials are installed and both signature-verification jobs pass.
+
 ## 0.9.0-beta.1 - Public beta
 
 ### Added

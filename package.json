@@ -27,6 +27,7 @@
   "scripts": {
     "test": "node tools/check-free-build.js && node tools/check-public-site.js && node tools/run-test-suite.js modules",
     "check:free": "node tools/check-free-build.js",
+    "check:packaged-free": "node tools/check-packaged-free-build.js",
     "check:site": "node tools/check-public-site.js",
     "test:renderers:philips": "node tools/run-test-suite.js renderers",
     "test:all:philips": "node tools/run-test-suite.js all",
@@ -46,6 +47,7 @@
     "test:control-api-ui": "electron test/control-api-renderer.test.js",
     "test:report": "node test/report-model.test.js",
     "test:output-routing": "node test/output-routing-model.test.js",
+    "test:release-signing": "node test/release-signing.test.js",
     "test:report-ui": "electron test/report-renderer.test.js",
     "test:beta-ui": "electron test/beta-usability-matrix.test.js",
     "displays:list": "electron tools/list-displays.js",
@@ -58,15 +60,16 @@
     "dist:all": "npm run dist:mac && npm run dist:win"
   },
   "devDependencies": {
+    "@electron/asar": "4.2.0",
     "@electron/fuses": "^2.1.3",
-    "electron": "42.6.1",
+    "electron": "43.1.1",
     "electron-builder": "26.15.3"
   },
   "engines": {
     "node": ">=22.12.0"
   },
   "allowScripts": {
-    "electron@42.6.1": true,
+    "electron@43.1.1": true,
     "electron-winstaller@5.4.0": true
   },
   "overrides": {
@@ -81,6 +84,7 @@
     },
     "electronFuses": {
       "runAsNode": false,
+      "enableCookieEncryption": true,
       "enableNodeOptionsEnvironmentVariable": false,
       "enableNodeCliInspectArguments": false,
       "enableEmbeddedAsarIntegrityValidation": true,
@@ -112,6 +116,8 @@
       ],
       "category": "public.app-category.utilities",
       "icon": "build/icon.icns",
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.inherit.plist",
       "artifactName": "ProTimer-Studio-${version}-${arch}.${ext}",
       "hardenedRuntime": true,
       "notarize": true
@@ -145,9 +151,9 @@
     }
   },
   "dependencies": {
-    "archiver": "5.3.2",
+    "archiver": "8.0.0",
     "localtunnel": "^2.0.2",
     "qrcode": "^1.5.4",
-    "yauzl": "2.10.0"
+    "yauzl": "3.4.0"
   }
 }

@@ -26,3 +26,7 @@ Before the public free-build extraction, the same product runtime passed the des
 - Search-engine discovery and real operator adoption can only be measured after publication.
 
 These gaps are why the release is labelled **public beta**, not stable or production-certified. Test the exact show computer, displays and media path before using it on-air.
+
+## Work after Beta 1
+
+Current `main` advances to Electron 43.1.1, 68 headless checks, explicit macOS entitlements and a fail-closed signed stable-release workflow. A local Apple Silicon package passes CLI boot, DMG integrity, ad-hoc signature and fuse checks. These post-release checks do not retroactively change the published Beta 1 artifact and do not replace the pending designated-display or physical Windows passes.

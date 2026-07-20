@@ -1,0 +1,244 @@
+name: Build signed stable release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing stable tag, for example v1.0.0
+        required: true
+        type: string
+      confirmation:
+        description: Type PUBLISH to enable the signed release gate
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+concurrency:
+  group: stable-release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Validate stable tag and confirmation
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          if [[ "$RELEASE_CONFIRMATION" != "PUBLISH" ]]; then
+            echo "Stable release blocked: confirmation must be PUBLISH." >&2
+            exit 1
+          fi
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Stable release blocked: tag must be a stable vMAJOR.MINOR.PATCH tag." >&2
+            exit 1
+          fi
+          expected_tag="v$(node -p "require('./package.json').version")"
+          if [[ "$RELEASE_TAG" != "$expected_tag" ]]; then
+            echo "Stable release blocked: tag $RELEASE_TAG does not match package version $expected_tag." >&2
+            exit 1
+          fi
+          if [[ -z "$(git tag --points-at HEAD --list "$RELEASE_TAG")" ]]; then
+            echo "Stable release blocked: checkout is not exactly tagged $RELEASE_TAG." >&2
+            exit 1
+          fi
+          git fetch origin main --no-tags
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "Stable release blocked: tagged commit is not on origin/main." >&2
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm test
+      - run: npm audit
+
+  macos-arm64:
+    needs: preflight
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Prepare macOS signing credentials
+        env:
+          MAC_CERT_P12_BASE64: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          MAC_CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_API_KEY_P8_BASE64: ${{ secrets.APPLE_API_KEY_P8_BASE64 }}
+          APPLE_API_KEY_ID_SECRET: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_SECRET: ${{ secrets.APPLE_API_ISSUER }}
+        run: |
+          set -euo pipefail
+          for name in MAC_CERT_P12_BASE64 MAC_CERT_PASSWORD APPLE_API_KEY_P8_BASE64 APPLE_API_KEY_ID_SECRET APPLE_API_ISSUER_SECRET; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Stable release blocked: missing GitHub secret $name." >&2
+              exit 1
+            fi
+          done
+          export CERT_PATH="$RUNNER_TEMP/protimer-developer-id.p12"
+          export API_KEY_PATH="$RUNNER_TEMP/AuthKey.p8"
+          node -e "const fs=require('fs'); fs.writeFileSync(process.env.CERT_PATH, Buffer.from(process.env.MAC_CERT_P12_BASE64, 'base64')); fs.writeFileSync(process.env.API_KEY_PATH, Buffer.from(process.env.APPLE_API_KEY_P8_BASE64, 'base64'));"
+          test -s "$CERT_PATH"
+          test -s "$API_KEY_PATH"
+          chmod 600 "$CERT_PATH" "$API_KEY_PATH"
+          printf 'CSC_LINK=%s\n' "$CERT_PATH" >> "$GITHUB_ENV"
+          printf 'APPLE_API_KEY=%s\n' "$API_KEY_PATH" >> "$GITHUB_ENV"
+      - name: Build, sign and notarize Apple Silicon DMG
+        env:
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: npm run dist:mac:release
+      - name: Verify signed and notarized Mac artifact
+        run: |
+          set -euo pipefail
+          app="dist-installers/mac-arm64/ProTimer Studio.app"
+          dmg="$(find dist-installers -maxdepth 1 -name 'ProTimer-Studio-*-arm64.dmg' -print -quit)"
+          test -n "$dmg"
+          "$app/Contents/MacOS/ProTimer Studio" --print-build-info
+          npm run check:packaged-free -- "$app/Contents/Resources/app.asar"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          signature="$(codesign -dv --verbose=4 "$app" 2>&1)"
+          printf '%s\n' "$signature"
+          grep -q 'Authority=Developer ID Application:' <<< "$signature"
+          spctl --assess --type execute --verbose=2 "$app"
+          xcrun stapler validate "$app"
+          hdiutil verify "$dmg"
+          fuses="$(node node_modules/@electron/fuses/dist/bin.js read --app "$app")"
+          printf '%s\n' "$fuses"
+          grep -q 'RunAsNode is Disabled' <<< "$fuses"
+          grep -q 'EnableNodeOptionsEnvironmentVariable is Disabled' <<< "$fuses"
+          grep -q 'EnableNodeCliInspectArguments is Disabled' <<< "$fuses"
+          grep -q 'EnableEmbeddedAsarIntegrityValidation is Enabled' <<< "$fuses"
+          grep -q 'OnlyLoadAppFromAsar is Enabled' <<< "$fuses"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: stable-macos-arm64
+          path: dist-installers/ProTimer-Studio-*-arm64.dmg
+          if-no-files-found: error
+
+  windows-x64:
+    needs: preflight
+    runs-on: windows-2025
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Prepare Windows signing credentials
+        shell: pwsh
+        env:
+          WINDOWS_CERT_PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:WINDOWS_CERT_PFX_BASE64)) {
+            throw "Stable release blocked: missing WINDOWS_CERT_PFX_BASE64."
+          }
+          if ([string]::IsNullOrWhiteSpace($env:WINDOWS_CERT_PASSWORD)) {
+            throw "Stable release blocked: missing WINDOWS_CERT_PASSWORD."
+          }
+          $certPath = Join-Path $env:RUNNER_TEMP "protimer-authenticode.pfx"
+          try {
+            $bytes = [Convert]::FromBase64String($env:WINDOWS_CERT_PFX_BASE64)
+          } catch {
+            throw "Stable release blocked: WINDOWS_CERT_PFX_BASE64 is not valid base64."
+          }
+          [IO.File]::WriteAllBytes($certPath, $bytes)
+          if ((Get-Item $certPath).Length -eq 0) {
+            throw "Stable release blocked: decoded Windows certificate is empty."
+          }
+          "WIN_CSC_LINK=$certPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Build and sign Windows x64 packages
+        env:
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: npm run dist:win:release
+      - name: Verify Authenticode signatures and timestamps
+        shell: pwsh
+        run: |
+          $app = Resolve-Path "dist-installers/win-unpacked/ProTimer Studio.exe"
+          $setup = Get-ChildItem "dist-installers/ProTimer-Studio-Setup-*.exe" | Select-Object -First 1
+          $portable = Get-ChildItem "dist-installers/ProTimer-Studio-*-portable.exe" | Select-Object -First 1
+          if (-not $setup -or -not $portable) {
+            throw "Stable release blocked: expected Windows artifacts are missing."
+          }
+          npm run check:packaged-free -- "dist-installers/win-unpacked/resources/app.asar"
+          foreach ($target in @($app.Path, $setup.FullName, $portable.FullName)) {
+            $signature = Get-AuthenticodeSignature $target
+            if ($signature.Status -ne "Valid") {
+              throw "Stable release blocked: invalid Authenticode signature for $target ($($signature.Status))."
+            }
+            if (-not $signature.SignerCertificate) {
+              throw "Stable release blocked: signer certificate missing for $target."
+            }
+            if (-not $signature.TimeStamperCertificate) {
+              throw "Stable release blocked: trusted timestamp missing for $target."
+            }
+            Write-Host "AUTHENTICODE_VALID file=$target subject=$($signature.SignerCertificate.Subject)"
+          }
+          & $app.Path --print-build-info
+          if ($LASTEXITCODE -ne 0) {
+            throw "Stable release blocked: packaged Windows CLI boot failed."
+          }
+      - uses: actions/upload-artifact@v7
+        with:
+          name: stable-windows-x64
+          path: |
+            dist-installers/ProTimer-Studio-Setup-*.exe
+            dist-installers/ProTimer-Studio-*-portable.exe
+          if-no-files-found: error
+
+  release:
+    needs: [preflight, macos-arm64, windows-x64]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: stable-*
+          path: release-assets
+          merge-multiple: true
+      - name: Generate SHA-256 checksums
+        working-directory: release-assets
+        run: sha256sum ProTimer-Studio-* > SHA256SUMS.txt
+      - name: Attest stable release binaries
+        uses: actions/attest@v4
+        with:
+          subject-path: release-assets/ProTimer-Studio-*
+      - name: Publish stable GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: >-
+          gh release create "$RELEASE_TAG"
+          release-assets/*
+          --repo "$GITHUB_REPOSITORY"
+          --verify-tag
+          --title "ProTimer Studio $RELEASE_TAG"
+          --generate-notes

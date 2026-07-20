@@ -82,6 +82,7 @@ The app serves output, remote, backstage and Signal Light pages on the productio
 - [Languages](docs/LOCALIZATION.md)
 - [Companion / HTTP / OSC](docs/COMPANION.md)
 - [Testing](docs/TESTING.md)
+- [Signing and release](docs/SIGNING-AND-RELEASE.md)
 - [Public beta verification](docs/PUBLIC-BETA-VERIFICATION.md)
 - [Architecture](ARCHITECTURE.md)
 - [Privacy](docs/PRIVACY.md)

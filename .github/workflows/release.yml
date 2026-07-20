@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 jobs:
   macos-arm64:
@@ -26,6 +28,7 @@ jobs:
       - name: Verify package boot and DMG
         run: |
           "dist-installers/mac-arm64/ProTimer Studio.app/Contents/MacOS/ProTimer Studio" --print-build-info
+          npm run check:packaged-free -- "dist-installers/mac-arm64/ProTimer Studio.app/Contents/Resources/app.asar"
           hdiutil verify dist-installers/ProTimer-Studio-*-arm64.dmg
           node node_modules/@electron/fuses/dist/bin.js read --app "dist-installers/mac-arm64/ProTimer Studio.app"
       - uses: actions/upload-artifact@v7
@@ -53,6 +56,7 @@ jobs:
           if (-not (Test-Path "dist-installers/win-unpacked/ProTimer Studio.exe")) { throw "Missing unpacked app" }
           if (-not (Test-Path "dist-installers/ProTimer-Studio-Setup-*.exe")) { throw "Missing installer" }
           if (-not (Test-Path "dist-installers/ProTimer-Studio-*-portable.exe")) { throw "Missing portable app" }
+          npm run check:packaged-free -- "dist-installers/win-unpacked/resources/app.asar"
       - uses: actions/upload-artifact@v7
         with:
           name: windows-x64
@@ -75,6 +79,10 @@ jobs:
       - name: Generate checksums
         working-directory: release-assets
         run: sha256sum ProTimer-Studio-* > SHA256SUMS.txt
+      - name: Attest release binaries
+        uses: actions/attest@v4
+        with:
+          subject-path: release-assets/ProTimer-Studio-*
       - name: Publish prerelease
         env:
           GH_TOKEN: ${{ github.token }}
