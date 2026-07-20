@@ -37,7 +37,9 @@ async function main() {
     fail(`cannot read app.asar: ${error.message}`);
   }
 
-  const entrySet = new Set(entries);
+  // @electron/asar builds listed paths with the host platform separator.
+  // Normalize them so the same release check works on macOS and Windows.
+  const entrySet = new Set(entries.map(entry => entry.replace(/\\/g, '/')));
   for (const forbidden of forbiddenPaths) {
     if (entrySet.has(forbidden)) fail(`forbidden packaged path: ${forbidden}`);
   }
