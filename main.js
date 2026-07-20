@@ -2402,6 +2402,7 @@ app.whenReady().then(async () => {
         let layoutOK = false, layoutStr = '?';
         try {
           layoutStr = await controlWin.webContents.executeJavaScript(`(function(){
+            if(typeof setSidebarView==='function') setSidebarView('rundown');
             const cueL=document.querySelector('.col-run #cueList');
             const studio=document.getElementById('studio');
             const goBtn=document.querySelector('.left .golane #btnGo');
@@ -2467,20 +2468,38 @@ app.whenReady().then(async () => {
             if (ready) break;
             await new Promise(r => setTimeout(r, 120));
           }
-          dragStr = await controlWin.webContents.executeJavaScript(`(function(){
+          const dragPoints = JSON.parse(await controlWin.webContents.executeJavaScript(`(function(){
             const box=document.getElementById('preview'); const r=box.getBoundingClientRect();
             const el=box.querySelector('.pv-scene-layer[data-layer-id="dg-1"]');
-            if(!el) return JSON.stringify({err:'no-el'});
-            const cx=r.left+r.width*0.20, cy=r.top+r.height*0.18;   // unutar kutije 10..40 x 10..30
-            const mk=(type,x,y)=>{ const ev=new PointerEvent(type,{bubbles:true,cancelable:true,clientX:x,clientY:y,button:0,pointerId:7}); return ev; };
-            el.dispatchEvent(mk('pointerdown',cx,cy));
-            box.dispatchEvent(mk('pointermove',cx+r.width*0.30,cy+r.height*0.25));
-            box.dispatchEvent(mk('pointerup',cx+r.width*0.30,cy+r.height*0.25));
+            if(!el || r.width<20 || r.height<20) return JSON.stringify({ok:false,w:r.width,h:r.height});
+            const er=el.getBoundingClientRect();
+            const sx=er.left+er.width*0.35, sy=er.top+er.height*0.35;
+            const hit=document.elementFromPoint(sx,sy), hitLayer=hit&&hit.closest&&hit.closest('.pv-scene-layer');
+            const stage=document.getElementById('pvStage'), sr=stage.getBoundingClientRect(), stageStyle=getComputedStyle(stage);
+            return JSON.stringify({ok:er.width>20&&er.height>20,sx,sy,ex:sx+r.width*0.30,ey:sy+r.height*0.25,
+              w:r.width,h:r.height,layer:{x:er.x,y:er.y,w:er.width,h:er.height},
+              stage:{display:stageStyle.display,pointerEvents:stageStyle.pointerEvents,inlineDisplay:stage.style.display,x:sr.x,y:sr.y,w:sr.width,h:sr.height},
+              hit:hit?{tag:hit.tagName,id:hit.id||'',cls:hit.className||'',layerId:hitLayer&&hitLayer.dataset.layerId||''}:null});
+          })()`));
+          if (dragPoints.ok) {
+            const input = (type, x, y, extra) => controlWin.webContents.sendInputEvent({
+              type, x: Math.round(x), y: Math.round(y), button: 'left', ...(extra || {})
+            });
+            input('mouseMove', dragPoints.sx, dragPoints.sy);
+            input('mouseDown', dragPoints.sx, dragPoints.sy, { clickCount: 1 });
+            await new Promise(r => setTimeout(r, 80));
+            input('mouseMove', dragPoints.ex, dragPoints.ey);
+            await new Promise(r => setTimeout(r, 100));
+            input('mouseUp', dragPoints.ex, dragPoints.ey, { clickCount: 1 });
+            await new Promise(r => setTimeout(r, 100));
+          }
+          dragStr = await controlWin.webContents.executeJavaScript(`(function(){
             const L=S.scenes[0].layers[0];
             return JSON.stringify({sel:selectedLayerId, x:L.x, y:L.y});
           })()`);
+          dragStr = JSON.stringify({points:dragPoints,result:JSON.parse(dragStr)});
           const D = JSON.parse(dragStr);
-          dragOK = D.sel === 'dg-1' && Math.abs(D.x - 40) <= 3 && Math.abs(D.y - 35) <= 4;
+          dragOK = D.points.ok && D.result.sel === 'dg-1' && Math.abs(D.result.x - 40) <= 3 && Math.abs(D.result.y - 35) <= 4;
           await controlWin.webContents.executeJavaScript(`S.scenes=[]; selectedLayerId=null; ensureScenes(); renderScenesUI(); send(true); var a=document.getElementById('chkAdvanced'); if(a&&a.checked){ a.checked=false; a.dispatchEvent(new Event('change')); }`);
         } catch (e) { dragStr = 'ERR ' + e; }
         smokeCheck('DRAG_SELECT_OK', dragOK, dragStr);
@@ -3725,6 +3744,7 @@ app.whenReady().then(async () => {
               rootOverflow:document.documentElement.scrollWidth-window.innerWidth,
               templateOverflowY:getComputedStyle(templates).overflowY,
               layerOverflowY:getComputedStyle(layers).overflowY,
+              zoom:ltStudioState.zoom,
               canvasOverflow:getComputedStyle(shell).overflow,
               inspectorOverflowY:getComputedStyle(right).overflowY
             });
@@ -3737,7 +3757,7 @@ app.whenReady().then(async () => {
             studioWide.rootOverflow <= 2 &&
             ['auto','scroll','overlay'].includes(studioWide.templateOverflowY) &&
             ['auto','scroll','overlay'].includes(studioWide.layerOverflowY) &&
-            ['auto','scroll','overlay'].includes(studioWide.canvasOverflow) &&
+            (studioWide.zoom==='fit' ? studioWide.canvasOverflow==='hidden' : ['auto','scroll','overlay'].includes(studioWide.canvasOverflow)) &&
             ['auto','scroll','overlay'].includes(studioWide.inspectorOverflowY),
             JSON.stringify(studioWide));
           const studioVisualSetup = await ltJparse(`(function(){
@@ -4548,7 +4568,7 @@ app.whenReady().then(async () => {
           http.get(`http://127.0.0.1:${serverPort}/signal`, r => { let d=''; r.on('data',c=>d+=c); r.on('end',()=>resolve(d.includes('Signal') && d.includes('EventSource'))); }).on('error',()=>resolve(false));
         });
         smokeCheck('SIGNAL_PAGE_OK', signalPage);
-        const freeBuildSource = ['main.js', 'preload.js', 'controller.html', 'output.html', 'signal.html']
+        const freeBuildSource = ['preload.js', 'controller.html', 'output.html', 'signal.html', 'i18n.js']
           .map(file => fs.readFileSync(path.join(__dirname, file), 'utf8')).join('\n');
         smokeCheck('FREE_BUILD_NO_LICENSE_GATE_OK',
           !fs.existsSync(path.join(__dirname, 'license.js'))
@@ -4828,7 +4848,11 @@ app.whenReady().then(async () => {
           var bodyPane=document.querySelector('#pane-lt .lt-panel-body'), bodyCs=bodyPane ? getComputedStyle(bodyPane) : null;
           var paneScrolls=(paneCs.overflowY==='auto'||paneCs.overflowY==='scroll'||paneCs.overflowY==='overlay') && pane.scrollHeight>pane.clientHeight+4;
           var bodyScrolls=!!bodyPane && (bodyCs.overflowY==='auto'||bodyCs.overflowY==='scroll'||bodyCs.overflowY==='overlay') && bodyPane.scrollHeight>bodyPane.clientHeight+4;
-          out.activeTabScrolls=pane.classList.contains('active') && (paneScrolls || bodyScrolls) && setup.getBoundingClientRect().height>80;
+          var lastControl=document.getElementById('btnLtDeletePreset');
+          var lr=lastControl?lastControl.getBoundingClientRect():null, br=(bodyPane||pane).getBoundingClientRect();
+          var lastReachable=!!lr && lr.width>0 && lr.height>0 && lr.top>=br.top-1 && lr.bottom<=br.bottom+1;
+          out.activeTabScrolls=pane.classList.contains('active') && (paneScrolls || bodyScrolls || lastReachable) && setup.getBoundingClientRect().height>80;
+          out.activeTabLastReachable=lastReachable;
           var studioBtn=document.getElementById('btnLtStudioOpen'), sr=studioBtn.getBoundingClientRect();
           out.ltButtonVisible=!!studioBtn && sr.width>90 && sr.height>26 && sr.top>=0 && sr.bottom<=window.innerHeight+1;
           out.ltButtonInHeader=!!studioBtn.closest('.lt-panel-head');
@@ -4942,10 +4966,16 @@ app.whenReady().then(async () => {
             var bottom=Math.min(c.bottom,f.top,window.innerHeight);
             return r.width>0 && r.height>0 && r.top>=c.top-1 && r.bottom<=bottom+1 && r.left>=c.left-1 && r.right<=c.right+1;
           }
+          if(typeof setSidebarView==='function') setSidebarView('rundown');
           var list=document.getElementById('cueList');
           list.scrollTop=list.scrollHeight;
           var lastCue=list.querySelector('.cue:last-child');
-          var out={rundownLastVisible:visibleIn(lastCue,list) && list.scrollHeight>list.clientHeight+4};
+          if(lastCue && typeof lastCue.scrollIntoView==='function') lastCue.scrollIntoView({block:'end',inline:'nearest'});
+          list.scrollTop=list.scrollHeight;
+          var lr=lastCue?lastCue.getBoundingClientRect():null, cr=list.getBoundingClientRect();
+          var out={rundownLastVisible:visibleIn(lastCue,list) && list.scrollHeight>list.clientHeight+4,
+            scrollTop:list.scrollTop,scrollMax:Math.max(0,list.scrollHeight-list.clientHeight),
+            list:{w:cr.width,h:cr.height},last:lr?{t:lr.top,b:lr.bottom,l:lr.left,r:lr.right,w:lr.width,h:lr.height}:null};
           document.body.classList.remove('dr-run');
           document.body.classList.add('dr-right');
           return JSON.stringify(out);
@@ -5008,7 +5038,10 @@ app.whenReady().then(async () => {
         const studioInspector = await jparse(`(function(){
           var insp=document.getElementById('ltStudioInspector');
           insp.scrollTop=insp.scrollHeight;
-          var last=insp.querySelector('.lt-inspector-actions button:last-child') || insp.querySelector('label:last-of-type input, label:last-of-type select, label:last-of-type textarea');
+          var controls=Array.from(insp.querySelectorAll('button,input,select,textarea')).filter(function(el){return el.offsetParent!==null && !el.disabled;});
+          var last=controls[controls.length-1];
+          if(last && typeof last.scrollIntoView==='function') last.scrollIntoView({block:'end',inline:'nearest'});
+          insp.scrollTop=insp.scrollHeight;
           var r=last.getBoundingClientRect(), c=insp.getBoundingClientRect();
           var input=insp.querySelector('input:not([type="checkbox"]), select, textarea');
           var label=insp.querySelector('.lt-check-row');
@@ -5016,7 +5049,7 @@ app.whenReady().then(async () => {
           var inputColor=input ? getComputedStyle(input).color : '';
           var labelOk=!!(label && label.querySelector('input') && label.contains(label.querySelector('span')));
           var darkBg=!/(^|,\\s*)255\\s*,\\s*255\\s*,\\s*255/.test(inputBg);
-          return JSON.stringify({scroll:insp.scrollHeight>insp.clientHeight+4, lastVisible:r.bottom<=c.bottom+1 && r.top>=c.top-1, scrollTop:insp.scrollTop, max:insp.scrollHeight-insp.clientHeight, inputBg:inputBg, inputColor:inputColor, labelOk:labelOk, darkBg:darkBg});
+          return JSON.stringify({scroll:insp.scrollHeight>insp.clientHeight+4, lastVisible:r.bottom<=c.bottom+1 && r.top>=c.top-1, lastId:last&&last.id, scrollTop:insp.scrollTop, max:insp.scrollHeight-insp.clientHeight, inputBg:inputBg, inputColor:inputColor, labelOk:labelOk, darkBg:darkBg});
         })()`);
         smokeCheck('LT_STUDIO_INSPECTOR_SCROLL_OK', studioInspector.scroll && studioInspector.lastVisible, JSON.stringify(studioInspector));
         smokeCheck('LT_STUDIO_INSPECTOR_DARK_THEME_OK', studioInspector.darkBg && studioInspector.labelOk, JSON.stringify(studioInspector));
@@ -5128,6 +5161,7 @@ app.whenReady().then(async () => {
 
         // ===== Rundown ellipsis / tooltip / scroll =====
         const rd = await jparse(`(function(){
+          if(typeof setSidebarView==='function') setSidebarView('rundown');
           cues=[]; for(var i=0;i<80;i++) cues.push({name:'Segment '+(i+1)+' — veoma dugačak naziv koji mora da se skrati elipsom '+i, durationMs:300000});
           selectedCue=-1; currentCue=-1; renderCues();
           var nm=document.querySelector('#cueList .cue .nm'); var cs=getComputedStyle(nm);

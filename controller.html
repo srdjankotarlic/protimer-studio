@@ -4534,10 +4534,12 @@ function renderStage(prefix, st, now){
   const textOnly = st.textOnly && st.text;
   applyGridPreview(ps);
   // tajmer kao lejer scene: kutija lejera pozicionira stage (grid ima prednost — on emulira PROZOR)
+  let previewTimerLayer=null;
   {
     const scn=activeScene(st);
     const lys=(scn && Array.isArray(scn.layers)) ? scn.layers.filter(l=>l && l.visible!==false) : [];
     const tl=lys.find(l=>l.type==='timer');
+    previewTimerLayer=tl||null;
     if(!(st.gridOn && st.gridSize)){
       if(tl){ const b=layerBounds(tl);
         ps.style.display='flex'; ps.style.inset='auto';
@@ -4547,6 +4549,9 @@ function renderStage(prefix, st, now){
       else { ps.style.display='flex'; ps.style.inset='0'; ps.style.left=ps.style.top=ps.style.width=ps.style.height=''; ps.style.opacity=''; }
     } else ps.style.display='flex';
   }
+  // Grid positions the timer itself; letting that full-size stage consume pointer input
+  // would make image/text scene layers underneath impossible to select or drag.
+  ps.style.pointerEvents=(prefix==='pv' && previewTimerLayer && !(st.gridOn && st.gridSize))?'auto':'none';
   const sw=ps.clientWidth||root.clientWidth, sh=ps.clientHeight||root.clientHeight;
 
   if(st.text){
@@ -8442,13 +8447,14 @@ $('inspFontSize').addEventListener('change',e=>inspApply(L=>{ if(L.type==='text'
 (function(){
   const box=$('preview'); if(!box) return;
   let drag=null;
-  const pctPoint=(e)=>{ const r=box.getBoundingClientRect();
+  const pctPoint=(e,fixedRect)=>{ const r=fixedRect||box.getBoundingClientRect();
     return { x:(e.clientX-r.left)/r.width*100, y:(e.clientY-r.top)/r.height*100, rect:r }; };
   const timerLayerOfScene=()=>{ const sc=currentScene(); return (sc.layers||[]).find(l=>l.type==='timer' && l.visible!==false) || null; };
   const layerById=(id)=>{ const sc=currentScene(); return (sc.layers||[]).find(l=>l.id===id) || null; };
 
   box.addEventListener('pointerdown',e=>{
     if(e.button!==0) return;
+    const pointerRect=box.getBoundingClientRect();
     let id=null;
     const lEl=e.target.closest('.pv-scene-layer');
     if(lEl && lEl.dataset.layerId) id=lEl.dataset.layerId;
@@ -8456,20 +8462,21 @@ $('inspFontSize').addEventListener('change',e=>inspApply(L=>{ if(L.type==='text'
     if(!id){ if(selectedLayerId){ selectLayer(null); } return; }
     const layer=layerById(id); if(!layer) return;
     if(selectedLayerId!==id) selectLayer(id);
-    const p=pctPoint(e);
+    const p=pctPoint(e,pointerRect);
     const b=layerBounds(layer);
     // resize ako je hvatanje blizu donjeg-desnog ugla kutije (u px)
     const cornerX=(b.x+b.w)/100*p.rect.width, cornerY=(b.y+b.h)/100*p.rect.height;
     const px=(e.clientX-p.rect.left), py=(e.clientY-p.rect.top);
     const mode=(Math.abs(px-cornerX)<18 && Math.abs(py-cornerY)<18)?'resize':'move';
-    drag={ id, mode, startX:p.x, startY:p.y, ox:b.x, oy:b.y, ow:b.w, oh:b.h };
+    drag={ id, mode, startX:p.x, startY:p.y, ox:b.x, oy:b.y, ow:b.w, oh:b.h,
+      rect:{left:p.rect.left,top:p.rect.top,width:p.rect.width,height:p.rect.height} };
     box.setPointerCapture(e.pointerId);
     e.preventDefault();
   });
   box.addEventListener('pointermove',e=>{
     if(!drag) return;
     const layer=layerById(drag.id); if(!layer) return;
-    const p=pctPoint(e);
+    const p=pctPoint(e,drag.rect);
     const dx=p.x-drag.startX, dy=p.y-drag.startY;
     if(drag.mode==='move'){
       layer.x=Math.max(0, Math.min(100-drag.ow, drag.ox+dx));
