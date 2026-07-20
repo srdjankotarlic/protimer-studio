@@ -10,12 +10,16 @@ const smokeDisplay = require('../tools/smoke-display.js');
 const root = path.resolve(__dirname, '..');
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'protimer-beta-usability-'));
 const artifactDirectory = path.join(root, 'artifacts', 'generated', 'beta-usability');
-const sizes = [
+const allSizes = [
   { name: '1440x900', width: 1440, height: 900 },
   { name: '1280x800', width: 1280, height: 800 },
   { name: '1024x700', width: 1024, height: 700 },
   { name: '900x600', width: 900, height: 600 }
 ];
+const requestedSize = String(process.env.PROTIMER_BETA_SIZE || '').trim();
+const sizes = requestedSize ? allSizes.filter(size => size.name === requestedSize) : allSizes;
+if (!sizes.length) throw new Error('Unknown PROTIMER_BETA_SIZE: ' + requestedSize);
+const hiddenVisual = process.env.PROTIMER_HIDDEN_VISUAL === '1';
 app.setPath('userData', profile);
 let target;
 let checks = 0;
@@ -80,7 +84,7 @@ async function setSize(win, size) {
 }
 
 async function capture(win, name) {
-  await new Promise(resolve => setTimeout(resolve, 130));
+  await new Promise(resolve => setTimeout(resolve, 300));
   fs.writeFileSync(path.join(artifactDirectory, name + '.png'), (await win.webContents.capturePage()).toPNG());
 }
 
@@ -89,12 +93,12 @@ async function json(win, source) {
 }
 
 app.whenReady().then(async () => {
-  target = smokeDisplay.resolveTargetDisplay(screen, { root }).display;
-  check('BETA_UI_TARGET_DISPLAY_OK', !!target && /PHL 243V7/i.test(target.label || ''), target ? target.label : 'missing');
+  target = hiddenVisual ? screen.getPrimaryDisplay() : smokeDisplay.resolveTargetDisplay(screen, { root }).display;
+  check('BETA_UI_TARGET_DISPLAY_OK', !!target && (hiddenVisual || /PHL 243V7/i.test(target.label || '')), target ? `${target.label}${hiddenVisual ? ' (hidden visual)' : ''}` : 'missing');
   fs.mkdirSync(artifactDirectory, { recursive: true });
   const win = new BrowserWindow({
     ...smokeDisplay.clampToWorkArea({ width: 1440, height: 900 }, target.workArea),
-    show: true,
+    show: !hiddenVisual,
     backgroundColor: '#0b0c0f',
     webPreferences: { preload: path.join(root, 'preload.js'), contextIsolation: true, nodeIntegration: false, backgroundThrottling: false }
   });
@@ -202,7 +206,7 @@ app.whenReady().then(async () => {
       const inputBg=getComputedStyle(document.getElementById('cueName')).backgroundColor;
       const saveReachable=__inside(document.getElementById('btnCueSave')); cueEditor.scrollTop=cueEditor.scrollHeight;
       const editor={visible:__visible(cueEditor),inside:__inside(document.querySelector('.card-rundown')),save:saveReachable,last:__inside(document.getElementById('chkNowNext')),dark:!['rgb(255, 255, 255)','rgba(0, 0, 0, 0)'].includes(inputBg)};
-      setCueEditorOpen(false); closeDrawers(); if(innerWidth<=1279){document.getElementById('btnSettingsDrawer').click();await new Promise(resolve=>setTimeout(resolve,420));} document.querySelector('#setupTabs button[data-pane="lt"]').click();
+      setCueEditorOpen(false); closeDrawers(); const setup=document.getElementById('setupWrap'); if(!__inside(setup)&&__inside(document.getElementById('btnSettingsDrawer'))){document.getElementById('btnSettingsDrawer').click();await new Promise(resolve=>setTimeout(resolve,420));} document.querySelector('#setupTabs button[data-pane="lt"]').click();
       const pane=document.getElementById('pane-lt'); pane.scrollTop=pane.scrollHeight; document.getElementById('btnLtDeletePreset').scrollIntoView({block:'nearest'});
       const lower={active:pane.classList.contains('active'),studioButton:__inside(document.getElementById('btnLtStudioOpen')),last:__inside(document.getElementById('btnLtDeletePreset')),scroll:getComputedStyle(pane).overflowY};
       const result={rundown,editor,lower,bodyX:document.documentElement.scrollWidth-innerWidth}; closeDrawers(); return result;
@@ -224,9 +228,13 @@ app.whenReady().then(async () => {
 
     await win.webContents.executeJavaScript(`openLtStudio();ltSetStudioPane('canvas');`);
     await new Promise(resolve => setTimeout(resolve, 100));
-    const studio = await json(win, `(()=>{const root=document.getElementById('ltStudio'),toolbar=root.querySelector('.lt-studio-toolbar'),canvas=document.getElementById('ltStudioCanvas'),activePane=document.querySelector('.lt-studio-center'),name=document.querySelector('[data-layer-id="beta-starter-name"]'),title=document.querySelector('[data-layer-id="beta-starter-title"]'),plate=document.querySelector('[data-layer-id="beta-starter-plate"]'),text=name&&name.querySelector('.lt-editor-text'),scale=canvas.clientWidth/1920,cs=text&&getComputedStyle(text),nr=name&&name.getBoundingClientRect(),tr=title&&title.getBoundingClientRect();return {open:root.classList.contains('open'),root:__inside(root),toolbar:__inside(toolbar),canvas:__visible(canvas)&&__inside(activePane),templates:document.querySelectorAll('#ltStudioTemplates .lt-template-row').length,layers:document.querySelectorAll('#ltStudioLayers .lt-layer-row').length,buttons:[...toolbar.querySelectorAll('button')].filter(__visible).map(__fits),bodyX:document.documentElement.scrollWidth-innerWidth,scale,font:cs?parseFloat(cs.fontSize):0,radius:plate?parseFloat(getComputedStyle(plate).borderRadius):0,textFits:!!text&&text.scrollHeight<=text.clientHeight+1&&text.scrollWidth<=text.clientWidth+1,layersSeparated:!!nr&&!!tr&&nr.bottom<=tr.top+1};})()`);
+    await win.webContents.executeJavaScript(`ltApplyCanvasZoom()`);
+    const studio = await json(win, `(()=>{const root=document.getElementById('ltStudio'),toolbar=root.querySelector('.lt-studio-toolbar'),canvas=document.getElementById('ltStudioCanvas'),shell=document.getElementById('ltStudioCanvasShell'),activePane=document.querySelector('.lt-studio-center'),name=document.querySelector('[data-layer-id="beta-starter-name"]'),title=document.querySelector('[data-layer-id="beta-starter-title"]'),plate=document.querySelector('[data-layer-id="beta-starter-plate"]'),text=name&&name.querySelector('.lt-editor-text'),scale=canvas.clientWidth/1920,cs=text&&getComputedStyle(text),nr=name&&name.getBoundingClientRect(),tr=title&&title.getBoundingClientRect(),cr=canvas.getBoundingClientRect(),sr=shell.getBoundingClientRect(),runtime=ltStudioState.previewRuntime||{},runtimeName=(runtime.resolvedLayers||[]).find(layer=>layer.id==='beta-starter-name');return {open:root.classList.contains('open'),root:__inside(root),toolbar:__inside(toolbar),canvas:__visible(canvas)&&__inside(activePane),canvasRect:{w:cr.width,h:cr.height},shellRect:{w:sr.width,h:sr.height},runtimeCanvas:runtime.canvas,canvasInsideShell:cr.left>=sr.left-1&&cr.top>=sr.top-1&&cr.right<=sr.right+1&&cr.bottom<=sr.bottom+1,fitNoScroll:shell.scrollWidth<=shell.clientWidth+1&&shell.scrollHeight<=shell.clientHeight+1,templates:document.querySelectorAll('#ltStudioTemplates .lt-template-row').length,layers:document.querySelectorAll('#ltStudioLayers .lt-layer-row').length,buttons:[...toolbar.querySelectorAll('button')].filter(__visible).map(__fits),bodyX:document.documentElement.scrollWidth-innerWidth,scale,font:cs?parseFloat(cs.fontSize):0,preferredFont:Number(runtimeName&&runtimeName.fontSize)||0,autoFit:!!(text&&text.dataset.autoFit),radius:plate?parseFloat(getComputedStyle(plate).borderRadius):0,textFits:!!text&&text.scrollHeight<=text.clientHeight+1&&text.scrollWidth<=text.clientWidth+1,layersSeparated:!!nr&&!!tr&&nr.bottom<=tr.top+1};})()`);
     check('BETA_STUDIO_' + size.name + '_OK', studio.open && studio.root && studio.toolbar && studio.canvas && studio.templates > 0 && studio.layers > 0 && studio.buttons.every(Boolean) && studio.bodyX <= 1, JSON.stringify(studio));
-    check('BETA_STUDIO_VISUAL_FIDELITY_' + size.name + '_OK', studio.textFits && studio.layersSeparated && Math.abs(studio.font-56*studio.scale)<1 && Math.abs(studio.radius-34*studio.scale)<1, JSON.stringify(studio));
+    const fontRatio = studio.preferredFont > 0 && studio.scale > 0 ? studio.font / (studio.preferredFont * studio.scale) : 0;
+    const canvasRatio = studio.canvasRect.h > 0 ? studio.canvasRect.w / studio.canvasRect.h : 0;
+    const runtimeRatio = Number(studio.runtimeCanvas&&studio.runtimeCanvas.height) > 0 ? Number(studio.runtimeCanvas.width) / Number(studio.runtimeCanvas.height) : 0;
+    check('BETA_STUDIO_VISUAL_FIDELITY_' + size.name + '_OK', studio.canvasInsideShell && studio.fitNoScroll && Math.abs(canvasRatio-runtimeRatio)<.01 && studio.textFits && studio.layersSeparated && fontRatio >= .9 && fontRatio <= 1.01 && Math.abs(studio.radius-34*studio.scale)<1, JSON.stringify({...studio,fontRatio,canvasRatio,runtimeRatio}));
     if (size.name === '1440x900' || size.name === '900x600') await capture(win, size.name + '-studio');
     await win.webContents.executeJavaScript(`closeLtStudio({returnFocus:false});`);
 
@@ -266,7 +274,8 @@ app.whenReady().then(async () => {
     check('BETA_STATE_' + size.name + '_OK', state.running && state.endAt === initialState.endAt && state.currentCue === initialState.currentCue && state.selectedCue === initialState.selectedCue && state.outputOpen === initialState.outputOpen && state.programScene === initialState.programScene && state.message === initialState.message, JSON.stringify({ initialState, state }));
   }
 
-  console.log('BETA_USABILITY_MATRIX_OK ' + checks + '/53 artifacts=' + artifactDirectory);
+  const expectedChecks = 1 + sizes.length * 13;
+  console.log('BETA_USABILITY_MATRIX_OK ' + checks + '/' + expectedChecks + ' artifacts=' + artifactDirectory);
   win.destroy();
   fs.rmSync(profile, { recursive: true, force: true });
   app.quit();

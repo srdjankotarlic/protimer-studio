@@ -1,31 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <defs>
-    <linearGradient id="tile" x1="180" y1="92" x2="846" y2="936" gradientUnits="userSpaceOnUse">
+    <linearGradient id="tile" x1="224" y1="124" x2="814" y2="916" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#292c31"/>
-      <stop offset="1" stop-color="#121417"/>
+      <stop offset="0.58" stop-color="#1a1d21"/>
+      <stop offset="1" stop-color="#101215"/>
     </linearGradient>
-    <linearGradient id="silver" x1="280" y1="236" x2="738" y2="808" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#f4f6f8"/>
-      <stop offset="1" stop-color="#cbd1d8"/>
+    <linearGradient id="rim" x1="246" y1="154" x2="766" y2="850" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f6f7f9"/>
+      <stop offset="0.55" stop-color="#d8dde3"/>
+      <stop offset="1" stop-color="#aeb6c0"/>
     </linearGradient>
-    <linearGradient id="live" x1="720" y1="244" x2="778" y2="304" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#8ee19d"/>
-      <stop offset="1" stop-color="#4fbe70"/>
+    <linearGradient id="signal" x1="708" y1="318" x2="766" y2="378" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#76dc91"/>
+      <stop offset="1" stop-color="#3faf63"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="145%">
-      <feDropShadow dx="0" dy="22" stdDeviation="28" flood-color="#000000" flood-opacity=".38"/>
+    <filter id="tileShadow" x="-18%" y="-18%" width="136%" height="145%">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#000000" flood-opacity=".42"/>
+    </filter>
+    <filter id="signalGlow" x="-90%" y="-90%" width="280%" height="280%">
+      <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#4bc56c" flood-opacity=".36"/>
     </filter>
   </defs>
 
-  <rect x="54" y="54" width="916" height="916" rx="202" fill="url(#tile)" filter="url(#shadow)"/>
-  <rect x="60" y="60" width="904" height="904" rx="196" fill="none" stroke="#ffffff" stroke-opacity=".10" stroke-width="8"/>
+  <!-- Keep the tile inside the macOS icon safe area. Transparent corners are intentional. -->
+  <rect x="92" y="92" width="840" height="840" rx="188" fill="url(#tile)" filter="url(#tileShadow)"/>
+  <rect x="98" y="98" width="828" height="828" rx="182" fill="none" stroke="#ffffff" stroke-opacity=".13" stroke-width="7"/>
+  <path d="M164 314 C202 203 294 132 410 112" fill="none" stroke="#ffffff" stroke-opacity=".055" stroke-width="8" stroke-linecap="round"/>
 
-  <path d="M430 222 A306 306 0 1 0 760 278" fill="none" stroke="url(#silver)" stroke-width="54" stroke-linecap="round"/>
-  <circle cx="760" cy="278" r="32" fill="url(#live)"/>
+  <!-- A single centered mark: stage/output frame inside a timing arc. -->
+  <path d="M373 271 A278 278 0 1 0 740 353" fill="none" stroke="url(#rim)" stroke-width="44" stroke-linecap="round"/>
+  <circle cx="740" cy="353" r="27" fill="url(#signal)" filter="url(#signalGlow)"/>
 
-  <path d="M350 378 H472 M552 378 H674 V630 Q674 678 626 678 H398 Q350 678 350 630 V378"
-        fill="none" stroke="url(#silver)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
-
-  <line x1="512" y1="350" x2="512" y2="560" stroke="url(#silver)" stroke-width="22" stroke-linecap="round"/>
-  <circle cx="512" cy="568" r="23" fill="#1a1d21" stroke="url(#silver)" stroke-width="12"/>
+  <path d="M466 382 H390 Q356 382 356 416 V616 Q356 650 390 650 H634 Q668 650 668 616 V416 Q668 382 634 382 H558"
+        fill="none" stroke="url(#rim)" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M512 348 V548" fill="none" stroke="url(#rim)" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="512" cy="568" r="22" fill="#171a1e" stroke="url(#rim)" stroke-width="11"/>
 </svg>

@@ -75,6 +75,32 @@ body {
   font: 13px/1.42 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif !important;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #454b54 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: #454b54;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #59616c;
+  background-clip: padding-box;
+}
+
 button,
 input,
 select,
@@ -1060,7 +1086,9 @@ kbd {
 }
 
 .lt-template-row.selected,
-.lt-layer-row.selected {
+.lt-template-row.active,
+.lt-layer-row.selected,
+.lt-layer-row.active {
   background: var(--pro-blue-soft) !important;
   border-color: rgba(91, 156, 245, .48) !important;
   box-shadow: inset 3px 0 0 var(--pro-blue) !important;
@@ -1113,9 +1141,32 @@ kbd {
 
 .lt-canvas-shell {
   padding: 18px !important;
+  overflow: hidden !important;
   border: 1px solid #24282e !important;
   border-radius: var(--pro-radius) !important;
   background: #080a0c !important;
+}
+
+.lt-canvas-shell.zoom-scroll {
+  place-items: start !important;
+  overflow: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: #4a5059 #111317;
+}
+
+.lt-canvas-shell.zoom-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.lt-canvas-shell.zoom-scroll::-webkit-scrollbar-track {
+  background: #111317;
+}
+
+.lt-canvas-shell.zoom-scroll::-webkit-scrollbar-thumb {
+  border: 2px solid #111317;
+  border-radius: 8px;
+  background: #4a5059;
 }
 
 .lt-canvas-frame {
@@ -1233,7 +1284,7 @@ kbd {
 }
 
 /* Responsive behavior keeps critical actions reachable. */
-@media (max-width: 1279px) {
+@media (max-width: 1319px) {
   .shell-layout .main.operator-workspace {
     grid-template-columns: clamp(236px, 25vw, 282px) minmax(0, 1fr) !important;
     gap: 8px !important;
@@ -1718,13 +1769,13 @@ kbd {
 }
 
 /* Every workspace remains explicitly reachable while the window changes size. */
-@media (max-width: 1279px) {
+@media (max-width: 1319px) {
   .shell-layout .tb-drawerbtn {
     display: inline-flex !important;
     align-items: center !important;
   }
 
-  .shell-layout #btnRundownDrawer { display: none !important; }
+  body:not(.compact) .shell-layout #btnRundownDrawer { display: none !important; }
 
   body:not(.compact) .shell-layout .utility-column,
   body:not(.compact) #setupWrap {
@@ -1743,12 +1794,16 @@ kbd {
     border-radius: var(--pro-radius) !important;
     background: var(--pro-surface-1) !important;
     box-shadow: var(--pro-shadow-window) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
     transform: translateX(calc(100% + 24px)) !important;
     transition: transform .16s ease !important;
   }
 
   body:not(.compact).dr-right .shell-layout .utility-column,
   body:not(.compact).dr-setup #setupWrap {
+    opacity: 1 !important;
+    pointer-events: auto !important;
     transform: none !important;
   }
 
@@ -1769,7 +1824,8 @@ kbd {
 }
 
 @media (max-width: 1100px) {
-  .shell-layout #btnRundownDrawer { display: inline-flex !important; }
+  body:not(.compact) .shell-layout #btnRundownDrawer,
+  body.compact .shell-layout #btnRundownDrawer { display: inline-flex !important; }
 
   .shell-layout .main.operator-workspace {
     grid-template-columns: minmax(0, 1fr) !important;
@@ -1796,11 +1852,15 @@ kbd {
     overflow: hidden !important;
     border: 1px solid var(--pro-line-strong) !important;
     box-shadow: var(--pro-shadow-window) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
     transform: translateX(calc(-100% - 24px)) !important;
     transition: transform .16s ease !important;
   }
 
   body:not(.compact).dr-run .shell-layout .primary-sidebar {
+    opacity: 1 !important;
+    pointer-events: auto !important;
     transform: none !important;
   }
 }

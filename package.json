@@ -25,8 +25,10 @@
     "av"
   ],
   "scripts": {
-    "test": "node tools/check-free-build.js && node tools/check-public-site.js && node tools/run-test-suite.js modules",
+    "build:icons": "electron tools/build-icons.js",
+    "test": "node tools/check-free-build.js && node tools/check-icon-assets.js && node tools/check-public-site.js && node tools/run-test-suite.js modules",
     "check:free": "node tools/check-free-build.js",
+    "check:icons": "node tools/check-icon-assets.js",
     "check:packaged-free": "node tools/check-packaged-free-build.js",
     "check:site": "node tools/check-public-site.js",
     "test:renderers:philips": "node tools/run-test-suite.js renderers",

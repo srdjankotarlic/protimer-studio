@@ -2776,9 +2776,6 @@
       border-radius:8px !important;
       padding:6px !important;
     }
-    .lt-canvas-frame{
-      width:100% !important;
-    }
     .lt-studio-toolbar{gap:6px !important;}
     .lt-studio-toolbar button{
       min-height:30px !important;
@@ -7172,8 +7169,11 @@ function ltApplyCanvasZoom(canvasSpec){
   const canvas=canvasSpec || (ltStudioState.previewRuntime && ltStudioState.previewRuntime.canvas) || {width:1920,height:1080};
   const cw=Math.max(1, Number(canvas.width)||1920);
   const ch=Math.max(1, Number(canvas.height)||1080);
-  const aw=Math.max(1, shell.clientWidth-24);
-  const ah=Math.max(1, shell.clientHeight-24);
+  const shellStyle=getComputedStyle(shell);
+  const padX=(parseFloat(shellStyle.paddingLeft)||0)+(parseFloat(shellStyle.paddingRight)||0);
+  const padY=(parseFloat(shellStyle.paddingTop)||0)+(parseFloat(shellStyle.paddingBottom)||0);
+  const aw=Math.max(1, shell.clientWidth-padX);
+  const ah=Math.max(1, shell.clientHeight-padY);
   let scale;
   if(ltStudioState.zoom==='50') scale=.5;
   else if(ltStudioState.zoom==='100') scale=1;
@@ -7183,7 +7183,7 @@ function ltApplyCanvasZoom(canvasSpec){
   frame.style.height=Math.round(ch*scale)+'px';
   frame.classList.toggle('zoom-50', ltStudioState.zoom==='50');
   frame.classList.toggle('zoom-100', ltStudioState.zoom==='100');
-  shell.classList.toggle('zoom-scroll', ltStudioState.zoom==='100');
+  shell.classList.toggle('zoom-scroll', ltStudioState.zoom!=='fit');
   ltApplyEditorVisualScale(Math.max(.01, frame.clientWidth/cw), ltStudioState.previewRuntime);
 }
 function ltScaledPx(value, scale, fallback=0){
@@ -7357,7 +7357,7 @@ function renderLtStudioInspector(){
   const isText=l.type==='dynamicText'||l.type==='staticText';
   const isMedia=l.type==='media'||l.type==='logo';
   const check=(id,label)=>`<label class="lt-check-row"><input id="${id}" type="checkbox"><span>${label}</span></label>`;
-  let html=`<div class="lt-section-title">${t('ltStudioInspector')}</div>`+ltAnimationInspectorHtml(template);
+  let html=`<div class="lt-section-title">${t('ltStudioInspector')}</div>`;
   html+=`<div class="lt-inspector-section"><div class="lt-inspector-section-title">${t('ltStudioTransform')}</div><div class="lt-inspector-grid">`;
   html+=`<label class="wide">${t('ltStudioLayerName')}<input id="ltInName" type="text" value="${ltEsc(l.name||'')}"></label>`;
   html+=`<label>X<input id="ltInX" type="number" step="1" value="${Math.round(Number(l.x)||0)}"></label>`;
@@ -7419,6 +7419,7 @@ function renderLtStudioInspector(){
   }
   if(isText || isMedia || l.type==='shape') html+='</div></div>';
   html+=`<div class="lt-inspector-section"><div class="lt-inspector-section-title">${t('ltStudioActions')}</div><div class="lt-inspector-actions"><button id="ltLayerCenter" class="mini">${t('ltStudioCenter')}</button><button id="ltLayerFull" class="mini">${t('ltStudioFullWidth')}</button><button id="ltLayerFitMedia" class="mini">${t('ltStudioFitMedia')}</button><button id="ltLayerReset" class="mini">${t('ltStudioResetTransform')}</button></div></div>`;
+  html+=ltAnimationInspectorHtml(template);
   box.innerHTML=html;
   ltBindAnimationInspector();
   const set=(id,event,fn)=>{ const el=$(id); if(el) el.addEventListener(event,()=>{ fn(el); ltMarkDirty(); renderLtStudioCanvas(); renderLtStudioLayers(); }); };
@@ -7593,6 +7594,21 @@ function ltEnsureStarterTemplate(){
   return tpl;
 }
 let ltStudioLastFocus = null;
+let ltCanvasResizeObserver = null;
+let ltCanvasResizeFrame = 0;
+function observeLtStudioCanvas(){
+  const shell=$('ltStudioCanvasShell');
+  if(!shell || typeof ResizeObserver==='undefined' || ltCanvasResizeObserver) return;
+  ltCanvasResizeObserver=new ResizeObserver(()=>{
+    if(!$('ltStudio')?.classList.contains('open')) return;
+    if(ltCanvasResizeFrame) cancelAnimationFrame(ltCanvasResizeFrame);
+    ltCanvasResizeFrame=requestAnimationFrame(()=>{
+      ltCanvasResizeFrame=0;
+      ltApplyCanvasZoom();
+    });
+  });
+  ltCanvasResizeObserver.observe(shell);
+}
 function openLtStudio(){
   const tab=document.querySelector('#setupTabs button[data-pane="lt"]');
   if(tab && !tab.classList.contains('active')) tab.click();
@@ -7605,6 +7621,7 @@ function openLtStudio(){
   studio.setAttribute('aria-hidden','false');
   document.body.classList.add('lt-studio-open');
   renderLtStudio();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>ltApplyCanvasZoom()));
   ltSetStatus(uiText('ltStudioReadyStatus'), ltStudioState.dirty ? 'dirty' : 'saved');
   setTimeout(()=>($('btnLtStudioSave')||studio).focus(),0);
 }
@@ -7629,6 +7646,7 @@ function closeLtStudio(opts={}){
 }
 function initLtStudio(){
   ltEnsureLibrary();
+  observeLtStudioCanvas();
   const t=ltCurrentTemplate();
   if(t && !ltStudioState.selectedLayerId) ltStudioState.selectedLayerId=((t.layers||[])[0]||{}).id || null;
   renderLtStudio();
