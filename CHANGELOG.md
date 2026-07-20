@@ -4,23 +4,37 @@ All notable changes to ProTimer Studio are documented here.
 
 ## Unreleased
 
+## 0.9.0-beta.2 - 2026-07-21
+
+### Added
+
+- Added a responsive navigation sidebar and drawers so rundown, slides, messages, settings and outputs remain reachable from 1440x900 down to 900x600.
+- Added release provenance, artifact attestations and fail-closed signed-candidate workflows for future stable packages.
+- Added deterministic package checks that reject activation code, private keys and unsafe release metadata from the public MIT build.
+
 ### Changed
 
 - Upgraded the development runtime from Electron 42.6.1 to current stable Electron 43.1.1.
 - Upgraded the ZIP package stack to Archiver 8.0.0 and yauzl 3.4.0 while preserving show/template package validation contracts.
-- Added explicit macOS Hardened Runtime entitlements and encrypted Chromium cookie storage in packaged builds.
-- Added a fail-closed signed stable-release workflow for Developer ID/notarized Mac and Authenticode-signed Windows artifacts.
-- Added GitHub artifact provenance attestations to future beta and stable release pipelines.
-- Added a packaged `app.asar` contract that blocks release artifacts containing activation code, key generators or private keys.
-- Restricted unsigned release tags to exact beta tags so a stable tag cannot publish an unsigned prerelease.
-- Split stable delivery into a signed private candidate and a separate publication gate tied to exact artifact hashes, designated-display smoke, physical Mac/Windows QA and external operator evidence.
+- Added explicit macOS Hardened Runtime entitlements while keeping Chromium cookie encryption disabled because the app has no account or cookie-based login.
+- Restricted unsigned publication to exact beta tags and separated future signed candidates from the stable publication gate.
 - Removed stale paid-tier labels from the free UI and added a headless 37-pack localization/fallback contract.
 - Build metadata now discloses dirty source state and records the full commit, preventing local modified packages from masquerading as exact release builds.
+- Replaced old product screenshots with current verified operator and Lower Third Studio views.
 
-### Verification pending
+### Fixed
 
-- Electron 43.1.1 has passed the headless suite and a local Apple Silicon package/CLI/DMG/fuse check. The full designated-display source and packaged regression remains required before the next published beta.
-- The stable candidate cannot be built until real signing credentials are installed; publication remains blocked until the exact signed artifacts also pass the retained physical/operator evidence gate.
+- Fixed rundown badge, schedule and duration overlap in dense cue rows.
+- Fixed drag state and resize access regressions in the operator workspace.
+- Fixed packaged image/video media loading being blocked by an unnecessary macOS Safe Storage Keychain prompt.
+- Isolated smoke-test browser profiles and artifact directories so source and packaged evidence cannot contaminate each other.
+
+### Verified
+
+- The complete 320-check source and packaged regression passed on the designated PHL 243V7 display with no test window on the HP display.
+- Packaged MP4 playback and WebM VP8/VP9 alpha compositing passed in Electron; external OBS/vMix alpha integration remains uncertified.
+- The Apple Silicon app passed package boot, DMG integrity, ad-hoc signature, Electron fuse and public MIT/free-build checks.
+- Windows x64 installer and portable packages remain CI-built beta artifacts and still require physical Windows validation.
 
 ## 0.9.0-beta.1 - Public beta
 

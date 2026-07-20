@@ -1,7 +1,7 @@
 {
   "name": "protimer-studio",
   "productName": "ProTimer Studio",
-  "version": "0.9.0-beta.1",
+  "version": "0.9.0-beta.2",
   "description": "Free open-source event rundown, stage timer, lower-third and multi-display control",
   "main": "main.js",
   "author": "Srdjan Kotarlic",

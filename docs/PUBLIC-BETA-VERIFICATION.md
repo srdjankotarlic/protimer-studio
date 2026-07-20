@@ -1,34 +1,49 @@
 # Public Beta Verification
 
-Verified for `0.9.0-beta.1` on 2026-07-13.
+Verified for `0.9.0-beta.2` on 2026-07-21. This page separates what was physically exercised from what was only built or checked in automation.
 
-## Passed in the public repository
+## Designated Mac display regression
 
-- `npm ci`: clean install on Node.js 22.
-- `npm audit`: 0 reported vulnerabilities.
-- `npm test`: 59 deterministic module checks plus the free-build and public-site contracts.
-- Public-site metadata: canonical URL, Open Graph/Twitter cards, SoftwareApplication/FAQ structured data, sitemap, robots file and local assets.
-- Apple Silicon package: native ARM64 application, successful CLI boot, valid DMG checksum and valid ad-hoc bundle signature.
-- Electron package hardening: RunAsNode, Node options and CLI inspect disabled; embedded ASAR integrity and OnlyLoadAppFromAsar enabled.
-- Windows package structure: x64 unpacked application plus NSIS installer and portable executable produced successfully.
-- Packaged-content audit: no activation module, license generator or private key in either Mac or Windows ASAR.
+The complete source and packaged Electron suites each passed **320/320 checks** on the designated `PHL 243V7` display. The smoke guard confirmed that no test window opened on the HP display.
 
-## Previously verified product baseline
+Covered workflows include:
 
-Before the public free-build extraction, the same product runtime passed the designated-display source and packaged regression suites, the 53-check responsive operator matrix and a condition-driven 15-minute lower-third soak. Removing the activation gate did not change timer, GO, Program, output-routing or renderer protocols.
+- rundown selection, LIVE state, GO transaction, timer continuity, reports and CSV;
+- responsive operator access from 1440x900 down to 900x600;
+- multiple fullscreen, window, custom-size and grid output routes;
+- missing-display fail-safe behavior and exact-display reconnection;
+- screen content, image/logo media, PDF, MP4 and browser outputs;
+- Lower Third Studio visibility, template persistence, drag/resize, Preview isolation, TAKE from the LIVE cue and HIDE cleanup;
+- PNG/JPG/SVG, MP4, WebM VP8 and WebM VP9 renderer fixtures, including internal alpha-pixel checks;
+- local network views, remote/API controls, localization, autosave, crash recovery and portable show packages.
 
-## Not yet proven for this public beta
+The packaged run used a fresh isolated profile and a clean Apple Silicon application produced from the release candidate. The app passed command-line build metadata, packaged MIT/free-build, DMG integrity, ad-hoc signature and Electron fuse checks. Chromium cookie encryption is deliberately disabled because ProTimer Studio has no account or cookie-based login; this also prevents an unnecessary macOS Safe Storage Keychain prompt.
 
-- The complete visible source/packaged suite has not been repeated after extraction because the configured PHL 243V7 test display was not connected. The test guard correctly aborted before opening any window.
-- Windows packages have not completed a clean physical Windows 10/11 install, launch, firewall, multi-display and uninstall pass.
-- The packages are not Developer ID/notarized or Windows Authenticode signed.
-- External OBS/vMix video-alpha workflows are not certified.
-- Search-engine discovery and real operator adoption can only be measured after publication.
+## Headless and repository checks
 
-These gaps are why the release is labelled **public beta**, not stable or production-certified. Test the exact show computer, displays and media path before using it on-air.
+- `npm test`: all 12 module scripts passed, including free-build, icon, public-site, localization, release metadata and signing-policy contracts.
+- The public site includes canonical metadata, Open Graph/Twitter data, SoftwareApplication and FAQ structured data, sitemap, robots file and local screenshots.
+- Release builds record the exact full commit and dirty state.
+- Packaged-content checks reject activation modules, license generators and private keys from the public MIT build.
+- Beta workflow artifacts receive SHA-256 checksums and GitHub provenance attestations.
 
-## Work after Beta 1
+## Platform truth
 
-Current `main` advances to Electron 43.1.1, 93 headless checks, explicit macOS entitlements and separate fail-closed signed-candidate/publication workflows. Native GitHub runners successfully build and inspect the actual Apple Silicon DMG, Windows installer and Windows portable package, including the packaged MIT/free-build contract. A local Apple Silicon package also passes CLI boot, DMG integrity, ad-hoc signature and fuse checks.
+### Proven on physical hardware
 
-The designated-display inventory on 2026-07-20 found only the Built-in Retina Display, so no visible test was opened and the PHL 243V7 source/packaged gate remains pending. These post-release checks do not retroactively change the published Beta 1 artifact and do not replace physical Windows installation or external operator testing.
+- Apple Silicon macOS build, designated Philips display, local network renderer and packaged lower-third/media workflows.
+
+### Built and inspected in CI, not physically certified
+
+- Windows 10/11 x64 installer and portable package.
+
+### Still not proven
+
+- Developer ID signing/notarization and Windows Authenticode signing.
+- Clean physical Windows install, firewall, multi-display, portable and uninstall workflows.
+- Intel Mac support.
+- External OBS/vMix video-alpha integration. Internal Electron alpha compositing is proven, but that does not certify another application's browser/media pipeline.
+- NDI, window capture, streaming/encoding, audio mixing or cloud collaboration.
+- Independent operator adoption or production certification.
+
+These gaps are why the release is labelled **public beta**. Test the exact show computer, display chain, network and media before using it on-air.

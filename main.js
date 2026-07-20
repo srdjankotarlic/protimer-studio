@@ -5268,6 +5268,15 @@ app.whenReady().then(async () => {
           await measureAt(1280, 800, { advanced:false });   // isključi emulaciju, vrati normalan viewport
         }
 
+        // Prepare a representative, real operator state for release screenshots.
+        await jx(`(function(){
+          seedDemoShow();
+          goLiveWithCue(1,{autostart:false});
+          selectedCue=2;
+          renderCues(); updateGoLabel(); updateLiveInfo();
+          if(typeof setSidebarView==='function') setSidebarView('rundown');
+        })()`);
+
         // ===== screenshots → artifacts/operator-ui/faza-1/ =====
         try {
           const writtenShots = [];

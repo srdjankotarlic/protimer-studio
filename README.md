@@ -18,7 +18,7 @@
 
 ![ProTimer Studio operator workspace](docs/images/operator-workspace.png)
 
-> **Public beta:** the core Mac workflow has extensive local test coverage. Windows packages are built automatically but still need broader real-hardware feedback. Current downloads are not yet Developer ID/Authenticode signed, so the operating system may show a security warning. Read [Install the beta](#install-the-beta) before downloading.
+> **Public beta:** the Beta 2 Mac candidate passed the complete 320-check source and packaged regression on the designated Philips display. Windows packages are built automatically but still need broader real-hardware feedback. Current downloads are not yet Developer ID/Authenticode signed, so the operating system may show a security warning. Read [Install the beta](#install-the-beta) before downloading.
 
 ## Why ProTimer Studio
 
@@ -36,7 +36,7 @@ Live event teams often combine a timer, rundown spreadsheet, speaker messages, l
 
 ## Install the beta
 
-Open [ProTimer Studio 0.9.0 Beta 1](https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.1) and download the file for your computer.
+Open [ProTimer Studio 0.9.0 Beta 2](https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.2) and download the file for your computer.
 
 ### macOS Apple Silicon
 

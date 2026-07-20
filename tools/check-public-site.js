@@ -15,7 +15,7 @@ const requiredSnippets = [
   '<meta name="twitter:card" content="summary_large_image">',
   '"@type": "SoftwareApplication"',
   '"@type": "FAQPage"',
-  'https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.1',
+  'https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.2',
   'https://github.com/srdjankotarlic/protimer-studio/discussions/1',
 ];
 
