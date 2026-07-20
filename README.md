@@ -18,7 +18,7 @@
 
 ![ProTimer Studio operator workspace](docs/images/operator-workspace.png)
 
-> **Public beta:** the core Mac workflow has extensive local test coverage. Windows packages are built automatically but still need broader real-hardware feedback. Current downloads are not yet Developer ID/AuthentiCode signed, so the operating system may show a security warning. Read [Install the beta](#install-the-beta) before downloading.
+> **Public beta:** the core Mac workflow has extensive local test coverage. Windows packages are built automatically but still need broader real-hardware feedback. Current downloads are not yet Developer ID/Authenticode signed, so the operating system may show a security warning. Read [Install the beta](#install-the-beta) before downloading.
 
 ## Why ProTimer Studio
 

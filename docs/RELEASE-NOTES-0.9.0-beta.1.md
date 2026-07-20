@@ -21,8 +21,8 @@ The first free public beta of ProTimer Studio.
 
 ## Important beta notes
 
-The packages are not yet Developer ID/AuthentiCode signed. macOS Gatekeeper and Windows SmartScreen may warn on first launch. Confirm that the file came from this repository and verify its checksum.
+The packages are not yet Developer ID/Authenticode signed. macOS Gatekeeper and Windows SmartScreen may warn on first launch. Confirm that the file came from this repository and verify its checksum.
 
 Windows packages are CI-built and need broader physical-machine feedback. OBS/vMix alpha behavior, NDI and window capture are not certified features. Test the complete show computer, displays, network and media before a live event.
 
-Please report reproducible issues through the repository bug form.
+Start at the [product page](https://srdjankotarlic.github.io/protimer-studio/), ask questions in the [public beta discussion](https://github.com/srdjankotarlic/protimer-studio/discussions/1), and report reproducible issues through the [bug form](https://github.com/srdjankotarlic/protimer-studio/issues/new?template=bug_report.yml).
