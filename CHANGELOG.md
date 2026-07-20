@@ -8,7 +8,7 @@ All notable changes to ProTimer Studio are documented here.
 
 ### Added
 
-- Added a responsive navigation sidebar and drawers so rundown, slides, messages, settings and outputs remain reachable from 1440x900 down to 900x600.
+- Added persistent left and right sidebar toggles plus responsive drawers so rundown, slides, messages, settings and outputs remain reachable from 1440x900 down to 900x600.
 - Added release provenance, artifact attestations and fail-closed signed-candidate workflows for future stable packages.
 - Added deterministic package checks that reject activation code, private keys and unsafe release metadata from the public MIT build.
 

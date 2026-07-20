@@ -4,7 +4,7 @@ Beta 2 focuses on reliability, operator clarity and honest public testing.
 
 ## What changed
 
-- Responsive sidebar and drawers keep rundown, slides, messages, settings and outputs reachable from 1440x900 down to 900x600.
+- Matching left and right sidebar toggles keep navigation and utility controls explicit; responsive drawers preserve access from 1440x900 down to 900x600.
 - Rundown rows now keep names, LT/LIVE/SELECTED badges, schedule and duration readable without overlap.
 - Scene dragging and resize behavior are more stable.
 - Product screenshots, icon validation and release metadata now match the tested build.

@@ -5202,9 +5202,7 @@ app.whenReady().then(async () => {
         const orderAfter = await jparse(`JSON.stringify(Array.from(document.querySelector('.main').children).map(function(c){return c.className.split(' ')[0];}).join(','))`);
         smokeCheck('NO_LAYOUT_DOM_REPARENTING_OK', reparent.noop && orderAfter===reparent.before, 'noop='+reparent.noop+' afterResizeSame='+(orderAfter===reparent.before));
 
-        // Utility-column WIDE at true wide (1440): current inline 3-col fits here. The 1280–1360
-        // 3-col clipping (utility should collapse to a drawer at <=1279 per Option A) is a
-        // documented DEFERRED item for the Utility Drawer phase — not changed in Faza 1.
+        // Utility-column: inline and collapsible at wide; a real drawer below 1320px.
         await measureAt(1440,900,{advanced:false});
         const uw = await jparse(`(function(){
           function box(el){ var r=el.getBoundingClientRect(); return {l:r.left,r:r.right,t:r.top,b:r.bottom,w:r.width,h:r.height}; }
@@ -5216,27 +5214,50 @@ app.whenReady().then(async () => {
             ownScroll: cs.overflowY==='auto'||cs.overflowY==='scroll', ovfX: document.documentElement.scrollWidth-window.innerWidth });
         })()`);
         smokeCheck('UTILITY_COLUMN_WIDE_OK', uw.visible && !uw.overlap && uw.ownScroll && uw.ovfX<=2, JSON.stringify(uw));
-        smokeCheck('UTILITY_COLUMN_NO_MAIN_SQUEEZE_OK', uw.mainWidth >= 360, 'mainWidth='+uw.mainWidth);
+        await jx(`document.getElementById('btnMsgDrawer').click()`);
+        await new Promise(r=>setTimeout(r,220));
+        const uwCollapsed = await jparse(`(function(){
+          var uc=document.querySelector('.utility-column'), main=document.querySelector('.operator-main'), btn=document.getElementById('btnMsgDrawer');
+          var r=uc.getBoundingClientRect(), cs=getComputedStyle(uc);
+          return JSON.stringify({hidden:cs.visibility==='hidden'&&cs.pointerEvents==='none', width:r.width,
+            mainWidth:Math.round(main.getBoundingClientRect().width), expanded:btn.getAttribute('aria-expanded')==='true'});
+        })()`);
+        await jx(`document.getElementById('btnMsgDrawer').click()`);
+        await new Promise(r=>setTimeout(r,220));
+        const uwRestored = await jparse(`(function(){
+          var uc=document.querySelector('.utility-column'), r=uc.getBoundingClientRect(), cs=getComputedStyle(uc), btn=document.getElementById('btnMsgDrawer');
+          return JSON.stringify({visible:cs.visibility!=='hidden'&&r.width>40, expanded:btn.getAttribute('aria-expanded')==='true'});
+        })()`);
+        smokeCheck('UTILITY_COLUMN_NO_MAIN_SQUEEZE_OK', uw.mainWidth >= 360 && uwCollapsed.hidden && uwCollapsed.mainWidth>uw.mainWidth+200 && !uwCollapsed.expanded && uwRestored.visible && uwRestored.expanded,
+          'wide='+uw.mainWidth+' collapsed='+JSON.stringify(uwCollapsed)+' restored='+JSON.stringify(uwRestored));
         smokeCheck('UTILITY_COLUMN_INTERNAL_SCROLL_OK', uw.ownScroll, 'overflowY-auto='+uw.ownScroll);
 
         await measureAt(1024,700,{advanced:false});
         const unClosed = await jparse(`(function(){
-          var uc=document.querySelector('.utility-column'), r=uc.getBoundingClientRect(), cs=getComputedStyle(uc);
+          var uc=document.querySelector('.utility-column'), r=uc.getBoundingClientRect(), cs=getComputedStyle(uc), btn=document.getElementById('btnMsgDrawer');
           var out={position:cs.position,closedVisible:r.width>40&&r.left<window.innerWidth&&r.right>0,
-            ownScroll:cs.overflowY==='auto'||cs.overflowY==='scroll'||cs.overflowY==='overlay'};
-          document.body.classList.add('dr-right');
+            ownScroll:cs.overflowY==='auto'||cs.overflowY==='scroll'||cs.overflowY==='overlay',
+            closedExpanded:btn.getAttribute('aria-expanded')==='true'};
           return JSON.stringify(out);
         })()`);
+        await jx(`document.getElementById('btnMsgDrawer').click()`);
         await new Promise(r=>setTimeout(r,320));
         const unOpen = await jparse(`(function(){
-          var uc=document.querySelector('.utility-column'), r=uc.getBoundingClientRect();
+          var uc=document.querySelector('.utility-column'), r=uc.getBoundingClientRect(), btn=document.getElementById('btnMsgDrawer');
           var out={openVisible:r.width>40&&r.left<window.innerWidth&&r.right>0,
-            ovfX:document.documentElement.scrollWidth-window.innerWidth};
-          document.body.classList.remove('dr-right');
+            ovfX:document.documentElement.scrollWidth-window.innerWidth,
+            openExpanded:btn.getAttribute('aria-expanded')==='true'};
           return JSON.stringify(out);
         })()`);
-        const un = {...unClosed,...unOpen};
-        smokeCheck('UTILITY_COLUMN_STANDARD_DRAWER_OK', un.position==='fixed' && !un.closedVisible && un.openVisible && un.ownScroll && un.ovfX<=2, JSON.stringify(un));
+        await jx(`document.getElementById('btnMsgDrawer').click()`);
+        await new Promise(r=>setTimeout(r,220));
+        const unRestored = await jparse(`(function(){
+          var uc=document.querySelector('.utility-column'), r=uc.getBoundingClientRect(), btn=document.getElementById('btnMsgDrawer');
+          return JSON.stringify({closedVisible:r.width>40&&r.left<window.innerWidth&&r.right>0,
+            expanded:btn.getAttribute('aria-expanded')==='true'});
+        })()`);
+        const un = {...unClosed,...unOpen,restored:unRestored};
+        smokeCheck('UTILITY_COLUMN_STANDARD_DRAWER_OK', un.position==='fixed' && !un.closedVisible && !un.closedExpanded && un.openVisible && un.openExpanded && un.ownScroll && un.ovfX<=2 && !un.restored.closedVisible && !un.restored.expanded, JSON.stringify(un));
 
         await measureAt(1440,900,{advanced:false});
         const rs = await jparse(`(function(){ if(cues.length<3){ cues=[{id:'r1',name:'R A',durationMs:60000},{id:'r2',name:'R B',durationMs:60000},{id:'r3',name:'R C',durationMs:60000}]; }

@@ -1922,7 +1922,8 @@ kbd {
   min-width: 34px !important;
   height: 34px !important;
   padding: 0 !important;
-  border-color: transparent !important;
+  border-color: var(--pro-line-strong) !important;
+  background: var(--pro-surface-1) !important;
   color: var(--pro-text-2) !important;
 }
 
@@ -1939,6 +1940,41 @@ kbd {
   pointer-events: none;
 }
 
+/* The right utility rail has the same persistent navigation affordance. */
+.shell-layout #btnMsgDrawer.utility-toggle {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+  border-color: var(--pro-line-strong) !important;
+  background: var(--pro-surface-1) !important;
+  color: var(--pro-text-2) !important;
+}
+
+.shell-layout #btnMsgDrawer.utility-toggle:hover,
+.shell-layout #btnMsgDrawer.utility-toggle:focus-visible,
+.shell-layout #btnMsgDrawer.utility-toggle.active {
+  border-color: var(--pro-line-strong) !important;
+  background: var(--pro-surface-2) !important;
+  color: var(--pro-text) !important;
+}
+
+.shell-layout #btnMsgDrawer.utility-toggle svg {
+  display: block;
+  pointer-events: none;
+}
+
+.shell-layout #btnMsgDrawer.utility-toggle .tb-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  margin: 0;
+}
+
 @media (min-width: 1101px) and (max-width: 1319px) {
   body.sidebar-collapsed .shell-layout .main.operator-workspace {
     grid-template-columns: 0 minmax(0, 1fr) !important;
@@ -1949,10 +1985,27 @@ kbd {
   body.sidebar-collapsed .shell-layout .main.operator-workspace {
     grid-template-columns: 0 minmax(520px, 1fr) clamp(276px, 21vw, 316px) !important;
   }
+
+  body.utility-collapsed .shell-layout .main.operator-workspace {
+    grid-template-columns: clamp(274px, 20vw, 306px) minmax(520px, 1fr) 0 !important;
+  }
+
+  body.sidebar-collapsed.utility-collapsed .shell-layout .main.operator-workspace {
+    grid-template-columns: 0 minmax(0, 1fr) 0 !important;
+  }
+
+  body.utility-collapsed .shell-layout .utility-column {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(12px) !important;
+  }
 }
 
 @media (min-width: 1101px) {
   .shell-layout .main.operator-workspace { transition: grid-template-columns .16s ease; }
+  .shell-layout .primary-sidebar,
+  .shell-layout .utility-column { transition: opacity .16s ease, transform .16s ease, visibility .16s ease; }
   body.sidebar-collapsed .shell-layout .primary-sidebar {
     visibility: hidden !important;
     opacity: 0 !important;
