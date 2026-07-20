@@ -1,9 +1,11 @@
 'use strict';
 
 const assert = require('assert');
+const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
+const root = path.join(__dirname, '..');
 const signingScript = path.join(__dirname, '..', 'tools', 'assert-release-signing.js');
 const signingKeys = [
   'CSC_LINK',
@@ -90,4 +92,14 @@ expectSuccess(
   'Windows'
 );
 
-console.log('RELEASE_SIGNING_TESTS_OK count=9');
+const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+assert.strictEqual(pkg.build.electronFuses.enableCookieEncryption, false,
+  'public beta must not open a macOS Safe Storage prompt for unused cookies');
+console.log('RELEASE_MAC_KEYCHAIN_PROMPT_DISABLED_OK=true');
+
+const smokeLauncher = fs.readFileSync(path.join(root, 'tools', 'run-smoke-on-display.js'), 'utf8');
+assert.match(smokeLauncher, /--smoke-user-data-dir=/,
+  'smoke launcher must isolate Chromium and application state');
+console.log('RELEASE_SMOKE_PROFILE_ISOLATED_OK=true');
+
+console.log('RELEASE_SIGNING_TESTS_OK count=11');

@@ -6,6 +6,7 @@
 // No arg-parsing dependency; forwards the display selector to main.js via --smoke-display.
 const { spawnSync } = require('child_process');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const argv = process.argv.slice(2);
@@ -19,6 +20,10 @@ try { config = JSON.parse(fs.readFileSync(path.join(root, '.protimer-smoke-displ
 
 const smokeArgs = ['--smoke'];
 if (argv.includes('--output-routing-only')) smokeArgs.push('--output-routing-only');
+const smokeProfileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'protimer-smoke-'));
+const artifactDir = path.join(root, 'artifacts', 'generated', packaged ? 'packaged' : 'source');
+fs.mkdirSync(artifactDir, { recursive: true });
+smokeArgs.push('--smoke-user-data-dir=' + smokeProfileDir, '--artifact-dir=' + artifactDir);
 const wantedId = displayId || (config && config.id);
 const wantedLabel = display || (config && config.labelContains);
 if (wantedId) smokeArgs.push('--smoke-display-id=' + wantedId);
@@ -38,6 +43,8 @@ if (packaged) {
   cmdArgs = ['.', ...smokeArgs];
 }
 
+console.log('SMOKE PROFILE: ' + smokeProfileDir);
+console.log('SMOKE ARTIFACTS: ' + artifactDir);
 console.log('LAUNCH ' + (packaged ? 'packaged' : 'source') + ' smoke: ' + cmd + ' ' + cmdArgs.join(' '));
 const r = spawnSync(cmd, cmdArgs, { cwd: root, stdio: 'inherit' });
 process.exit(r.status == null ? 1 : r.status);
