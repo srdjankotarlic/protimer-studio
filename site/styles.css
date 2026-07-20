@@ -77,7 +77,8 @@ h2{margin:0;font-size:40px;line-height:1.12}
 .platform-head h3{margin:0;font-size:24px}
 .platform-head span{color:#bcd0e6;font:700 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
 .install-grid p{color:var(--muted);max-width:520px}
-.install-grid .button{margin-top:auto}
+.install-grid article>.platform-actions,.install-grid article>.button{margin-top:auto}
+.platform-actions{display:flex;flex-wrap:wrap;gap:10px}
 .integrity-note{display:flex;gap:18px;margin-top:14px;padding:18px;border-left:3px solid var(--amber);background:#17191a;color:var(--muted)}
 .integrity-note strong{color:#f3d597;white-space:nowrap}
 code{padding:2px 5px;border-radius:4px;background:#252b31;color:#d8e2ea}
@@ -125,6 +126,8 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#090c0f}
   .problem-band,.serbian,.beta-band{padding:50px 0}
   .features,.screens,.install,.faq{padding:64px 0}
   .feature-grid,.install-grid{grid-template-columns:1fr}
+  .platform-actions{width:100%}
+  .platform-actions .button{width:100%}
   .feature-grid article{min-height:180px}
   .integrity-note{flex-direction:column;gap:6px}
   .footer-layout{align-items:flex-start;flex-direction:column}

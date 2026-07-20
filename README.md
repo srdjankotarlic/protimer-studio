@@ -36,7 +36,7 @@ Live event teams often combine a timer, rundown spreadsheet, speaker messages, l
 
 ## Install the beta
 
-Open the [latest GitHub Release](https://github.com/srdjankotarlic/protimer-studio/releases/latest) and download the file for your computer.
+Open [ProTimer Studio 0.9.0 Beta 1](https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.1) and download the file for your computer.
 
 ### macOS Apple Silicon
 
