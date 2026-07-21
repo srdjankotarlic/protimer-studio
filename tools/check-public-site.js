@@ -7,7 +7,12 @@ const root = path.resolve(__dirname, '..');
 const siteDir = path.join(root, 'site');
 const indexPath = path.join(siteDir, 'index.html');
 const html = fs.readFileSync(indexPath, 'utf8');
+const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
+const releaseNotes = fs.readFileSync(path.join(root, 'docs', 'RELEASE-NOTES-0.9.0-beta.2.md'), 'utf8');
 const failures = [];
+
+const macInstallerUrl = 'https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-arm64.dmg';
+const windowsInstallerUrl = 'https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-Setup-0.9.0-beta.2.exe';
 
 const requiredSnippets = [
   '<link rel="canonical" href="https://srdjankotarlic.github.io/protimer-studio/">',
@@ -17,10 +22,24 @@ const requiredSnippets = [
   '"@type": "FAQPage"',
   'https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.2',
   'https://github.com/srdjankotarlic/protimer-studio/discussions/1',
+  macInstallerUrl,
+  windowsInstallerUrl,
+  "GitHub's automatic <code>Source code</code>",
 ];
 
 for (const snippet of requiredSnippets) {
   if (!html.includes(snippet)) failures.push(`missing required site metadata: ${snippet}`);
+}
+
+for (const [name, content] of [
+  ['README.md', readme],
+  ['release notes', releaseNotes],
+]) {
+  if (!content.includes(macInstallerUrl)) failures.push(`${name} is missing the recommended macOS installer`);
+  if (!content.includes(windowsInstallerUrl)) failures.push(`${name} is missing the recommended Windows installer`);
+  if (!/Source code[\s\S]{0,180}(?:will not install|do not contain an installer)/i.test(content)) {
+    failures.push(`${name} does not warn that GitHub source archives are not installers`);
+  }
 }
 
 const description = html.match(/<meta name="description" content="([^"]+)">/i)?.[1] || '';

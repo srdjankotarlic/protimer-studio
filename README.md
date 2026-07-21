@@ -18,51 +18,54 @@
 
 ![ProTimer Studio operator workspace](docs/images/operator-workspace.png)
 
-> **Public beta:** the Beta 2 Mac candidate passed the complete 320-check source and packaged regression on the designated Philips display. Windows packages are built automatically but still need broader real-hardware feedback. Current downloads are not yet Developer ID/Authenticode signed, so the operating system may show a security warning. Read [Install the beta](#install-the-beta) before downloading.
+ProTimer Studio is free stage-timer and event-rundown software for conferences, venues, churches and live-production teams. Prepare the next cue without changing LIVE, run the speaker timer, create lower thirds and send Program to several displays from one local operator workspace.
 
-## Why ProTimer Studio
+## Download and install
 
-Live event teams often combine a timer, rundown spreadsheet, speaker messages, lower-third tool and several output windows. ProTimer Studio brings those jobs into one local, offline-first operator workspace without an account or subscription.
+> **Download exactly one recommended installer for your computer.** The `Source code` ZIP and TAR.GZ files shown by GitHub are for developers and will not install the app.
 
-- Rundown-first **NEXT / LIVE / GO** workflow.
-- Countdown, stopwatch and clock with warnings, overtime and scheduled start.
-- Multiple Program outputs: fullscreen, window, exact pixel size or grid cell.
-- Phone remote, backstage view and podium Signal Light on the local network.
-- Lower Third Studio with dynamic cue fields, text, shapes, logos, images and video.
-- Screen content for images, video, PDF, text, logos, timer and blank states.
-- Autosave, crash recovery and portable `.protimer-show` / `.protimer-lt` packages.
-- HTTP and OSC control plus post-show timing reports and CSV export.
+| Your computer | Recommended download | Install |
+|---|---|---|
+| Apple Silicon Mac (M1 or newer) | **[Download the macOS DMG](https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-arm64.dmg)** | Open the DMG, then drag **ProTimer Studio** to Applications. |
+| Windows 10/11 x64 | **[Download the Windows installer](https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-Setup-0.9.0-beta.2.exe)** | Run Setup and follow the installer. |
+
+Need a Windows build that does not install? Use the [portable EXE](https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-portable.exe). This is an advanced option; most Windows users should choose Setup.
+
+<details>
+<summary><strong>First-launch security warning</strong></summary>
+
+The public beta is not yet Apple-notarized or Windows Authenticode-signed.
+
+- On macOS, open **System Settings → Privacy & Security** and choose **Open Anyway** after confirming the app came from this repository.
+- On Windows, SmartScreen may show **Unknown publisher**. Continue only for the installer downloaded from this repository.
+- Optional integrity hashes are in [SHA256SUMS.txt](https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/SHA256SUMS.txt).
+
+</details>
+
+See [system requirements](docs/SYSTEM-REQUIREMENTS.md) and [known limitations](docs/KNOWN-LIMITATIONS.md). Intel Mac is not currently published.
+
+> **Public beta evidence:** the Beta 2 source and packaged Mac runs each passed 320 checks on the designated Philips display. Windows packages are built and inspected on GitHub's native Windows runner but still need physical operator feedback.
+
+## How it works
+
+1. **Build the rundown.** Create a show, paste rows from Excel or Google Sheets, or import CSV/TSV.
+2. **Prepare NEXT, then press GO.** Selecting a cue never changes LIVE. **GO NEXT** atomically updates the live cue and timer.
+3. **Send Program where it belongs.** Route the timer, lower third or screen content to one or more fullscreen, windowed, pixel-sized or grid-cell outputs.
+
+The complete operator workflow is in the [User Guide](docs/USER-GUIDE.md).
+
+## What it controls
+
+- Countdown, stopwatch and clock with warning colors, overtime and scheduled start.
+- Rundown-first **NEXT / LIVE / GO** workflow with autosave, recovery and reports.
+- Speaker messages, phone remote, backstage view and podium Signal Light on the local network.
+- Lower Third Studio with dynamic cue fields, text, shapes, logos, images and muted video.
+- Screen content for images, video, PDF pages, text, logos, timer and blank states.
+- Multiple Program destinations with explicit display assignment and no silent monitor fallback.
+- HTTP and OSC control plus portable `.protimer-show` and `.protimer-lt` packages.
 - English and Serbian full UI, plus 35 core language packs with English fallback.
 
-## Install the beta
-
-Open [ProTimer Studio 0.9.0 Beta 2](https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.2) and download the file for your computer.
-
-### macOS Apple Silicon
-
-1. Download `ProTimer-Studio-*-arm64.dmg`.
-2. Open the DMG and drag **ProTimer Studio** to Applications.
-3. Because the beta is not yet notarized, macOS may block the first launch. Open **System Settings → Privacy & Security**, confirm that you downloaded the app from this repository, and choose **Open Anyway**.
-
-Intel Mac builds are not currently published.
-
-### Windows 10/11 x64
-
-1. Download `ProTimer-Studio-Setup-*.exe` for the installer, or `ProTimer-Studio-*-portable.exe` for the no-install version.
-2. Windows SmartScreen may show **Unknown publisher** because the beta is not yet Authenticode signed. Continue only if the file came from this repository and its SHA-256 matches `SHA256SUMS.txt` in the release.
-3. Allow private-network access if you plan to use phone, backstage, Signal Light or browser outputs.
-
-See [system requirements](docs/SYSTEM-REQUIREMENTS.md) and [known limitations](docs/KNOWN-LIMITATIONS.md).
-
-## Quick start
-
-1. Open **New Show** and enter the event details.
-2. Paste rows from Excel/Google Sheets or import CSV/TSV.
-3. Assign the speaker display and finish **Preflight**.
-4. Select a cue to prepare NEXT; only **GO NEXT** changes LIVE.
-5. Start the timer and confirm Program before enabling venue outputs.
-
-The complete workflow is in the [User Guide](docs/USER-GUIDE.md).
+ProTimer Studio is event-control software, not a video switcher or a replacement for show-critical hardware redundancy. Test the exact computer, displays, network and media off-air before every event.
 
 ## Product views
 

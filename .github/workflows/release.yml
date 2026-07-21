@@ -118,11 +118,25 @@ jobs:
       - name: Publish prerelease
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh release create "${GITHUB_REF_NAME}"
-          release-assets/*
-          --repo "${GITHUB_REPOSITORY}"
-          --prerelease
-          --verify-tag
-          --title "ProTimer Studio ${GITHUB_REF_NAME}"
-          --generate-notes
+        run: |
+          set -euo pipefail
+          mac_asset="$(find release-assets -maxdepth 1 -name 'ProTimer-Studio-*-arm64.dmg' -print -quit)"
+          windows_setup="$(find release-assets -maxdepth 1 -name 'ProTimer-Studio-Setup-*.exe' -print -quit)"
+          windows_portable="$(find release-assets -maxdepth 1 -name 'ProTimer-Studio-*-portable.exe' -print -quit)"
+          checksums="release-assets/SHA256SUMS.txt"
+
+          test -n "$mac_asset"
+          test -n "$windows_setup"
+          test -n "$windows_portable"
+          test -f "$checksums"
+
+          gh release create "${GITHUB_REF_NAME}" \
+            "${mac_asset}#macOS Apple Silicon installer (recommended)" \
+            "${windows_setup}#Windows x64 installer (recommended)" \
+            "${windows_portable}#Windows x64 portable app (advanced)" \
+            "${checksums}#Optional SHA-256 checksums" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --prerelease \
+            --verify-tag \
+            --title "ProTimer Studio ${GITHUB_REF_NAME}" \
+            --generate-notes

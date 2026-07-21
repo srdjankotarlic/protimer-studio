@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ProTimer Studio — Free Stage Timer and Live Event Control</title>
-  <meta name="description" content="Free open-source stage timer, rundown, lower-third studio and multi-display control for live events. Download for Apple Silicon Mac and Windows x64.">
+  <title>ProTimer Studio | Free Stage Timer &amp; Event Rundown</title>
+  <meta name="description" content="Free stage timer, event rundown, lower-third and multi-display software for live production. Download the installer for Apple Silicon Mac or Windows x64.">
   <meta name="keywords" content="stage timer, speaker timer, event rundown software, live production timer, lower thirds, AV production, conference timer, OBS browser source, show control">
   <meta name="author" content="Srdjan Kotarlic">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
@@ -18,15 +18,15 @@
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="ProTimer Studio">
-  <meta property="og:title" content="ProTimer Studio — Free Live Event Control">
-  <meta property="og:description" content="Rundown, speaker timer, lower thirds, screen content and multiple outputs in one free local app.">
+  <meta property="og:title" content="ProTimer Studio | Free Stage Timer &amp; Event Rundown">
+  <meta property="og:description" content="Prepare NEXT, press GO and send the speaker timer, lower thirds or screen content to multiple displays.">
   <meta property="og:url" content="https://srdjankotarlic.github.io/protimer-studio/">
   <meta property="og:image" content="https://srdjankotarlic.github.io/protimer-studio/assets/social-preview.png">
-  <meta property="og:image:width" content="1440">
+  <meta property="og:image:width" content="1600">
   <meta property="og:image:height" content="900">
   <meta property="og:image:alt" content="ProTimer Studio operator workspace">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="ProTimer Studio — Free Live Event Control">
+  <meta name="twitter:title" content="ProTimer Studio | Free Stage Timer &amp; Event Rundown">
   <meta name="twitter:description" content="A free stage timer, rundown, lower-third and multi-display app for live production.">
   <meta name="twitter:image" content="https://srdjankotarlic.github.io/protimer-studio/assets/social-preview.png">
 
@@ -43,7 +43,18 @@
     "url": "https://srdjankotarlic.github.io/protimer-studio/",
     "sameAs": "https://github.com/srdjankotarlic/protimer-studio",
     "softwareHelp": "https://github.com/srdjankotarlic/protimer-studio/discussions/1",
-    "downloadUrl": "https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.2",
+    "downloadUrl": [
+      "https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-arm64.dmg",
+      "https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-Setup-0.9.0-beta.2.exe"
+    ],
+    "softwareRequirements": "Apple Silicon Mac, or Windows 10/11 x64",
+    "featureList": [
+      "Event rundown with NEXT, LIVE and GO workflow",
+      "Speaker countdown, stopwatch and clock",
+      "Lower-third template studio",
+      "Multiple fullscreen and windowed Program outputs",
+      "Phone remote, backstage view and Signal Light"
+    ],
     "license": "https://opensource.org/license/mit",
     "isAccessibleForFree": true,
     "offers": {
@@ -72,6 +83,11 @@
         "@type": "Question",
         "name": "Is ProTimer Studio free?",
         "acceptedAnswer": {"@type": "Answer", "text": "Yes. ProTimer Studio is free and open source under the MIT License. There is no account, subscription, trial limit or output watermark."}
+      },
+      {
+        "@type": "Question",
+        "name": "Which ProTimer Studio file should I download?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Apple Silicon Mac users should download the ARM64 DMG. Windows 10 or 11 x64 users should download the Setup EXE. GitHub Source code archives are for developers and do not install the app."}
       },
       {
         "@type": "Question",
@@ -105,7 +121,7 @@
       <a href="#screens">Screens</a>
       <a href="#install">Install</a>
       <a href="#faq">FAQ</a>
-      <a class="nav-download" href="https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.2">Download</a>
+      <a class="nav-download" href="#install">Download</a>
     </nav>
   </header>
 
@@ -115,10 +131,10 @@
       <div class="hero-content">
         <p class="eyebrow">Free and open source</p>
         <h1 id="hero-title">ProTimer Studio</h1>
-        <p class="hero-lead">Run the rundown, speaker timer, lower thirds and every event screen from one local app.</p>
+        <p class="hero-lead">Prepare NEXT, press GO and send the speaker timer, lower thirds or screen content to every event display from one local app.</p>
         <div class="hero-actions">
-          <a class="button primary" href="https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.2">Download public beta</a>
-          <a class="button secondary" href="https://github.com/srdjankotarlic/protimer-studio">View on GitHub</a>
+          <a class="button primary" href="https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-arm64.dmg">Download for Mac</a>
+          <a class="button secondary" href="https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-Setup-0.9.0-beta.2.exe">Download for Windows</a>
         </div>
         <div class="hero-facts" aria-label="Product facts">
           <span>macOS Apple Silicon</span>
@@ -136,6 +152,30 @@
           <h2 id="problem-title">One operator view. One source of truth.</h2>
         </div>
         <p>Prepare NEXT without changing LIVE, keep Program visible, route it to several destinations and give speakers, crew and stream operators the views they need. The core workflow stays on your computer and production LAN.</p>
+      </div>
+    </section>
+
+    <section class="workflow" aria-labelledby="workflow-title">
+      <div class="section-inner">
+        <p class="eyebrow">Three-step workflow</p>
+        <h2 id="workflow-title">From rundown to every screen</h2>
+        <div class="workflow-steps">
+          <article>
+            <span>01</span>
+            <h3>Build the rundown</h3>
+            <p>Create cues or paste rows from Excel and Google Sheets. Selecting a row prepares NEXT without changing LIVE.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Press GO</h3>
+            <p>GO NEXT updates the live cue and timer together. Program remains the operator's source of truth.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Route Program</h3>
+            <p>Send the timer, lower third or screen content to several fullscreen, windowed or precisely sized outputs.</p>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -196,25 +236,35 @@
     <section class="install" id="install" aria-labelledby="install-title">
       <div class="section-inner">
         <p class="eyebrow">Public beta downloads</p>
-        <h2 id="install-title">Choose your computer</h2>
+        <h2 id="install-title">Download one installer</h2>
+        <p class="download-guidance"><strong>Choose the recommended file for your computer.</strong> GitHub's automatic <code>Source code</code> ZIP and TAR.GZ files are for developers and will not install ProTimer Studio.</p>
         <div class="install-grid">
           <article>
             <div class="platform-head"><h3>macOS</h3><span>Apple Silicon</span></div>
-            <p>DMG for M-series Macs. The beta is ad-hoc signed but not Apple notarized, so first launch requires macOS Privacy &amp; Security approval.</p>
-            <a class="button primary" href="https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-arm64.dmg">Download DMG</a>
+            <ol class="install-steps">
+              <li>Download the DMG for an M1 or newer Mac.</li>
+              <li>Open it and drag ProTimer Studio to Applications.</li>
+              <li>Approve the first launch in Privacy &amp; Security if macOS asks.</li>
+            </ol>
+            <a class="button primary" href="https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-arm64.dmg">Download macOS DMG</a>
           </article>
           <article>
             <div class="platform-head"><h3>Windows</h3><span>x64 beta</span></div>
-            <p>Installer and portable versions for Windows 10/11 x64. SmartScreen may warn because Authenticode signing is not yet available.</p>
-            <div class="platform-actions">
-              <a class="button primary" href="https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-Setup-0.9.0-beta.2.exe">Download installer</a>
-              <a class="button secondary" href="https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-portable.exe">Portable app</a>
-            </div>
+            <ol class="install-steps">
+              <li>Download Setup for Windows 10 or 11 x64.</li>
+              <li>Run the installer and follow the prompts.</li>
+              <li>Allow private-network access for remote and browser views.</li>
+            </ol>
+            <a class="button primary" href="https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-Setup-0.9.0-beta.2.exe">Download Windows Setup</a>
+            <details class="advanced-download">
+              <summary>Need a no-install version?</summary>
+              <p>The <a href="https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-portable.exe">portable EXE</a> is intended for advanced users who cannot install software.</p>
+            </details>
           </article>
         </div>
         <div class="integrity-note">
           <strong>Verify your download.</strong>
-          <span>Every release includes <code>SHA256SUMS.txt</code>. Download only from the official GitHub repository.</span>
+          <span>Every release includes <a href="https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/SHA256SUMS.txt"><code>SHA256SUMS.txt</code></a>. Download only from the official repository and see the <a href="https://github.com/srdjankotarlic/protimer-studio/releases/tag/v0.9.0-beta.2">release details</a> when needed.</span>
         </div>
       </div>
     </section>
@@ -241,6 +291,10 @@
         </div>
         <div class="faq-list">
           <details open>
+            <summary>Which file should I download?</summary>
+            <p>Apple Silicon Mac users need the ARM64 DMG. Windows 10/11 x64 users should choose the Setup EXE. Do not download GitHub's Source code ZIP or TAR.GZ files unless you are building the app yourself.</p>
+          </details>
+          <details>
             <summary>Is it really free?</summary>
             <p>Yes. The MIT License permits use, modification and redistribution. There is no account, subscription, trial limit or output watermark.</p>
           </details>

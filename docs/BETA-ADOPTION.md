@@ -29,13 +29,26 @@ Ask for the app version, OS, CPU, display arrangement and exact reproduction ste
 
 ## Natural outreach copy
 
-### Suggested post
+### Suggested Reddit post
 
-I built ProTimer Studio, a free open-source rundown, stage timer, lower-third and multi-display tool for live events. I am looking for a few operators who can test it off-air and tell me what is unclear or fails on their setup.
+**Title:** I built a free open-source stage timer and rundown app - looking for off-air testers
 
-Mac and Windows beta: https://srdjankotarlic.github.io/protimer-studio/
+I built ProTimer Studio for live-event teams that need a rundown, speaker timer, messages, lower thirds and multiple screen outputs in one local app.
 
-Use a real screenshot or a short unedited workflow recording. Do not describe the app as OBS/vMix certified, fully translated into 37 languages, signed, notarized or production-proven.
+Create or import a rundown, prepare the next cue, press GO to make it live, then send the timer or screen content to one or more displays.
+
+It is free, open source, and available for Apple Silicon Mac and Windows:
+https://srdjankotarlic.github.io/protimer-studio/
+
+I am looking for operators willing to test it off-air and tell me what is confusing or breaks on their setup.
+
+Disclosure: I am the creator and development was AI-assisted. The packaged Mac build was tested on a real two-display setup; Windows still needs physical beta feedback.
+
+Use the real product image below with the post:
+
+![ProTimer Studio Reddit promo](images/reddit-promo.png)
+
+Do not describe the app as OBS/vMix certified, signed, notarized or production-proven.
 
 ## Feedback and metrics
 

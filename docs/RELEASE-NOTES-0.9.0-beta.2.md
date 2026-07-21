@@ -2,6 +2,19 @@
 
 Beta 2 focuses on reliability, operator clarity and honest public testing.
 
+## Install
+
+Most users should download exactly one recommended installer:
+
+| Your computer | Download |
+|---|---|
+| Apple Silicon Mac (M1 or newer) | [`ProTimer-Studio-0.9.0-beta.2-arm64.dmg`](https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-arm64.dmg) |
+| Windows 10/11 x64 | [`ProTimer-Studio-Setup-0.9.0-beta.2.exe`](https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-Setup-0.9.0-beta.2.exe) |
+
+Do not download GitHub's automatic **Source code** ZIP or TAR.GZ files to install ProTimer Studio. They are developer archives and do not contain an installer.
+
+The [Windows portable EXE](https://github.com/srdjankotarlic/protimer-studio/releases/download/v0.9.0-beta.2/ProTimer-Studio-0.9.0-beta.2-portable.exe) is an advanced no-install option. Most Windows users should choose Setup. `SHA256SUMS.txt` is optional and lets you verify file integrity.
+
 ## What changed
 
 - Matching left and right sidebar toggles keep navigation and utility controls explicit; responsive drawers preserve access from 1440x900 down to 900x600.
@@ -17,13 +30,6 @@ Beta 2 focuses on reliability, operator clarity and honest public testing.
 The complete source and packaged suites each passed **320/320 checks** on the designated `PHL 243V7` display, with no test window on the HP display. The run covered timer/GO state, responsive operator access, multi-output routing, screen content, local network views and the full Lower Third Studio Preview/Take/Hide workflow.
 
 Packaged fixtures also proved PNG/JPG/SVG rendering, MP4 playback and WebM VP8/VP9 alpha compositing inside Electron. This does not certify external OBS or vMix alpha behavior.
-
-## Downloads
-
-- `ProTimer-Studio-0.9.0-beta.2-arm64.dmg`: Apple Silicon Mac.
-- `ProTimer-Studio-Setup-0.9.0-beta.2.exe`: Windows 10/11 x64 installer.
-- `ProTimer-Studio-0.9.0-beta.2-portable.exe`: Windows 10/11 x64 without installation.
-- `SHA256SUMS.txt`: integrity checksums for all downloads.
 
 ## Important beta notes
 
